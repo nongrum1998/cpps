@@ -5,10 +5,7 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./eslint.config.js": "./eslint.config.js",
-    "./prettier.config.js": "./prettier.config.js",
-    "./tsconfig.base.json": "./tsconfig.base.json"
+    ".": "./src/index.ts"
   },
   "scripts": {
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
@@ -16,11 +13,11 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@eslint/js": "9.39.5",
+    "@pension/eslint-config": "workspace:*",
+    "@pension/prettier-config": "workspace:*",
+    "@pension/typescript-config": "workspace:*",
     "eslint": "9.39.5",
-    "eslint-config-prettier": "10.1.2",
     "prettier": "3.2.5",
-    "typescript": "6.0.3",
-    "typescript-eslint": "^8.70.0"
+    "typescript": "6.0.3"
   }
 }
