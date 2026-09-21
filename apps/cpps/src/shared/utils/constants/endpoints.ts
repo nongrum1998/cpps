@@ -8,20 +8,18 @@
  * readonly; reference them instead of hardcoding path strings.
  */
 export const ENDPOINTS = {
+  BASE_URL: process.env.EXPO_PUBLIC_API_URL,
   /** Authentication-related endpoints for the pensioner portal and DAT API. */
   AUTH: {
     /** Main app login. */
-    LOGIN: '/login/',
-    /** DAT API login, requires `EXPO_PUBLIC_DAT_API_URL`. */
-    DAT_LOGIN: `${process.env.EXPO_PUBLIC_DAT_API_URL}/login`,
+    LOGIN: '/login',
     /** Main app logout. */
-    LOGOUT: '/logout/',
+    LOGOUT: '/logout',
     /** DAT API logout, requires `EXPO_PUBLIC_DAT_API_URL`. */
-    DAT_LOGOUT: `${process.env.EXPO_PUBLIC_DAT_API_URL}/login`,
     /** Token validation endpoint for the main app. */
     VALIDATE_TOKEN: '/api/validate_token/',
     /** Fetches the current authenticated user. */
-    CURRENT_USER: '/current-user/',
+    USER: '/user',
   },
 
   /** User profile and account management endpoints. */

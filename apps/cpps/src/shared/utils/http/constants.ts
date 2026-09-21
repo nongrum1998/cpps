@@ -19,7 +19,7 @@ export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL as string;
  * against `originalRequest.url` (e.g. `/login/`), which is why the values
  * include their leading/trailing slashes.
  */
-export const AUTH_PATHS = ['/login/', '/api/validate_token/', '/logout'] as const;
+export const AUTH_PATHS = ['/login', '/logout', '/user'] as const;
 
 /**
  * Checks if a given URL is one of the authentication-related paths.

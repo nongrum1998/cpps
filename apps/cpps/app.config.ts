@@ -44,26 +44,26 @@ function getBundleId(base: string): string {
 function getAppName(): string {
   switch (variant) {
     case 'development':
-      return `Pension [dev]`;
+      return `CPPS [dev]`;
     case 'preview':
-      return `Pension [Preview]`;
+      return `CPPS [Preview]`;
     case 'production':
-      return 'Pension';
+      return 'CPPS';
     default:
-      return `Pension [dev]`;
+      return `CPPS [dev]`;
   }
 }
 
 function getSchemaName(): string {
   switch (variant) {
     case 'development':
-      return `pension-dev`;
+      return `cpps-dev`;
     case 'preview':
-      return `pension-preview`;
+      return `cpps-preview`;
     case 'production':
-      return 'pension';
+      return 'cpps';
     default:
-      return `pension-dev`;
+      return `cpps-dev`;
   }
 }
 
@@ -146,7 +146,7 @@ const config: ExpoConfig = {
           enableShrinkResourcesInReleaseBuilds: true,
 
           // usesCleartextTraffic: false -> FORBID plain http:// on ALL Android
-          // versions; only https:// is allowed. Protects the pensioner photo
+          // versions; only https:// is allowed. Protects the cppser photo
           // and PII in transit. (Android 9/API 28+ blocks cleartext by default;
           // this also enforces it on 7.x/8.x devices -> fail-secure.)
           usesCleartextTraffic: variant !== 'production' ? true : false,

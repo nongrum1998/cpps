@@ -8,9 +8,7 @@
 import { TokenStoreManager } from '@stores/token.store';
 import { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { ApiResponse } from '@sharedTypes/api';
-import { logger } from '@utils/logger';
 import { ENDPOINTS } from '@utils/constants/endpoints';
-import { LoginT } from '@sharedTypes/auth';
 import { triggerSessionExpired } from './session-expired-handler';
 import {
   failedQueue,
@@ -215,8 +213,7 @@ export const handleResponse = <T>(response: AxiosResponse<T>): ApiResponse<T> =>
   };
 };
 
-interface LoginResponseT extends LoginT {
-  renew_token: string;
+interface LoginResponseT {
   token: string;
 }
 
@@ -225,48 +222,18 @@ export const handleLoginResponse = async (response: AxiosResponse) => {
 
   if (response.status !== 200) return response;
   // Safely check if the request path matches the login endpoint, ignoring query parameters
-  const isLoginEndpoint = requestUrl.split('?')[0].endsWith(ENDPOINTS.AUTH.LOGIN);
-  const isDatLogin = requestUrl.split('?')[0].endsWith(ENDPOINTS.AUTH.DAT_LOGIN);
+  const isLoginEndpoint = requestUrl === ENDPOINTS.AUTH.LOGIN;
 
-  // handle dat login
-  if (isDatLogin && response.data) {
-    const data = response.data.data as Omit<LoginResponseT, 'renew_token'>;
-    try {
-      if (data.token) {
-        logger.info('Setting DAT Token');
-        await TokenStoreManager.addDatAccessToken(data.token);
-        logger.info('Token DAT Set');
-      }
-    } catch (error) {
-      logger.error('Failed to save dat tokens to store', error);
-      return Promise.reject(error);
-    }
-  }
-
-  // Axios only passes 2xx status codes to this handler by default
-  if (isLoginEndpoint && response.data) {
-    const data = response.data as LoginResponseT;
+  if (response.data && isLoginEndpoint) {
+    const data = response.data.data as LoginResponseT;
 
     try {
       if (data.token) {
-        logger.info('Setting Token');
         await TokenStoreManager.addAccessToken(data.token);
-        logger.info('Token Set');
-      }
-
-      if (data.renew_token) {
-        logger.info('Setting Refresh Token');
-        await TokenStoreManager.addRefreshToken(data.renew_token);
-        logger.info('Refresh Token Set');
       }
     } catch (error) {
-      logger.error('Failed to save tokens to store', error);
       return Promise.reject(error);
     }
-
-    // Strip tokens from the response payload returned to callers
-    const { token, renew_token, ...userData } = data;
-    response.data = userData;
   }
 
   return response;
@@ -286,7 +253,7 @@ export const handleRefreshTokenResponse = async (
       return new Promise((resolve, reject) => {
         failedQueue.push({
           resolve: (token: string) => {
-            originalRequest.headers.Authorization = `accessToken ${token}`;
+            originalRequest.headers.Authorization = `Bearer ${token}`;
             resolve(apiClient(originalRequest));
           },
           reject,
@@ -302,7 +269,7 @@ export const handleRefreshTokenResponse = async (
       processQueue(null, newToken);
 
       if (originalRequest.headers) {
-        originalRequest.headers.Authorization = `accessToken ${newToken}`;
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
       }
       return apiClient(originalRequest);
     } catch (refreshError) {

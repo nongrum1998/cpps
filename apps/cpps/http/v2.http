@@ -127,3 +127,44 @@ Content-Type: application/json
 # "success": true | false
 # }
 # ----------------------------
+
+### get-user 
+POST {{BASE_URL}}/user
+
+# ----------------------------
+# Payload
+# ----------------------------
+# { 
+#   "pp_no":"[Redacted]"
+# }
+# ----------------------------
+
+{ }
+
+# ----------------------------
+# Response
+# ----------------------------
+# {
+# "data": {
+#   "app_date": "string",
+#   "app_exp": "string",
+#   "bank_accno": "string",
+#   "dob": "string",
+#   "gender": "string",
+#   "member_id": "string",
+#   "mtype": "string",
+#   "pclass": "string",
+#   "pclass_cd": "string",
+#   "photo": "string",
+#   "pname": "string",
+#   "ppo_id": "string",
+#   "ppo_no": "string",
+#   "ptype_cd": "string",
+#   "rela": "string",
+#   "trea_code": "string",
+#   "treasury_name": "string"
+#  },
+#  "message": "string",
+#  "status": "boolean"
+# }
+# ----------------------------

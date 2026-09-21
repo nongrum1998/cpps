@@ -1,72 +1,51 @@
 /**
- * @file Axios request interceptor — attaches access token and device headers.
+ * @file Axios request interceptor — attaches the access token and encrypts
+ * request payloads.
  *
- * Adds a trace ID, device type, association slug, and Bearer token (if available)
- * to every outgoing request.
+ * Adds the Bearer access token to outgoing requests when available.
+ * Plain-object request bodies are automatically encrypted and wrapped with
+ * the required payload format. Pre-serialized request bodies are passed
+ * through unchanged.
  */
 
-// import { encryptFields } from '@lib/encryption';
 import { encryptFields } from '@lib/encryption';
 import { TokenStoreManager } from '@stores/token.store';
-import { ENDPOINTS } from '@utils/constants';
-import { logger } from '@utils/logger';
 import type { InternalAxiosRequestConfig } from 'axios';
 
 /**
- * Creates the request interceptor that attaches the access token and device headers
- * to every outgoing request.
+ * Creates the Axios request interceptor that attaches the access token
+ * and encrypts eligible request bodies.
  *
- * Body handling: only plain-object bodies are auto-encrypted and stamped with
- * `version`. Pre-serialized bodies (`string`, `URLSearchParams`, `FormData`) are
- * passed through untouched so callers can control their exact wire format
- * (e.g. `application/x-www-form-urlencoded` login payloads) and to prevent
- * double-encrypting values that are already encrypted.
+ * Body handling:
+ * - Plain-object bodies are automatically encrypted.
+ * - Pre-serialized bodies such as strings, URLSearchParams, and FormData
+ *   are passed through unchanged.
  *
- * @returns The request interceptor function.
+ * This prevents double-encrypting payloads and allows callers to control
+ * the exact wire format when required, such as for
+ * `application/x-www-form-urlencoded` requests.
+ *
+ * @returns The Axios request interceptor function.
  */
-const skipEncUrl: string[] = [
-  ENDPOINTS.VERIFICATION.VERIFICATION,
-  ENDPOINTS.AUTH.DAT_LOGIN,
-  ENDPOINTS.PENSIONER_STATEMENTS.SIX_MONTH_STATEMENTS,
-  ENDPOINTS.AUTH.DAT_LOGOUT,
-];
-
-const baererTokenUrl: string[] = [
-  ENDPOINTS.PENSIONER_STATEMENTS.SIX_MONTH_STATEMENTS,
-  ENDPOINTS.AUTH.DAT_LOGOUT,
-];
-
 export const createRequestInterceptor = () => {
   return async (config: InternalAxiosRequestConfig) => {
-    if (__DEV__) {
-      logger.log(`Request: ${config.method} ${config.url}`);
-    }
     const accessToken = await TokenStoreManager.getAccessToken();
 
-    const isBaerer: boolean = baererTokenUrl.includes(config.url || '');
-
-    if (accessToken && !isBaerer) {
-      config.headers.Authorization = `accessToken ${accessToken}`;
+    if (accessToken && !config.headers.Authorization) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
-    // Pre-serialized bodies must reach the server byte-for-byte: spreading a
-    // URLSearchParams or FormData instance into an object literal yields an
-    // empty object (their entries are not own enumerable properties), which
-    // silently destroys the payload. Strings would likewise be exploded into
-    // indexed character objects by object spread.
-    const isPreSerializedBody =
-      typeof config.data === 'string' ||
-      config.data instanceof URLSearchParams ||
-      config.data instanceof FormData;
-
-    if (!skipEncUrl.includes(config?.url || '/login/')) {
-      if (!isPreSerializedBody) {
-        config.data = {
-          ...encryptFields(config.data),
-          version: '24',
-        };
-      }
+    if (
+      config.data &&
+      typeof config.data === 'object' &&
+      !(config.data instanceof FormData) &&
+      !(config.data instanceof URLSearchParams)
+    ) {
+      config.data = encryptFields({
+        payload: JSON.stringify(config.data),
+      });
     }
+
     return config;
   };
 };

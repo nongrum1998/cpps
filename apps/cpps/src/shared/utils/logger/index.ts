@@ -68,7 +68,8 @@ const formatData = (type: ErrorType, ...args: unknown[]): string => {
  */
 const logMethod = async (type: ErrorType, ...args: unknown[]): Promise<void> => {
   if (__DEV__) {
-    console.log(formatData(type, ...args));
+    // console.log(formatData(type, ...args));
+    return;
   }
 
   if (!__DEV__ && type !== 'LOG') {

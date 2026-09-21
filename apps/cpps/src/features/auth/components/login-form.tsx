@@ -9,9 +9,7 @@ import { Input } from '@components/ui/input';
 import { Button } from '@components/ui/button';
 import { Icon } from '@components/ui/icon';
 import { Alert, AlertDescription, AlertTitle } from '@components/ui/alert';
-import { useSnackbar } from '@hooks/use-snackbar';
 import { useNetworkStatus } from '@hooks/use-network-status';
-import { useDatLogin } from '../hooks/use-dat-login';
 
 const defaultValues = {
   // DEV-ONLY convenience prefill. EXPO_PUBLIC_PPO_NO is compiled into the JS
@@ -25,9 +23,7 @@ const defaultValues = {
 
 export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const { showSnackbar } = useSnackbar();
   const { mutateAsync, isPending, isSuccess, data } = useLogin();
-  const { mutateAsync: datMutateAsync, isPending: isDatPending } = useDatLogin();
   const { isOffline } = useNetworkStatus();
 
   const form = useForm<LoginInput>({
@@ -36,14 +32,7 @@ export const LoginForm = () => {
   });
 
   const onSubmit = async (data: LoginInput) => {
-    await Promise.all([
-      await mutateAsync(data, {
-        onSuccess: (res) => {
-          if (res.success) showSnackbar('Login Success', 'info');
-        },
-      }),
-      await datMutateAsync(data),
-    ]);
+    await mutateAsync(data);
   };
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
@@ -132,7 +121,7 @@ export const LoginForm = () => {
       {/* Submit Button */}
       <Button
         testID="login-submit"
-        isLoading={isPending || isDatPending}
+        isLoading={isPending}
         size="lg"
         disabled={isPending || isOffline}
         onPress={form.handleSubmit(onSubmit)}

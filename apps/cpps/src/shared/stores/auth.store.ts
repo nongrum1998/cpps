@@ -34,9 +34,8 @@ export const useAuthStore = create<AuthStore>()(
         const accessToken = await TokenStoreManager.getAccessToken();
         if (accessToken) {
           try {
-            const res = await http.post<UserT>(ENDPOINTS.AUTH.CURRENT_USER);
-
-            if (res.success && res.data) {
+            const res = await http.post<UserT>(ENDPOINTS.AUTH.USER, {});
+            if (res.data && res.success) {
               set({
                 user: res.data,
                 isSignedIn: true,
@@ -58,18 +57,9 @@ export const useAuthStore = create<AuthStore>()(
         try {
           set({ isAuthLoading: true });
           const accessToken = await TokenStoreManager.getAccessToken();
-          const datAccessToken = await TokenStoreManager.getDatAccessToken();
 
           if (accessToken) {
             await http.post(ENDPOINTS.AUTH.LOGOUT);
-          }
-
-          if (datAccessToken) {
-            await http.post(
-              ENDPOINTS.AUTH.DAT_LOGOUT,
-              { token: datAccessToken },
-              { headers: { Authorization: `Bearer ${datAccessToken}` } }
-            );
           }
         } catch (error) {
           logger.error('AuthStore: logout API call failed', error);

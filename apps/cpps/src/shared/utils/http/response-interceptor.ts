@@ -10,6 +10,8 @@ import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axio
 
 import { isAuthPath } from './constants';
 import { handleLoginResponse, handleRefreshTokenResponse } from './response';
+import { TokenStoreManager } from '@stores/token.store';
+import { ENDPOINTS } from '@utils/constants';
 
 /**
  * Creates the response interceptor that handles 401 errors by attempting
@@ -25,12 +27,11 @@ import { handleLoginResponse, handleRefreshTokenResponse } from './response';
 export const createResponseInterceptor = () => {
   return [
     async (response: AxiosResponse) => {
-      await handleLoginResponse(response);
+      const res = await handleLoginResponse(response);
       // Capture the return value - it may be the retried response after token refresh
-      const refreshedResponse = await handleRefreshTokenResponse(response);
 
       // Return the refreshed response if token was refreshed, otherwise original
-      return refreshedResponse;
+      return res;
     },
 
     async (error: AxiosError) => {
@@ -43,6 +44,10 @@ export const createResponseInterceptor = () => {
       }
 
       const requestPath = originalRequest.url ?? '';
+
+      if (requestPath === ENDPOINTS.AUTH.USER) {
+        await TokenStoreManager.removeTokens();
+      }
 
       if (isAuthPath(requestPath)) {
         if (error.response) return Promise.resolve(error.response);
