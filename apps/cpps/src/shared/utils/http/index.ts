@@ -1,9 +1,11 @@
+/**
+ * @file Public API for the shared HTTP client.
+ *
+ * Exposes the configured axios instance, the typed `http` wrapper, and the
+ * shared client constants. Internal modules (interceptor factories and the
+ * normalizers) are intentionally not re-exported.
+ */
+
 export { default } from './client';
 export * from './constants';
 export * from './http';
-export * from './request-interceptor';
-export * from './response';
-export * from './response-interceptor';
-export * from './session-expired-handler';
-export * from './token-refresher';
-export { tokenRefreshClient } from './token-refresh-client';
