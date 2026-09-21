@@ -1,5 +1,6 @@
 # ── Dependencies ────────────────────────────────────────────────
 node_modules/
+npm-debug.*
 
 # ── Expo / Metro ────────────────────────────────────────────────
 .expo/
@@ -19,9 +20,19 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
-# ── Worktrees / scratch ─────────────────────────────────────────
+# ── Native ios/android dirs (generated per app by EAS/prebuild) ─
+apps/*/ios/
+apps/*/android/
+
+# ── Worktrees / scratch / residue ───────────────────────────────
 .worktrees
 .metro-health-check*
+*.orig.*
+ignore*
+
+# ── Per-app tooling caches / local env files ────────────────────
+apps/*/.export-verify
+apps/*/http/http-client.env.json
 
 # ── App's pre-monorepo git history (archived, never committed) ──
 # apps/pension was its own git repo before the monorepo was created.
