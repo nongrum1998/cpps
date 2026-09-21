@@ -2,8 +2,10 @@
   "name": "pension-workspace",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter cssp-mobile dev",
-    "export": "pnpm --filter cssp-mobile export",
+    "dev": "pnpm --filter pension dev",
+    "dev:cpps": "pnpm --filter cpps dev",
+    "export": "pnpm --filter pension export",
+    "export:cpps": "pnpm --filter cpps export",
     "lint": "pnpm -r lint",
     "format": "pnpm -r format",
     "test": "pnpm -r test"
