@@ -1,0 +1,14 @@
+{
+  "name": "pension",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter pension dev",
+    "android": "pnpm --filter pension android",
+    "ios": "pnpm --filter meghalaya ios",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test"
+  },
+  "dependencies": {
+    "typescript": "6.0.3"
+  }
+}

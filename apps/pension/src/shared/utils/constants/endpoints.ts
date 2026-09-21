@@ -1,0 +1,66 @@
+/**
+ * Central registry of all API endpoint paths used by the app.
+ *
+ * Grouped by feature area (auth, user, verification, DLC, documentation, and
+ * pension statements). Some values are built from environment variables:
+ * DAT-related endpoints use `EXPO_PUBLIC_DAT_API_URL` and are therefore only
+ * defined when that variable is set at build time. Treat all values as
+ * readonly; reference them instead of hardcoding path strings.
+ */
+export const ENDPOINTS = {
+  /** Authentication-related endpoints for the pensioner portal and DAT API. */
+  AUTH: {
+    /** Main app login. */
+    LOGIN: '/login/',
+    /** DAT API login, requires `EXPO_PUBLIC_DAT_API_URL`. */
+    DAT_LOGIN: `${process.env.EXPO_PUBLIC_DAT_API_URL}/login`,
+    /** Main app logout. */
+    LOGOUT: '/logout/',
+    /** DAT API logout, requires `EXPO_PUBLIC_DAT_API_URL`. */
+    DAT_LOGOUT: `${process.env.EXPO_PUBLIC_DAT_API_URL}/login`,
+    /** Token validation endpoint for the main app. */
+    VALIDATE_TOKEN: '/api/validate_token/',
+    /** Fetches the current authenticated user. */
+    CURRENT_USER: '/current-user/',
+  },
+
+  /** User profile and account management endpoints. */
+  USER: {
+    /** Checks whether a pensioner is already registered. */
+    REGISTRATION_STATUS: '/get_registration_status/',
+    /** Creates a new pensioner record. */
+    CREATE_PENSIONER: '/api/create_pensioner/',
+    /** Changes the user's password. */
+    CHANGE_PASSWORD: '/api/change_password/',
+    /** Updates the user's profile. */
+    UPDATE_PROFILE: '/api/update_profile/',
+  },
+
+  /** Verification-related endpoints. */
+  VERIFICATION: {
+    /** Submits or retrieves verification data. */
+    VERIFICATION: '/api/verification/',
+    /** Retrieves verification status. */
+    STATUS: '/api/verification_status/',
+  },
+
+  /** DLC (life certificate) endpoints. */
+  DLC: {
+    /** Creates a life certificate. */
+    CREATE: '/api/lc/',
+  },
+
+  /** External documentation URLs. */
+  DOCUMENTATION: {
+    /** Pensioner manual hosted on shillong.meg.nic.in. */
+    MANUAL: 'https://shillong.meg.nic.in/manual.html',
+    /** Privacy policy hosted on shillong.meg.nic.in. */
+    POLICY: 'https://shillong.meg.nic.in/privacy_policy.html',
+  },
+  /** Pension statement endpoints on the DAT API. */
+  PENSIONER_STATEMENTS: {
+    /** Fetches the six-month pension statement, requires
+     * `EXPO_PUBLIC_DAT_API_URL`. */
+    SIX_MONTH_STATEMENTS: `${process.env.EXPO_PUBLIC_DAT_API_URL}/paymentslip`,
+  },
+} as const;

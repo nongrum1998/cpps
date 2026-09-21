@@ -1,0 +1,22 @@
+### Encrypt helper
+POST http://localhost:3000/api/cpps/PensionersApp/v1/encrypt
+Content-Type: application/json
+
+{ 
+    "uid":"{{UID_ENCRYPTED}}",
+}
+
+### Decrypt helper
+POST http://localhost:3000/api/cpps/PensionersApp/v1/decrypt
+Content-Type: application/json
+
+{
+  "payload":"{{DECRYPT_PAYLOAD}}"
+}
+
+### format-password helper
+POST http://localhost:3000/api/cpps/PensionersApp/v1/format-password
+
+{
+  "password":"{{PASSWORD}}"
+}

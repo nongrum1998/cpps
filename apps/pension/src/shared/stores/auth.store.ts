@@ -1,0 +1,130 @@
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import * as SecureStore from 'expo-secure-store';
+import { UserT } from '../types/auth';
+import { TokenStoreManager } from '@stores/token.store';
+import { logger } from '@utils/logger';
+import { http } from '@utils/http';
+import { ENDPOINTS } from '@utils/constants';
+
+type AuthStore = {
+  user?: UserT | null;
+  isSignedIn: boolean;
+  isAuthLoading: boolean;
+
+  // TODO: remove this and handle with current-user
+  setUser: (data: UserT) => void;
+  fetchUser: () => Promise<void>;
+  refresh: () => void;
+  reset: () => void;
+  logout: () => Promise<void>;
+  _hydrate: () => Promise<void>;
+};
+
+export const useAuthStore = create<AuthStore>()(
+  persist(
+    (set, get) => ({
+      user: null,
+      isSignedIn: true,
+      isAuthLoading: true,
+
+      setUser: (data) => set({ user: data, isAuthLoading: false, isSignedIn: true }),
+
+      fetchUser: async (keepStaleOnError?: boolean) => {
+        const accessToken = await TokenStoreManager.getAccessToken();
+        if (accessToken) {
+          try {
+            const res = await http.post<UserT>(ENDPOINTS.AUTH.CURRENT_USER);
+
+            if (res.success && res.data) {
+              set({
+                user: res.data,
+                isSignedIn: true,
+                isAuthLoading: false,
+              });
+            } else {
+              get().reset();
+            }
+          } catch {
+            if (!keepStaleOnError) {
+              get().reset();
+            }
+          }
+        }
+      },
+      refresh: () => get().fetchUser(),
+      reset: () => set({ user: null, isSignedIn: false }),
+      logout: async () => {
+        try {
+          set({ isAuthLoading: true });
+          const accessToken = await TokenStoreManager.getAccessToken();
+          const datAccessToken = await TokenStoreManager.getDatAccessToken();
+
+          if (accessToken) {
+            await http.post(ENDPOINTS.AUTH.LOGOUT);
+          }
+
+          if (datAccessToken) {
+            await http.post(
+              ENDPOINTS.AUTH.DAT_LOGOUT,
+              { token: datAccessToken },
+              { headers: { Authorization: `Bearer ${datAccessToken}` } }
+            );
+          }
+        } catch (error) {
+          logger.error('AuthStore: logout API call failed', error);
+        }
+
+        await TokenStoreManager.removeTokens();
+        get().reset();
+
+        try {
+          const { queryClient } = await import('@utils/react-query');
+          queryClient.clear();
+        } catch (error) {
+          logger.error('Error Logout Query Clear', error);
+        }
+        set({ isAuthLoading: false });
+      },
+
+      _hydrate: async () => {
+        try {
+          const accessToken = await TokenStoreManager.getAccessToken();
+          if (accessToken) {
+            await get().fetchUser();
+          } else {
+            get().reset();
+          }
+        } catch {
+          get().reset();
+        } finally {
+          set({ isAuthLoading: false });
+        }
+      },
+    }),
+    {
+      name: 'auth-storage',
+      storage: createJSONStorage(() => ({
+        getItem: async (key) => {
+          const value = await SecureStore.getItemAsync(key);
+          return value;
+        },
+        setItem: async (key, value) => {
+          return SecureStore.setItemAsync(key, value);
+        },
+        removeItem: async (key) => {
+          return SecureStore.deleteItemAsync(key);
+        },
+      })),
+
+      partialize: (state) => {
+        const partial = {
+          user: state.user,
+          isSignedIn: state.isSignedIn,
+          isAuthLoading: false,
+        };
+        return partial;
+      },
+    }
+  )
+);

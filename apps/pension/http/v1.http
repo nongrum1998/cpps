@@ -1,0 +1,96 @@
+# ============================================================================
+# cssp-mobile API playground (VSCode REST Client)
+#
+# SECURITY NOTICE:
+#   - NEVER commit real tokens, passwords, hashes, or encrypted payloads here.
+#   - Values are interpolated from your LOCAL .env at request time.
+#   - Required .env vars: BASE_URL, ACCESS_TOKEN, RENEW_TOKEN.
+#     After a fresh login, copy token= / renew_token= values into .env and
+#     keep .env gitignored.
+# ============================================================================
+
+### Current User
+POST {{BASE_URL}}/current-user/
+
+### Registration Status
+POST {{BASE_URL}}/get_registration_status/
+
+{
+  "ppo_no": "{{PPO_NO}}",
+  "version": "{{VERSION}}"
+}
+
+### Create Pensioner
+POST {{BASE_URL}}/api/create_pensioner/
+
+{
+  "ppo_no":{{USERNAME_ENCRYPTED}},
+  "dob":"{{DOB}}",
+  "bank_account_number":"{{BANK_AC_NO}}",
+  "password":"{{PPO_NO_ENCRYPTED}}"
+}
+
+### Login
+POST {{BASE_URL}}/login/
+Content-Type: application/x-www-form-urlencoded
+
+password={{PASSWORD_ENCRYPTED}}&username={{USERNAME_ENCRYPTED}}&version=24
+
+### Logout
+POST {{BASE_URL}}/logout/
+Content-Type: application/json
+Authorization: accessToken {{accessToken}}
+Accept: application/json
+
+### Verification
+POST {{BASE_URL}}/api/verification/
+Content-Type: application/x-www-form-urlencoded
+
+image_1={{IMAGE_SAMPLE_2}}&image_1={{IMAGE_SAMPLE_2}}
+
+// { 
+//    "image_1":"{{IMAGE_SAMPLE_ENCRYPTED_2}}",
+//    "image_2":"{{IMAGE_SAMPLE_ENCRYPTED_2}}",
+//    "version":"24"
+// }
+
+
+### DLC
+POST {{BASE_URL}}/api/lc/
+Content-Type: application/json
+Authorization: accessToken {{accessToken}}
+Accept: application/json
+
+{
+  "selfVerNec": "",
+  "selfVerNmc": "",
+  "device": "",
+  "device_id": "",
+  "ver_mode_code": "",
+  "self_ver_code": "",
+  "place": ""
+}
+
+### Verification Status
+POST {{BASE_URL}}/api/verification_status/
+
+{
+  "ppo_no": "{{PPO_NO}}"
+}
+
+### Change Password
+POST {{BASE_URL}}/api/change_password/
+
+{
+  "oldPassword": "",
+  "newPassword": ""
+}
+
+### Validate Token
+# @name=refresh token
+POST {{BASE_URL}}/api/validate_token/
+Content-Type: application/x-www-form-urlencoded
+
+request_token={{RENEW_TOKEN}}&uid={{UID_ENCRYPTED}}
+
+
