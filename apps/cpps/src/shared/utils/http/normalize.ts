@@ -1,23 +1,15 @@
 /**
- * @file Axios response and error handlers.
+ * @file Response and error normalizers (dependency-free leaf module).
  *
- * Contains the two helper functions used by the HTTP client to transform
- * raw Axios responses and errors into the standardised {@link ApiResponse} shape.
+ * Contains the pure helpers that transform raw Axios responses and errors into
+ * the standardised {@link ApiResponse} shape used by the HTTP client. This
+ * module imports no other application modules, so it can be unit-tested and
+ * reasoned about in isolation.
  */
 
-import { TokenStoreManager } from '@stores/token.store';
-import { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import { ApiResponse } from '@sharedTypes/api';
-import { ENDPOINTS } from '@utils/constants/endpoints';
-import { triggerSessionExpired } from './session-expired-handler';
-import {
-  failedQueue,
-  isRefreshing,
-  processQueue,
-  refreshToken,
-  setRefreshing,
-} from './token-refresher';
-import apiClient from './client';
+import type { AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
+import type { ApiResponse } from '@sharedTypes/api';
 
 /** Shape of error bodies the backend may return. */
 type BackendErrorBody = {
@@ -59,13 +51,11 @@ const isHtml = (value: unknown): value is string => {
  */
 const getErrorMessage = (message: unknown, status?: number): string => {
   if (!isHtml(message)) {
-    return typeof message === 'string' ? message : 'Something went wrong. Please try again.';
+    return typeof message === 'string' ? message : DEFAULT_ERROR_MESSAGE;
   }
 
   switch (status) {
     case 502:
-      return 'The server is temporarily unavailable. Please try again later.';
-
     case 503:
       return 'The server is temporarily unavailable. Please try again later.';
 
@@ -211,80 +201,4 @@ export const handleResponse = <T>(response: AxiosResponse<T>): ApiResponse<T> =>
     status,
     ...buildErrorFields(data, status),
   };
-};
-
-interface LoginResponseT {
-  token: string;
-}
-
-export const handleLoginResponse = async (response: AxiosResponse) => {
-  const requestUrl = response.config.url || '';
-
-  if (response.status !== 200) return response;
-  // Safely check if the request path matches the login endpoint, ignoring query parameters
-  const isLoginEndpoint = requestUrl === ENDPOINTS.AUTH.LOGIN;
-
-  if (response.data && isLoginEndpoint) {
-    const data = response.data.data as LoginResponseT;
-
-    try {
-      if (data.token) {
-        await TokenStoreManager.addAccessToken(data.token);
-      }
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  return response;
-};
-
-export const handleRefreshTokenResponse = async (
-  response: AxiosResponse
-): Promise<AxiosResponse> => {
-  const originalRequest = response.config as InternalAxiosRequestConfig & {
-    _retry?: boolean;
-  };
-
-  const refreshResponseStatus = response?.status === 202;
-
-  if (refreshResponseStatus && !originalRequest._retry) {
-    if (isRefreshing) {
-      return new Promise((resolve, reject) => {
-        failedQueue.push({
-          resolve: (token: string) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            resolve(apiClient(originalRequest));
-          },
-          reject,
-        });
-      });
-    }
-
-    originalRequest._retry = true;
-    setRefreshing(true);
-
-    try {
-      const newToken = await refreshToken();
-      processQueue(null, newToken);
-
-      if (originalRequest.headers) {
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
-      }
-      return apiClient(originalRequest);
-    } catch (refreshError) {
-      processQueue(refreshError, null);
-
-      await TokenStoreManager.removeTokens();
-
-      triggerSessionExpired();
-
-      if (response) return response;
-
-      return response;
-    } finally {
-      setRefreshing(false);
-    }
-  }
-  return response;
 };

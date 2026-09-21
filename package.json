@@ -10,8 +10,5 @@
     "format": "pnpm -r format",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck"
-  },
-  "dependencies": {
-    "typescript": "6.0.3"
   }
 }

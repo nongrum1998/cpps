@@ -1,56 +1,89 @@
 /**
- * @file Axios response interceptor — handles 401 errors with token refresh.
+ * @file Axios response interceptor — login token capture and auth-path handling.
  *
- * On a 401 response, the interceptor attempts to refresh the access token
- * transparently and retry the original request. Auth-path errors bypass the
- * refresh flow and return directly to the caller.
+ * On successful responses it captures the access token returned by the login
+ * endpoint. On errors it lets auth-path failures pass through to the caller
+ * (login/logout never trigger token machinery) and purges stored tokens when
+ * the `/user` endpoint fails. There is intentionally no 401 token refresh:
+ * the old refresh/retry machinery was never wired in and has been removed.
  */
 
-import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import type { AxiosError, AxiosResponse } from 'axios';
+
+import { TokenStoreManager } from '@stores/token.store';
+import { ENDPOINTS } from '@utils/constants/endpoints';
 
 import { isAuthPath } from './constants';
-import { handleLoginResponse, handleRefreshTokenResponse } from './response';
-import { TokenStoreManager } from '@stores/token.store';
-import { ENDPOINTS } from '@utils/constants';
+
+/** Shape of a login response body: `{ data: { token } }` when successful. */
+type LoginResponseBody = {
+  data?: {
+    token?: string;
+  };
+};
 
 /**
- * Creates the response interceptor that handles 401 errors by attempting
- * to refresh the access token and retrying the failed request.
+ * Captures the access token from a successful login response.
  *
- * Auth-path errors are returned directly to the caller without triggering
- * the refresh flow.
+ * Runs on every fulfilled response but only touches the secure store when the
+ * request targets {@link ENDPOINTS.AUTH.LOGIN} with status 200 and a body
+ * containing `data.token`. Rejects when the secure store write fails so the
+ * caller sees the storage error.
  *
- * @param apiClient - The Axios instance used to retry failed requests.
- * @returns A pair of [onFulfilled, onRejected] handlers for `axios.interceptors.response.use()`.
+ * @param response - The Axios response object.
+ * @returns The original response, after any token capture.
  */
+async function captureAccessTokenFromLogin(response: AxiosResponse): Promise<AxiosResponse> {
+  const requestUrl = response.config.url || '';
 
+  if (response.status !== 200 || requestUrl !== ENDPOINTS.AUTH.LOGIN || !response.data) {
+    return response;
+  }
+
+  const token = (response.data as LoginResponseBody).data?.token;
+
+  if (!token) {
+    return response;
+  }
+
+  try {
+    await TokenStoreManager.addAccessToken(token);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+
+  return response;
+}
+
+/**
+ * Creates the Axios response interceptor pair for `axios.interceptors.response.use()`.
+ *
+ * Fulfilled handler: captures the login token. Rejected handler: purges stored
+ * tokens when the `/user` endpoint fails, resolves auth-path errors with the
+ * raw error response (so the wrapper can normalise them), and rejects
+ * everything else unchanged.
+ *
+ * @returns A pair of [onFulfilled, onRejected] handlers.
+ */
 export const createResponseInterceptor = () => {
   return [
-    async (response: AxiosResponse) => {
-      const res = await handleLoginResponse(response);
-      // Capture the return value - it may be the retried response after token refresh
-
-      // Return the refreshed response if token was refreshed, otherwise original
-      return res;
-    },
+    captureAccessTokenFromLogin,
 
     async (error: AxiosError) => {
-      const originalRequest = error.config as InternalAxiosRequestConfig & {
-        _retry?: boolean;
-      };
-
-      if (!originalRequest) {
+      if (!error.config) {
         return Promise.reject(error);
       }
 
-      const requestPath = originalRequest.url ?? '';
+      const requestPath = error.config.url ?? '';
 
       if (requestPath === ENDPOINTS.AUTH.USER) {
         await TokenStoreManager.removeTokens();
       }
 
       if (isAuthPath(requestPath)) {
-        if (error.response) return Promise.resolve(error.response);
+        if (error.response) {
+          return Promise.resolve(error.response);
+        }
         return Promise.reject(error);
       }
 

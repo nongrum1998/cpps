@@ -42,8 +42,9 @@ Finish with `npx tsc --noEmit` → `pnpm test` → `pnpm lint`.
   and the `nativewind` jsx import source.
 - API paths: reference `ENDPOINTS`
   (`src/shared/utils/constants/endpoints.ts`) — never hardcode URL strings.
-  The app-wide axios client is `src/shared/utils/http/client.ts` (JSON, auth +
-  token-refresh interceptors).
+  The app-wide axios client is `src/shared/utils/http/client.ts` (JSON; attaches
+  the Bearer token and Fernet-encrypts object payloads; resolves auth-path errors
+  to the caller; no automatic 401 token refresh).
 - JSDoc all exported functions/hooks/components (repo-wide style). Commits are
   Conventional Commits.
 - New features: `node scripts/generate-feature.js` scaffolds the slice, then

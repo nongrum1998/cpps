@@ -1,0 +1,10 @@
+{
+  "name": "@pension/jest-config",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./jest.config.js",
+  "exports": {
+    ".": "./jest.config.js",
+    "./jest.config.js": "./jest.config.js"
+  }
+}
