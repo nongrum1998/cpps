@@ -423,27 +423,6 @@ importers:
         specifier: 6.0.3
         version: 6.0.3
 
-  packages/config:
-    devDependencies:
-      '@pension/eslint-config':
-        specifier: workspace:*
-        version: link:../eslint-config
-      '@pension/prettier-config':
-        specifier: workspace:*
-        version: link:../prettier-config
-      '@pension/typescript-config':
-        specifier: workspace:*
-        version: link:../typescript-config
-      eslint:
-        specifier: 9.39.5
-        version: 9.39.5(jiti@1.21.7)
-      prettier:
-        specifier: 3.2.5
-        version: 3.2.5
-      typescript:
-        specifier: 6.0.3
-        version: 6.0.3
-
   packages/core:
     devDependencies:
       '@pension/eslint-config':
@@ -526,6 +505,27 @@ importers:
         version: 6.0.3
 
   packages/prettier-config: {}
+
+  packages/types:
+    devDependencies:
+      '@pension/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@pension/prettier-config':
+        specifier: workspace:*
+        version: link:../prettier-config
+      '@pension/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      eslint:
+        specifier: 9.39.5
+        version: 9.39.5(jiti@1.21.7)
+      prettier:
+        specifier: 3.2.5
+        version: 3.2.5
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
 
   packages/typescript-config: {}
 
