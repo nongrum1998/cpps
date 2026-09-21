@@ -5,12 +5,26 @@
  * and typed response shapes. Each method returns a consistent {@link ApiResponse} shape.
  */
 
-import { type AxiosRequestConfig } from 'axios';
-
-import { type ApiResponse } from '@sharedTypes/api';
+import type { AxiosRequestConfig, AxiosResponse } from 'axios';
+import type { ApiResponse } from '@sharedTypes/api';
 
 import apiClient from './client';
-import { handleAxiosError, handleResponse } from './response';
+import { handleAxiosError, handleResponse } from './normalize';
+
+/**
+ * Executes an Axios call and maps the result into the standard {@link ApiResponse}.
+ * Centralises the try/catch every method used to repeat.
+ *
+ * @param executor - Thunk performing the Axios call for one HTTP method.
+ * @returns A promise resolving to a typed {@link ApiResponse}.
+ */
+const request = async <T>(executor: () => Promise<AxiosResponse<T>>): Promise<ApiResponse<T>> => {
+  try {
+    return handleResponse<T>(await executor());
+  } catch (error) {
+    return handleAxiosError<T>(error);
+  }
+};
 
 /**
  * Typed HTTP client with `get`, `post`, `put`, and `delete` methods.
@@ -36,14 +50,8 @@ export const http = {
    * @param config - Optional Axios request config.
    * @returns A promise resolving to a typed {@link ApiResponse}.
    */
-  get: async <T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> => {
-    try {
-      const response = await apiClient.get(url, config);
-      return handleResponse<T>(response);
-    } catch (error) {
-      return handleAxiosError<T>(error);
-    }
-  },
+  get: <T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> =>
+    request(() => apiClient.get<T>(url, config)),
 
   /**
    * Sends a POST request.
@@ -55,18 +63,11 @@ export const http = {
    * @param config - Optional Axios request config.
    * @returns A promise resolving to a typed {@link ApiResponse}.
    */
-  post: async <T>(
+  post: <T>(
     url: string,
     data?: object | string,
     config?: AxiosRequestConfig
-  ): Promise<ApiResponse<T>> => {
-    try {
-      const response = await apiClient.post(url, data, config);
-      return handleResponse<T>(response);
-    } catch (error) {
-      return handleAxiosError<T>(error);
-    }
-  },
+  ): Promise<ApiResponse<T>> => request(() => apiClient.post<T>(url, data, config)),
 
   /**
    * Sends a PUT request.
@@ -76,18 +77,8 @@ export const http = {
    * @param config - Optional Axios request config.
    * @returns A promise resolving to a typed {@link ApiResponse}.
    */
-  put: async <T>(
-    url: string,
-    data?: object,
-    config?: AxiosRequestConfig
-  ): Promise<ApiResponse<T>> => {
-    try {
-      const response = await apiClient.put(url, data, config);
-      return handleResponse<T>(response);
-    } catch (error) {
-      return handleAxiosError<T>(error);
-    }
-  },
+  put: <T>(url: string, data?: object, config?: AxiosRequestConfig): Promise<ApiResponse<T>> =>
+    request(() => apiClient.put<T>(url, data, config)),
 
   /**
    * Sends a DELETE request.
@@ -96,12 +87,6 @@ export const http = {
    * @param config - Optional Axios request config.
    * @returns A promise resolving to a typed {@link ApiResponse}.
    */
-  delete: async <T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> => {
-    try {
-      const response = await apiClient.delete(url, config);
-      return handleResponse<T>(response);
-    } catch (error) {
-      return handleAxiosError<T>(error);
-    }
-  },
+  delete: <T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> =>
+    request(() => apiClient.delete<T>(url, config)),
 };
