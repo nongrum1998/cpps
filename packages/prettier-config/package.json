@@ -1,0 +1,10 @@
+{
+  "name": "@pension/prettier-config",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./prettier.config.js",
+  "exports": {
+    ".": "./prettier.config.js",
+    "./prettier.config.js": "./prettier.config.js"
+  }
+}
