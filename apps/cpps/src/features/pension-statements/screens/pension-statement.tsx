@@ -6,7 +6,7 @@ import { PensionerStatementListItem, PensionerStatementListSkeleton } from '../c
 import type { PensionerStatement } from '../types';
 import { Button } from '@components/ui';
 import { PAGE_ROUTES } from '@utils/constants';
-import { FooterImg, NicBanner, Ternary } from '@components/common';
+import { FooterImg, Ternary } from '@components/common';
 import { useSafeNavigation } from '@hooks/use-safe-navigation';
 import { usePdfPreviewStore } from '@stores/pdf-preview';
 import { EmptyScreen } from '@components/screens';
