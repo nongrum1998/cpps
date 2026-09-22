@@ -32,7 +32,6 @@ export const PensionStatementScreen = () => {
   const uri = statements?.pdf;
   const setPdf = usePdfPreviewStore((s) => s.setPdf);
   const { navigate } = useSafeNavigation();
-  console.log(statements?.pension);
 
   const onPressPreview = () => {
     if (!uri) return;
