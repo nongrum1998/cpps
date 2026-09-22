@@ -2,21 +2,23 @@
 # Pensioner v2
 # --------------------------------------------
 
+# Pre-script
+< {% 
+   require("./scripts/enc-req.http.js");
+% }
+
 ###  login
 POST {{BASE_URL}}/login
-# ----------------------------
-# Payload
-# ----------------------------
-# { 
-#   "username":"[Redacted]",
-#   "password":"[Redacted]"
-# }
-# ----------------------------
-
 
 {
   "payload":"{{LOGIN_PAYLOAD}}"
 }
+
+# Post-script
+
+> {% 
+   require("./scripts/dec-res.http.js");
+%}
 
 # ----------------------------
 # Response
@@ -99,7 +101,6 @@ POST {{BASE_URL}}/logout
 
 ### get-ppo-status 
 POST {{BASE_URL}}/get_ppo_status
-Content-Type: application/json
 
 # ----------------------------
 # Payload
@@ -134,12 +135,14 @@ POST {{BASE_URL}}/user
 # ----------------------------
 # Payload
 # ----------------------------
-# { 
-#   "pp_no":"[Redacted]"
-# }
+# {}
 # ----------------------------
 
-{ }
+{}
+
+> {% 
+   require("./scripts/decrypt-response.http.js");
+%}
 
 # ----------------------------
 # Response
@@ -164,6 +167,81 @@ POST {{BASE_URL}}/user
 #   "trea_code": "string",
 #   "treasury_name": "string"
 #  },
+#  "message": "string",
+#  "status": "boolean"
+# }
+# ----------------------------
+
+### facial-registration
+POST {{BASE_URL}}/facial_registration
+
+# ----------------------------
+# Payload
+# ----------------------------
+# { 
+#   "ppo_no": "[Redacted]",
+#   "dob": "[Redacted]",
+#   "bank_accno": "[Redacted]",
+#   "password":"[Redacted]",
+#   "image":"{{EXPO_PUBLIC_TEST_IMAGE}}"
+# }
+# ----------------------------
+
+{
+  "payload":"{{FACIAL_REG_PAYLOAD}}"
+}
+
+# ----------------------------
+# Response
+# ----------------------------
+# {
+#  "data": {},
+#  "message": "string",
+#  "status": "boolean"
+# }
+# ----------------------------
+
+### submit-dlc
+POST {{BASE_URL}}/dlc
+
+# ----------------------------
+# Payload
+# ----------------------------
+# { }
+# ----------------------------
+
+{
+  "payload":"{{FACIAL_REG_PAYLOAD}}"
+}
+
+# ----------------------------
+# Response
+# ----------------------------
+# {
+#  "data": { },
+#  "message": "string",
+#  "status": "boolean"
+# }
+# ----------------------------
+
+### dlc-status
+POST {{BASE_URL}}/dlc_status
+
+# ----------------------------
+# Payload
+# ----------------------------
+# { }
+# ----------------------------
+
+{
+  "payload":"{{FACIAL_REG_PAYLOAD}}"
+}
+
+# ----------------------------
+# Response
+# ----------------------------
+# {
+#  "data": { },
 #  "message": "string",
 #  "status": "boolean"
 # }
