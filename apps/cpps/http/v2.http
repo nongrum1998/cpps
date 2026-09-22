@@ -2,10 +2,10 @@
 # Pensioner v2
 # --------------------------------------------
 
-# Pre-script
-< {% 
-   require("./scripts/enc-req.http.js");
-% }
+# # Pre-script
+# < {% 
+#    require("./scripts/enc-req.http.js");
+# % }
 
 ###  login
 POST {{BASE_URL}}/login
