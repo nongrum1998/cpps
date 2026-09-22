@@ -31,6 +31,7 @@ export const useAuthStore = create<AuthStore>()(
       setUser: (data) => set({ user: data, isAuthLoading: false, isSignedIn: true }),
 
       fetchUser: async (keepStaleOnError?: boolean) => {
+        set({ isAuthLoading: true });
         const accessToken = await TokenStoreManager.getAccessToken();
         if (accessToken) {
           try {
@@ -48,6 +49,8 @@ export const useAuthStore = create<AuthStore>()(
             if (!keepStaleOnError) {
               get().reset();
             }
+          } finally {
+            set({ isAuthLoading: false });
           }
         }
       },
