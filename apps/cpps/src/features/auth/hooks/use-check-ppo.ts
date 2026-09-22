@@ -5,9 +5,10 @@ import { RegistrationStatusInput } from '../validators';
 import { useRegistrationStore } from '../store/registration';
 
 type PPOStatus = {
-  bank_account_no: string;
+  bank_accno: string;
   dob: string;
-  status: string;
+  pname: string;
+  ppo_no: string;
 };
 
 export function useCheckPPO() {
@@ -20,7 +21,7 @@ export function useCheckPPO() {
       if (!data.data) return;
 
       const dob = data.data?.dob;
-      const bank_account_no = data.data?.bank_account_no;
+      const bank_account_no = data.data?.bank_accno;
 
       if (!dob || !bank_account_no) return;
       saveData({ ppo_no: variables.ppo_no });

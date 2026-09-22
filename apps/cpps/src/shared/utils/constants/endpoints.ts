@@ -23,9 +23,9 @@ export const ENDPOINTS = {
   /** User profile and account management endpoints. */
   USER: {
     /** Checks whether a pensioner is already registered. */
-    REGISTRATION_STATUS: '/get_registration_status/',
+    REGISTRATION_STATUS: '/get_ppo_status',
     /** Creates a new pensioner record. */
-    CREATE_PENSIONER: '/api/create_pensioner/',
+    CREATE_PENSIONER: '/facial_registration',
     /** Changes the user's password. */
     CHANGE_PASSWORD: '/api/change_password/',
     /** Updates the user's profile. */
@@ -35,10 +35,9 @@ export const ENDPOINTS = {
   /** Verification-related endpoints. */
   VERIFICATION: {
     /** Submits or retrieves verification data. */
-    VERIFICATION: '/api/verification/',
+    VERIFICATION: '/verification',
     /** Retrieves verification status. */
-    // STATUS: '/api/verification_status/',
-    STATUS: '/get_ppo_status',
+    STATUS: '/verification_status',
   },
 
   /** DLC (life certificate) endpoints. */

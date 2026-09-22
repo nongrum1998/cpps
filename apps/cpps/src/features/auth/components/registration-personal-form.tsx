@@ -15,12 +15,18 @@ import { sha256 } from '@lib/encryption';
  * format placeholder for DOB, and a "Back" button that PRESERVES entered
  * data instead of resetting the whole flow.
  */
+const defaultValues = {
+  dob: process.env.EXPO_PUBLIC_DOB,
+  bank_account_number: process.env.EXPO_PUBLIC_AC_NO,
+};
 export const RegistrationPersonalForm = () => {
   const { nextStep, validation, prevStep, saveData, formData } = useRegistrationStore();
 
   const form = useForm<RegisterPersonalInfoInput>({
     resolver: zodResolver(RegisterPersonalInfoSchema),
-    defaultValues: { dob: formData.dob, bank_account_number: formData.bank_account_number },
+    defaultValues: __DEV__
+      ? defaultValues
+      : { dob: formData.dob, bank_account_number: formData.bank_account_number },
     mode: 'onTouched',
   });
 

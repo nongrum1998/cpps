@@ -7,28 +7,14 @@ import { VerificationStatusT } from '@features/verification';
 export function useVerificationStatus() {
   const { user, isSignedIn } = useAuthStore();
 
-  // Fallback is DEV-ONLY; EXPO_PUBLIC_PPO_NO inlines into the bundle.
-  const ppo_no = user?.ppo_no || process.env.EXPO_PUBLIC_PPO_NO;
+  const ppo_no = user?.ppo_no;
 
   const isEnabled = isSignedIn && !!ppo_no;
 
   return useQuery({
     queryKey: ['verificationStatus', ppo_no],
-
     queryFn: () => http.post<VerificationStatusT>(ENDPOINTS.VERIFICATION.STATUS, { ppo_no }),
-
-    select: (response) => {
-      const data = response.data;
-      if (!data) return;
-      return {
-        ...data,
-        ver_status: data?.ver_status
-          ?.replace(/\r?\n|\r/g, ' ')
-          .replace(/\s+/g, ' ')
-          .trim(),
-      };
-    },
-
+    select: (d) => d.data,
     enabled: isEnabled,
   });
 }
