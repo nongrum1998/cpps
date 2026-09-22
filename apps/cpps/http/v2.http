@@ -1,22 +1,20 @@
-# --------------------------------------------
-# Pensioner v2
-# --------------------------------------------
+### --------------------------------------------
+### Login
+# ------------ Pre-script -------------------
+< {%
+   require("./scripts/enc-req.http.js");
+%}
 
-# # Pre-script
-# < {% 
-#    require("./scripts/enc-req.http.js");
-# % }
-
-###  login
 POST {{BASE_URL}}/login
 
-{
-  "payload":"{{LOGIN_PAYLOAD}}"
-}
+# ----------------------------
+# Payload
+# ----------------------------
+{ "payload":"{{LOGIN_PAYLOAD}}" }
+# ----------------------------
 
-# Post-script
-
-> {% 
+# ------------ Post-script -------------------
+> {%
    require("./scripts/dec-res.http.js");
 %}
 
@@ -31,25 +29,35 @@ POST {{BASE_URL}}/login
 #   "success": true
 # }
 # ----------------------------
+### --------------------------------------------
 
-###  pension statement
+### --------------------------------------------
+### Pension statement
+# ------------ Pre-script -------------------
+< {%
+   require("./scripts/enc-req.http.js");
+%}
+
 POST {{BASE_URL}}/paymentslip
 
 # ----------------------------
 # Payload
 # ----------------------------
-# { 
+# {
 #   "pp_no":"[Redacted]"
 # }
+{ "payload":"{{DAT_PENSION_PAYMENT_SLIP_PAYLOAD}}" }
 # ----------------------------
 
-{
-  "payload":"{{PAYMENT_SLIP_PAYLOAD}}"
-}
+# ------------ Post-script -------------------
+> {%
+   require("./scripts/dec-res.http.js");
+%}
+
 # ----------------------------
 # Response
 # ----------------------------
-#   {
+# {
 #   "pdf": "string",
 #   "pension": [
 #     {
@@ -81,38 +89,60 @@ POST {{BASE_URL}}/paymentslip
 #   "success": true
 # }
 # ----------------------------
+### --------------------------------------------
 
+### --------------------------------------------
+### Pension logout
+# ------------ Pre-script -------------------
+< {%
+   require("./scripts/enc-req.http.js");
+%}
 
-### pension logout
 POST {{BASE_URL}}/logout
 
-{
- "token":"{{ACCESS_TOKEN}}"
-}
+# ----------------------------
+# Payload
+# ----------------------------
+{ "token":"{{ACCESS_TOKEN}}" }
+# ----------------------------
+
+# ------------ Post-script -------------------
+> {%
+   require("./scripts/dec-res.http.js");
+%}
 
 # ----------------------------
 # Response
 # ----------------------------
 # {
-#   "message": "success"
-#   "status": true,
+#   "message": "success",
+#   "status": true
 # }
 # ----------------------------
+### --------------------------------------------
 
-### get-ppo-status 
+### --------------------------------------------
+### get-ppo-status
+# ------------ Pre-script -------------------
+< {%
+   require("./scripts/enc-req.http.js");
+%}
+
 POST {{BASE_URL}}/get_ppo_status
 
 # ----------------------------
 # Payload
 # ----------------------------
-# { 
+# {
 #   "pp_no":"[Redacted]"
 # }
+{ "payload":"{{DAT_PENSION_PAYMENT_SLIP_PAYLOAD}}" }
 # ----------------------------
 
-{
- "payload":"{{PAYMENT_SLIP_PAYLOAD}}"
-}
+# ------------ Post-script -------------------
+> {%
+   require("./scripts/dec-res.http.js");
+%}
 
 # ----------------------------
 # Response
@@ -123,25 +153,30 @@ POST {{BASE_URL}}/get_ppo_status
 #     "pname": "string",
 #     "dob": "string",
 #     "bank_accno": "string"
-#   }
-# }
-# "success": true | false
+#   },
+#   "success": true | false
 # }
 # ----------------------------
+### --------------------------------------------
 
-### get-user 
+### --------------------------------------------
+### get-user
+# ------------ Pre-script -------------------
+< {%
+   require("./scripts/enc-req.http.js");
+%}
+
 POST {{BASE_URL}}/user
 
 # ----------------------------
 # Payload
 # ----------------------------
-# {}
+{}
 # ----------------------------
 
-{}
-
-> {% 
-   require("./scripts/decrypt-response.http.js");
+# ------------ Post-script -------------------
+> {%
+   require("./scripts/dec-res.http.js");
 %}
 
 # ----------------------------
@@ -171,25 +206,34 @@ POST {{BASE_URL}}/user
 #  "status": "boolean"
 # }
 # ----------------------------
+### --------------------------------------------
 
+### --------------------------------------------
 ### facial-registration
+# ------------ Pre-script -------------------
+< {%
+   require("./scripts/enc-req.http.js");
+%}
+
 POST {{BASE_URL}}/facial_registration
 
 # ----------------------------
 # Payload
 # ----------------------------
-# { 
+# {
 #   "ppo_no": "[Redacted]",
 #   "dob": "[Redacted]",
 #   "bank_accno": "[Redacted]",
 #   "password":"[Redacted]",
 #   "image":"{{EXPO_PUBLIC_TEST_IMAGE}}"
 # }
+{ "payload":"{{FACIAL_REG_PAYLOAD}}" }
 # ----------------------------
 
-{
-  "payload":"{{FACIAL_REG_PAYLOAD}}"
-}
+# ------------ Post-script -------------------
+> {%
+   require("./scripts/dec-res.http.js");
+%}
 
 # ----------------------------
 # Response
@@ -200,49 +244,68 @@ POST {{BASE_URL}}/facial_registration
 #  "status": "boolean"
 # }
 # ----------------------------
+### --------------------------------------------
 
+### --------------------------------------------
 ### submit-dlc
+# ------------ Pre-script -------------------
+< {%
+   require("./scripts/enc-req.http.js");
+%}
+
 POST {{BASE_URL}}/dlc
 
 # ----------------------------
 # Payload
 # ----------------------------
-# { }
+# {}
+{ "payload":"{{FACIAL_REG_PAYLOAD}}" }
 # ----------------------------
 
-{
-  "payload":"{{FACIAL_REG_PAYLOAD}}"
-}
+# ------------ Post-script -------------------
+> {%
+   require("./scripts/dec-res.http.js");
+%}
 
 # ----------------------------
 # Response
 # ----------------------------
 # {
-#  "data": { },
+#  "data": {},
 #  "message": "string",
 #  "status": "boolean"
 # }
 # ----------------------------
+### --------------------------------------------
 
+### --------------------------------------------
 ### dlc-status
+# ------------ Pre-script -------------------
+< {%
+   require("./scripts/enc-req.http.js");
+%}
+
 POST {{BASE_URL}}/dlc_status
 
 # ----------------------------
 # Payload
 # ----------------------------
-# { }
+# {}
+{ "payload":"{{FACIAL_REG_PAYLOAD}}" }
 # ----------------------------
 
-{
-  "payload":"{{FACIAL_REG_PAYLOAD}}"
-}
+# ------------ Post-script -------------------
+> {%
+   require("./scripts/dec-res.http.js");
+%}
 
 # ----------------------------
 # Response
 # ----------------------------
 # {
-#  "data": { },
+#  "data": {},
 #  "message": "string",
 #  "status": "boolean"
 # }
 # ----------------------------
+### --------------------------------------------
