@@ -20,6 +20,7 @@
     "@hugeicons/core-free-icons": "4.3.0",
     "@hugeicons/react-native": "1.0.16",
     "@pension/core": "workspace:*",
+    "@pension/api": "workspace:*",
     "@react-native-community/netinfo": "12.0.1",
     "@tanstack/react-query": "5.101.4",
     "axios": "1.19.0",

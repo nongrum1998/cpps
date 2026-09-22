@@ -6,6 +6,5 @@
  * normalizers) are intentionally not re-exported.
  */
 
-export { default } from './client';
+export { default, http } from './client';
 export * from './constants';
-export * from './http';

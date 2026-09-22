@@ -29,12 +29,6 @@ import type { InternalAxiosRequestConfig } from 'axios';
  */
 export const createRequestInterceptor = () => {
   return async (config: InternalAxiosRequestConfig) => {
-    const accessToken = await TokenStoreManager.getAccessToken();
-
-    if (accessToken && !config.headers.Authorization) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-
     if (
       config.data &&
       typeof config.data === 'object' &&
@@ -44,6 +38,18 @@ export const createRequestInterceptor = () => {
       config.data = encryptFields({
         payload: JSON.stringify(config.data),
       });
+    }
+
+    return config;
+  };
+};
+
+export const handleRequestToken = () => {
+  return async (config: InternalAxiosRequestConfig) => {
+    const accessToken = await TokenStoreManager.getAccessToken();
+
+    if (accessToken && !config.headers.Authorization) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
     return config;

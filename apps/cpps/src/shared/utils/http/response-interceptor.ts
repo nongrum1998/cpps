@@ -32,7 +32,7 @@ type LoginResponseBody = {
  * @param response - The Axios response object.
  * @returns The original response, after any token capture.
  */
-async function captureAccessTokenFromLogin(response: AxiosResponse): Promise<AxiosResponse> {
+export async function captureAccessTokenFromLogin(response: AxiosResponse): Promise<AxiosResponse> {
   const requestUrl = response.config.url || '';
 
   if (response.status !== 200 || requestUrl !== ENDPOINTS.AUTH.LOGIN || !response.data) {
@@ -65,59 +65,40 @@ async function captureAccessTokenFromLogin(response: AxiosResponse): Promise<Axi
  *
  * @returns A pair of [onFulfilled, onRejected] handlers.
  */
-export const createResponseInterceptor = () => {
-  return [
-    async (response: AxiosResponse) => {
-      if (__DEV__) {
-        console.log(
-          JSON.stringify(
-            {
-              url: response.config.url,
-              status: response.status,
-            },
-            null,
-            2
-          )
-        );
-      }
-      // First, decrypt the payload
-      const decryptedResponse = decryptRequestResponse(response);
-
-      // Then, check the decrypted payload for a login token
-      return await captureAccessTokenFromLogin(decryptedResponse);
-    },
-
-    async (error: AxiosError) => {
-      if (__DEV__) {
-        console.log(
-          JSON.stringify(
-            {
-              url: error?.config?.url,
-              status: error?.status,
-            },
-            null,
-            2
-          )
-        );
-      }
-      if (!error.config) {
-        return Promise.reject(error);
-      }
-
-      const requestPath = error.config.url ?? '';
-
-      if (requestPath === ENDPOINTS.AUTH.USER) {
-        await TokenStoreManager.removeTokens();
-      }
-
-      if (isAuthPath(requestPath)) {
-        if (error.response) {
-          return Promise.resolve(error.response);
-        }
-        return Promise.reject(error);
-      }
-
+export const handleErrorResponse = () => {
+  return async (error: AxiosError) => {
+    if (__DEV__) {
+      console.log(
+        JSON.stringify(
+          {
+            method: error?.config?.method,
+            baseURL: error?.config?.baseURL,
+            url: error?.config?.url,
+            data: error?.config?.data,
+            status: error?.status,
+          },
+          null,
+          2
+        )
+      );
+    }
+    if (!error.config) {
       return Promise.reject(error);
-    },
-  ] as const;
+    }
+
+    const requestPath = error.config.url ?? '';
+
+    if (requestPath === ENDPOINTS.AUTH.USER) {
+      await TokenStoreManager.removeTokens();
+    }
+
+    if (isAuthPath(requestPath)) {
+      if (error.response) {
+        return Promise.resolve(error.response);
+      }
+      return Promise.reject(error);
+    }
+
+    return Promise.reject(error);
+  };
 };

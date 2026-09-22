@@ -14,5 +14,8 @@ export function useLogin() {
         refresh();
       }
     },
+    onError: (error) => {
+      console.log(error);
+    },
   });
 }
