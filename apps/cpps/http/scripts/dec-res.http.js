@@ -14,6 +14,7 @@ if (!key) {
 
 const decrypted = decryptText(encrypted, key);
 
-const data = JSON.parse(decrypted);
+const data = typeof decrypted === 'string' ? JSON.parse(decrypted) : decrypted;
 
-client.log(JSON.stringify(data, null, 2));
+console.log('ENC =>', encrypted);
+client.log('DEC =>', JSON.stringify(data, null, 2));

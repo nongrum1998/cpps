@@ -19,3 +19,6 @@ if (typeof encrypted !== 'string') {
 request.body = JSON.stringify({
   payload: encrypted,
 });
+
+client.log('Payload =>', body);
+client.log('BODY =>', request.body);

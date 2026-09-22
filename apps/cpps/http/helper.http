@@ -1,20 +1,46 @@
+### --------------------------------------------
 ### Encrypt helper
+# -------------- Pre Script -------------------------
+< {%
+   require('./scripts/enc-req.http.js');
+%}
+
 POST http://localhost:3000/api/cpps/PensionersApp/v1/encrypt
 
-{ 
-    "uid":"{{UID_ENCRYPTED}}",
+{
+  "data": "123"
 }
 
+# -------------- Post Script -------------------------
+> {%
+  require('./scripts/dec-res.http.js');
+%}
+
+
+### --------------------------------------------
 ### Decrypt helper
+
+< {%
+   require('./scripts/enc-req.http.js');
+%}
+
 POST http://localhost:3000/api/cpps/PensionersApp/v1/decrypt
 
 {
-  "payload":"{{DECRYPT_PAYLOAD}}"
+  "payload": "123"
 }
 
+> {%
+  require('./scripts/dec-res.http.js');
+%}
+### --------------------------------------------
+
+### --------------------------------------------
 ### format-password helper
 POST http://localhost:3000/api/cpps/PensionersApp/v1/format-password
 
 {
-  "password":"{{PASSWORD}}"
+  "password": "{{PASSWORD}}"
 }
+
+### --------------------------------------------
