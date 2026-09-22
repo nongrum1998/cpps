@@ -34,10 +34,10 @@ export const useAuthStore = create<AuthStore>()(
         const accessToken = await TokenStoreManager.getAccessToken();
         if (accessToken) {
           try {
-            const res = await http.post<UserT>(ENDPOINTS.AUTH.USER, {});
-            if (res.data && res.success) {
+            const { data, success } = await http.post<UserT>(ENDPOINTS.AUTH.USER, {});
+            if (data && success) {
               set({
-                user: res.data,
+                user: data,
                 isSignedIn: true,
                 isAuthLoading: false,
               });

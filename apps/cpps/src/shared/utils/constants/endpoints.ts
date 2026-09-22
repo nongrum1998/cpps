@@ -37,7 +37,8 @@ export const ENDPOINTS = {
     /** Submits or retrieves verification data. */
     VERIFICATION: '/api/verification/',
     /** Retrieves verification status. */
-    STATUS: '/api/verification_status/',
+    // STATUS: '/api/verification_status/',
+    STATUS: '/get_ppo_status',
   },
 
   /** DLC (life certificate) endpoints. */
@@ -57,6 +58,6 @@ export const ENDPOINTS = {
   PENSIONER_STATEMENTS: {
     /** Fetches the six-month pension statement, requires
      * `EXPO_PUBLIC_DAT_API_URL`. */
-    SIX_MONTH_STATEMENTS: `${process.env.EXPO_PUBLIC_DAT_API_URL}/paymentslip`,
+    PAYMENT_SLIP: `/paymentslip`,
   },
 } as const;

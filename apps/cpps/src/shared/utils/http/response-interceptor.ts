@@ -14,12 +14,11 @@ import { TokenStoreManager } from '@stores/token.store';
 import { ENDPOINTS } from '@utils/constants/endpoints';
 
 import { isAuthPath } from './constants';
+import { decryptRequestResponse } from './decrypt-response';
 
 /** Shape of a login response body: `{ data: { token } }` when successful. */
 type LoginResponseBody = {
-  data?: {
-    token?: string;
-  };
+  token?: string;
 };
 
 /**
@@ -40,7 +39,8 @@ async function captureAccessTokenFromLogin(response: AxiosResponse): Promise<Axi
     return response;
   }
 
-  const token = (response.data as LoginResponseBody).data?.token;
+  const data = response.data as LoginResponseBody;
+  const token = data.token;
 
   if (!token) {
     return response;
@@ -67,9 +67,39 @@ async function captureAccessTokenFromLogin(response: AxiosResponse): Promise<Axi
  */
 export const createResponseInterceptor = () => {
   return [
-    captureAccessTokenFromLogin,
+    async (response: AxiosResponse) => {
+      if (__DEV__) {
+        console.log(
+          JSON.stringify(
+            {
+              url: response.config.url,
+              status: response.status,
+            },
+            null,
+            2
+          )
+        );
+      }
+      // First, decrypt the payload
+      const decryptedResponse = decryptRequestResponse(response);
+
+      // Then, check the decrypted payload for a login token
+      return await captureAccessTokenFromLogin(decryptedResponse);
+    },
 
     async (error: AxiosError) => {
+      if (__DEV__) {
+        console.log(
+          JSON.stringify(
+            {
+              url: error?.config?.url,
+              status: error?.status,
+            },
+            null,
+            2
+          )
+        );
+      }
       if (!error.config) {
         return Promise.reject(error);
       }

@@ -1,36 +1,54 @@
 import { useAuthStore } from '@stores/auth.store';
 import { useQuery } from '@tanstack/react-query';
 import { http } from '@utils/http';
-import { PensionStatementResponseI } from '../types';
 import { ENDPOINTS } from '@utils/constants';
+import { decryptText } from '@lib/encryption';
+import { PensionStatementResponseI, PensionerStatement } from '../types';
 
-/**
- * Fetches the current user's six-month pension statements.
- *
- * Reads the authenticated user's PPO number from the auth store, encrypts it,
- * and posts it to the PENSIONER_STATEMENTS.SIX_MONTH_STATEMENTS endpoint using
- * a DAT access token obtained from TokenStoreManager. Wraps the request in a
- * react-query query keyed by the user's PPO number, so results are cached per
- * user and automatically re-fetched when the PPO number changes.
- *
- * @returns A react-query UseQueryResult whose `data` is a
- *   PensionStatementResponseI (the list of statements plus the statement PDF
- *   URI), along with the standard loading, error, and refetch state.
- *
- * @example
- * const { data, isLoading, refetch } = usePensionerStatement();
- */
 export function usePensionerStatement() {
-  const { user } = useAuthStore();
+  const { user, isSignedIn } = useAuthStore();
   const ppoNo = user?.ppo_no;
+  const isEnabled = !!ppoNo && isSignedIn;
+
   return useQuery({
     queryKey: ['pensioner', 'statement', ppoNo],
     queryFn: async () => {
-      return http.post<PensionStatementResponseI>(
-        ENDPOINTS.PENSIONER_STATEMENTS.SIX_MONTH_STATEMENTS,
-        { ppo_no: ppoNo }
+      const response = await http.post<PensionStatementResponseI>(
+        ENDPOINTS.PENSIONER_STATEMENTS.PAYMENT_SLIP,
+        {
+          ppo_no: ppoNo,
+        }
       );
+      return response.data;
     },
-    select: (data) => data.data,
+    enabled: isEnabled,
+    select: (data) => {
+      if (!data) return data;
+
+      // Note: If your Axios response interceptor already decrypts the entire payload,
+      // you can simply return `data` without any manual decryption here.
+
+      let decryptedPension: PensionerStatement[] = [];
+      let decryptedPdf: string = '';
+
+      try {
+        decryptedPension =
+          typeof data.pension === 'string' ? JSON.parse(decryptText(data.pension)) : data.pension;
+      } catch (e) {
+        console.error('Failed to parse decrypted pension statement:', e);
+      }
+
+      try {
+        decryptedPdf = typeof data.pdf === 'string' ? decryptText(data.pdf) : data.pdf;
+      } catch (e) {
+        console.error('Failed to decrypt PDF URI:', e);
+      }
+
+      return {
+        ...data,
+        pension: decryptedPension,
+        pdf: decryptedPdf,
+      };
+    },
   });
 }
