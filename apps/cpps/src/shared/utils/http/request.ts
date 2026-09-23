@@ -27,7 +27,7 @@ import type { InternalAxiosRequestConfig } from 'axios';
  *
  * @returns The Axios request interceptor function.
  */
-export const createRequestInterceptor = () => {
+export const encryptReqBody = () => {
   return async (config: InternalAxiosRequestConfig) => {
     if (
       config.data &&
@@ -44,7 +44,7 @@ export const createRequestInterceptor = () => {
   };
 };
 
-export const handleRequestToken = () => {
+export const attachReqHeaderAccessToken = () => {
   return async (config: InternalAxiosRequestConfig) => {
     const accessToken = await TokenStoreManager.getAccessToken();
 

@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native';
-import { cn } from '@utils/helpers/cn';
+import { cn } from '@pension/utils';
 import { Container } from '../layout/container';
 import { Button, Icon } from '@components/ui';
 

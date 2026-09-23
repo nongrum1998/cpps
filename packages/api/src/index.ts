@@ -6,27 +6,12 @@
  * backend tooling. Exports are minimal until the contracts are extracted.
  */
 
-import { AxiosInstance, AxiosInterceptorOptions } from 'axios';
 import { createApiClient } from './client';
-import { createAuthService } from './services/auth.service';
+import { createAuthService } from './services';
 import { createHttp } from './http';
+import { ApiClientConfig, ApiInterceptors } from '@pension/types';
 
-export interface ApiInterceptors {
-  request?: Array<{
-    onFulfilled?: Parameters<AxiosInstance['interceptors']['request']['use']>[0];
-    onRejected?: Parameters<AxiosInstance['interceptors']['request']['use']>[1];
-    options?: AxiosInterceptorOptions;
-  }>;
-
-  response?: Array<{
-    onFulfilled?: Parameters<AxiosInstance['interceptors']['response']['use']>[0];
-    onRejected?: Parameters<AxiosInstance['interceptors']['response']['use']>[1];
-    options?: AxiosInterceptorOptions;
-  }>;
-}
-
-export interface ApiConfig {
-  baseURL: string;
+export interface ApiConfig extends ApiClientConfig {
   interceptors?: ApiInterceptors;
 }
 

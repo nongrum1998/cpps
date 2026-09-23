@@ -7,7 +7,7 @@ import { useCheckPPO } from '../hooks';
 import { Input } from '@components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@components/ui/alert';
 import { Icon } from '@components/ui/icon';
-import { cn } from '@utils/helpers';
+import { cn } from '@pension/utils';
 
 const defaultValues = {
   // DEV-ONLY prefill; EXPO_PUBLIC_PPO_NO inlines into the bundle at build time.

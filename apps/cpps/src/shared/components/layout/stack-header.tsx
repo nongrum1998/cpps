@@ -4,11 +4,12 @@ import { useNavigation } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRoutePath } from '@hooks/use-route-path';
 import { useSafeNavigation } from '@hooks/use-safe-navigation';
-import { matchPageHeader, cn } from '@utils/helpers';
+import { matchPageHeader } from '@utils/helpers';
 import { Icon } from '@components/ui/icon';
 import { DrawerToggleButton } from 'expo-router/drawer';
 import { NicBanner } from '@components/common/nic-banner';
 import { NetworkStatusBanner } from '@components/common/network-status-banner';
+import { cn } from '@pension/utils';
 
 export const StackHeader = memo(() => {
   const path = useRoutePath();

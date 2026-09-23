@@ -1,4 +1,4 @@
-import { cn } from '@utils/helpers/cn';
+import { cn } from '@pension/utils';
 import { ActivityIndicator, Text } from 'react-native';
 import { Container } from '../layout/container';
 

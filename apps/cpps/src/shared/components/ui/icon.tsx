@@ -34,7 +34,7 @@ import {
   Download01Icon,
   FileCheckIcon,
 } from './icons';
-import { cn } from '@utils/helpers';
+import { cn } from '@pension/utils';
 
 export type IconName =
   | 'eye-open'

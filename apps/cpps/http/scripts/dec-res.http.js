@@ -12,9 +12,10 @@ if (!key) {
   throw new Error('FERNET_KEY is missing');
 }
 
-const decrypted = decryptText(encrypted, key);
+const normalizeData = typeof encrypted === 'string' ? encrypted : JSON.stringify(encrypted);
+
+const decrypted = decryptText(normalizeData, key);
 
 const data = typeof decrypted === 'string' ? JSON.parse(decrypted) : decrypted;
 
-console.log('ENC =>', encrypted);
 client.log('DEC =>', JSON.stringify(data, null, 2));

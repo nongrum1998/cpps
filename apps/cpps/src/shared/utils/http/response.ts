@@ -69,6 +69,7 @@ export const handleErrorResponse = () => {
   return async (error: AxiosError) => {
     if (__DEV__) {
       console.log(
+        'Request Error =>',
         JSON.stringify(
           {
             method: error?.config?.method,
@@ -82,6 +83,7 @@ export const handleErrorResponse = () => {
         )
       );
     }
+
     if (!error.config) {
       return Promise.reject(error);
     }

@@ -9,29 +9,7 @@
 
 import type { AxiosResponse } from 'axios';
 import { AxiosError } from 'axios';
-
-export interface ApiResponse<T> {
-  /** Whether the request was processed successfully. */
-  success: boolean;
-  /** Human-readable status message from the server, or a fallback. */
-  message: string;
-  /** HTTP status code. Omitted when no server response was received
-   *  (e.g. network failure, request-setup error). */
-  status?: number;
-  /** Response payload — `null` on failure. */
-  data?: T | null;
-  /** Structured error details returned on failure. */
-  error?: { msg: string } | string | Record<string, unknown>;
-  /** Per-field validation errors returned on failure. */
-  errors?: Record<string, unknown>;
-}
-/** Shape of error bodies the backend may return. */
-type BackendErrorBody = {
-  message?: string;
-  error?: string | Record<string, unknown>;
-  errors?: Record<string, unknown>;
-  msg?: string;
-};
+import { ApiResponse, BackendErrorBody } from '@pension/types';
 
 /** Fallback shown when the backend provides no usable message. */
 const DEFAULT_ERROR_MESSAGE = 'Something went wrong. Please try again.';

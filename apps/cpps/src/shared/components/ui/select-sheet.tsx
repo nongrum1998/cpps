@@ -18,7 +18,7 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { cn } from '@utils/helpers/cn';
+import { cn } from '@pension/utils';
 import { Ternary } from '@components/common';
 import { Button } from './button';
 import { Icon } from './icon';

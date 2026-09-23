@@ -6,5 +6,4 @@
  * until helpers are extracted from the app.
  */
 
-/** Canonical npm package name for the utils package. */
-export const UTILS_PACKAGE_NAME = '@pension/utils';
+export * from './helpers';

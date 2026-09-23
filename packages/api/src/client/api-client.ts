@@ -1,9 +1,5 @@
 import axios, { type AxiosInstance } from 'axios';
-
-export interface ApiClientConfig {
-  baseURL: string;
-  timeout?: number;
-}
+import { ApiClientConfig } from '@pension/types';
 
 export function createApiClient(config: ApiClientConfig): AxiosInstance {
   return axios.create({

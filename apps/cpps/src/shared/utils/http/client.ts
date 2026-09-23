@@ -1,8 +1,8 @@
 import { API_BASE_URL } from './constants';
 import { createApi } from '@pension/api';
-import { createRequestInterceptor, handleRequestToken } from './request-interceptor';
+import { encryptReqBody, attachReqHeaderAccessToken } from './request';
 import { decryptRequestResponse } from './decrypt-response';
-import { handleErrorResponse } from './response-interceptor';
+import { captureAccessTokenFromLogin, handleErrorResponse } from './response';
 /**
  * Configured Axios instance for application-wide API requests.
  * Includes base URL, credentials support, default JSON headers,
@@ -13,15 +13,20 @@ const apiClient = createApi({
   interceptors: {
     request: [
       {
-        onFulfilled: handleRequestToken(),
+        onFulfilled: attachReqHeaderAccessToken(),
       },
       {
-        onFulfilled: createRequestInterceptor(),
+        onFulfilled: encryptReqBody(),
       },
     ],
     response: [
       {
         onFulfilled: decryptRequestResponse,
+      },
+      {
+        onFulfilled: captureAccessTokenFromLogin,
+      },
+      {
         onRejected: handleErrorResponse(),
       },
     ],

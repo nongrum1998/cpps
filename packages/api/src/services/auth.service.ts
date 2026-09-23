@@ -1,29 +1,26 @@
 import type { AxiosInstance } from 'axios';
-
-type LoginRequest = {
-  username: string;
-  password: string;
-};
-
-type LoginResponse = {
-  token: string;
-};
-
-type CurrentUserResponse = {
-  username: string;
-};
+import {
+  LoginRequest,
+  LoginResponse,
+  LogoutRequest,
+  LogoutResponse,
+  UserResponse,
+} from '@pension/types';
 
 export function createAuthService(client: AxiosInstance) {
   return {
     async login(data: LoginRequest) {
       const response = await client.post<LoginResponse>('/login', data);
-
       return response.data;
     },
 
     async currentUser() {
-      const response = await client.post<CurrentUserResponse>('/user', {});
+      const response = await client.post<UserResponse>('/user', {});
+      return response.data;
+    },
 
+    async logout(data: LogoutRequest) {
+      const response = await client.post<LogoutResponse>('/logout', data);
       return response.data;
     },
   };

@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { View, Text } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
-import { cn } from '@utils/helpers';
+import { cn } from '@pension/utils';
 
 export const NetworkStatusBanner = () => {
   const [isOffline, setIsOffline] = useState<boolean>(false);

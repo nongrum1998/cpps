@@ -1,4 +1,4 @@
-import { cn } from '@utils/helpers/cn';
+import { cn } from '@pension/utils';
 import React from 'react';
 import { Text, TouchableOpacity, ActivityIndicator, TouchableOpacityProps } from 'react-native';
 import { cva, type VariantProps } from 'class-variance-authority';

@@ -11,7 +11,10 @@ POST {{BASE_URL}}/login
 # ----------------------------
 # Payload
 # ----------------------------
-{ "payload":"{{LOGIN_PAYLOAD}}" }
+{
+  "username":"{{PPO_NO}}",
+  "password":"{{PASSWORD}}"
+}
 # ----------------------------
 
 # ------------ Post-script -------------------

@@ -8,7 +8,7 @@ import {
   DialogDescription,
 } from './dialog';
 import { Button } from './button';
-import { cn } from '../../utils/helpers/cn';
+import { cn } from '@pension/utils';
 
 /**
  * AlertDialog Root

@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from 'react';
 import { View, Text, ViewProps, TextProps } from 'react-native';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@utils/helpers';
+import { cn } from '@pension/utils';
 
 type Variant = 'default' | 'destructive' | 'success' | 'warning' | 'info';
 
