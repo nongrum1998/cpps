@@ -1,14 +1,12 @@
 import { Text, View } from 'react-native';
 
 import {
-  ConfirmRegistrationScreen,
   RegistrationForm,
   RegistrationStatusForm,
   RegistrationStepHeader,
   RegistrationSuccessView,
 } from '../components';
 import { Container } from '@components/layout';
-import { FooterImg } from '@components/common/nic-footer-img';
 import { useRegistrationStore } from '../store/registration';
 import { RegistrationCamera } from '../components/registration-camera';
 
@@ -56,15 +54,10 @@ export default function RegistrationScreen() {
       <RegistrationStepHeader step={step} />
 
       {/* Active step form */}
-      <View className="mt-6 w-full">
+      <View className="mt-6">
         {step === 1 && <RegistrationStatusForm />}
         {step === 2 && <RegistrationForm />}
         {step === 3 && <RegistrationCamera />}
-      </View>
-
-      {/* Anchored to viewport bottom when content is short */}
-      <View className="mt-auto pt-6">
-        <FooterImg />
       </View>
     </Container>
   );

@@ -51,6 +51,7 @@ interface RegistrationStepHeaderProps {
 export function RegistrationStepHeader({ step }: RegistrationStepHeaderProps) {
   const safeStep = Math.min(Math.max(step, 1), TOTAL_STEPS);
   const { title, subtitle } = STEP_CONTENT[safeStep];
+  if (safeStep === 3) return null;
 
   return (
     <View className="w-full">

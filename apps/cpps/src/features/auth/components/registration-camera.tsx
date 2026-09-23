@@ -6,6 +6,8 @@ import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Camera, CameraOutput, useCameraDevice, usePhotoOutput } from 'react-native-vision-camera';
 import { createFaceDetectorOutput, Face } from 'react-native-vision-camera-face-detector';
+import { Button } from '@components/ui';
+import { useRegistrationStore } from '../store';
 
 /**
  * Renders the active front camera full-screen, overlays detected-face
@@ -18,6 +20,7 @@ import { createFaceDetectorOutput, Face } from 'react-native-vision-camera-face-
 export function RegistrationCamera() {
   const device = useCameraDevice('front');
   const message = 'Blinked your eyes';
+  const { prevStep } = useRegistrationStore();
 
   const photoOutput = usePhotoOutput({
     qualityPrioritization: 'speed',
@@ -66,32 +69,30 @@ export function RegistrationCamera() {
   }
 
   return (
-    <>
-      <SafeAreaView className="flex-1" edges={['left', 'right']}>
-        <View
-          className="flex-1"
-          onLayout={(e) => {
-            const { width, height } = e.nativeEvent.layout;
-            setLayoutSize({ width, height });
-          }}>
-          <Camera
-            style={StyleSheet.absoluteFill}
-            device={device}
-            isActive={true}
-            outputs={outputs}
-          />
-          <CameraPainter
-            faces={faces}
-            frameWidth={frameSize.width}
-            frameHeight={frameSize.height}
-            viewWidth={layoutSize.width}
-            viewHeight={layoutSize.height}
-          />
-          <View className="absolute bottom-5 left-5 right-5 rounded-xl bg-black/75 p-4">
-            <Text className="text-center text-lg font-bold text-white">{message}</Text>
-          </View>
+    <SafeAreaView className="h-full flex-1 border border-red-500">
+      <View
+        className=""
+        onLayout={(e) => {
+          const { width, height } = e.nativeEvent.layout;
+          setLayoutSize({ width, height });
+        }}>
+        <CameraPainter
+          faces={faces}
+          frameWidth={frameSize.width}
+          frameHeight={frameSize.height}
+          viewWidth={layoutSize.width}
+          viewHeight={layoutSize.height}
+        />
+        <Camera style={StyleSheet.absoluteFill} device={device} isActive={true} outputs={outputs} />
+      </View>
+      <View className="absolute bottom-0 left-5 right-5 gap-2 bg-background">
+        <View className="rounded-xl bg-black/75 p-4">
+          <Text className="text-center text-lg font-bold text-white">{message}</Text>
         </View>
-      </SafeAreaView>
-    </>
+        <Button variant="outline" size="lg" onPress={prevStep} className="flex-1">
+          Back
+        </Button>
+      </View>
+    </SafeAreaView>
   );
 }
