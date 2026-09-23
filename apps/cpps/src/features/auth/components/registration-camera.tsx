@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 import { FaceCaptureCamera } from '@components/common/face-capture-camera';
 import { useFaceCapture } from '@hooks/use-face-capture';
@@ -38,12 +38,19 @@ type RegistrationCameraPhase = 'camera' | 'capturing' | 'submitting' | 'error';
  * screen and the loading gate fails closed while the camera is
  * unavailable.
  *
+ * This component must be rendered as a top-level route step (definite
+ * height) — never nested inside a ScrollView or padded container, or the
+ * absolutely-positioned camera preview collapses to zero height and only
+ * the overlay text remains visible. The registration screen bypasses its
+ * scroll container on step 3 to guarantee this.
+ *
  * @returns The rendered registration camera step.
  */
 export function RegistrationCamera() {
   const { formData, prevStep, setSuccess } = useRegistrationStore();
   const { hasPermission, requestPermission } = useCameraPermission();
   const device = useCameraDevice('front');
+  const insets = useSafeAreaInsets();
   const [phase, setPhase] = useState<RegistrationCameraPhase>('camera');
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -123,8 +130,9 @@ export function RegistrationCamera() {
             message={capture.message}
           />
 
-          {/* Back to details — top-left over the live preview */}
-          <View className="absolute left-5 top-8">
+          {/* Back to details — top-left over the live preview; inset below
+              the status bar because the camera runs full-bleed */}
+          <View className="absolute left-5" style={{ top: insets.top + 12 }}>
             <Button variant="outline" size="lg" onPress={prevStep}>
               Back
             </Button>

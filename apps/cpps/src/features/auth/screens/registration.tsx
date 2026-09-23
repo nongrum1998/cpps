@@ -18,8 +18,10 @@ import { useRegistrationStore } from '../store/registration';
  *
  * Step 1 checks the PPO number, step 2 collects details (DOB, bank account,
  * password), and step 3 captures a liveness face photo and submits
- * automatically. The step-3 header is hidden so the camera fills the
- * screen.
+ * automatically. Step 3 bypasses the scroll container entirely and renders
+ * {@link RegistrationCamera} full-bleed: inside a ScrollView's content the
+ * camera's absolutely-positioned preview has no intrinsic height, so its
+ * flex wrappers collapse to zero and the preview stays invisible.
  *
  * After a successful submit, the entire step content (header, form, footer)
  * is replaced by the success view, which resets the wizard and returns the
@@ -53,16 +55,21 @@ export default function RegistrationScreen() {
     );
   }
 
+  // Step 3 renders outside the Container so the camera gets a definite
+  // height (see the doc comment above).
+  if (step === 3) {
+    return <RegistrationCamera />;
+  }
+
   return (
     <Container className="flex-1 gap-5 py-10">
-      {/* Step X of 4 + progress bar + title + instruction */}
+      {/* Step X of 3 + progress bar + title + instruction */}
       <RegistrationStepHeader step={step} />
 
       {/* Active step form */}
       <View className="mt-6">
         {step === 1 && <RegistrationStatusForm />}
         {step === 2 && <RegistrationForm />}
-        {step === 3 && <RegistrationCamera />}
       </View>
     </Container>
   );
