@@ -21,7 +21,9 @@ interface RegistrationStore {
   setValidationData: (data: Omit<RegisterInput, 'confirm_password' | 'password'>) => void;
 
   isSuccess: boolean;
+  isError: boolean;
   setSuccess: () => void;
+  setIsError: () => void;
 }
 
 export const useRegistrationStore = create<RegistrationStore>((set, get) => ({
@@ -29,6 +31,8 @@ export const useRegistrationStore = create<RegistrationStore>((set, get) => ({
   formData: defaultValue,
   validation: null,
   isSuccess: false,
+  isError: false,
+  setIsError: () => set({ isError: true }),
   setValidationData: (data) => set({ validation: data }),
 
   setStep: (step) => set({ step }),

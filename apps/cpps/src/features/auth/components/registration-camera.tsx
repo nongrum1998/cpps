@@ -47,7 +47,7 @@ type RegistrationCameraPhase = 'camera' | 'capturing' | 'submitting' | 'error';
  * @returns The rendered registration camera step.
  */
 export function RegistrationCamera() {
-  const { formData, prevStep, setSuccess } = useRegistrationStore();
+  const { formData, prevStep, setSuccess, setIsError } = useRegistrationStore();
   const { hasPermission, requestPermission } = useCameraPermission();
   const device = useCameraDevice('front');
   const [phase, setPhase] = useState<RegistrationCameraPhase>('camera');
@@ -79,12 +79,12 @@ export function RegistrationCamera() {
           setSuccess();
         } else {
           setErrorMsg(data.message || 'Registration failed');
-          setPhase('error');
+          setIsError();
         }
       },
       onError: () => {
         setErrorMsg('Something went wrong. Please try again.');
-        setPhase('error');
+        setIsError();
       },
     });
   };
@@ -146,29 +146,6 @@ export function RegistrationCamera() {
           <Text className="text-base font-medium text-muted-foreground">
             {phase === 'capturing' ? 'Processing photo...' : 'Submitting registration...'}
           </Text>
-        </View>
-      )}
-
-      {/* Error — retry the capture or return to details */}
-      {phase === 'error' && (
-        <View className="flex-1 items-center justify-center gap-5 px-6">
-          <Text className="text-center text-lg font-semibold text-foreground">
-            {errorMsg || 'Something went wrong. Please try again.'}
-          </Text>
-          <View className="w-full flex-row gap-3">
-            <Button variant="outline" size="lg" className="flex-1" onPress={prevStep}>
-              Back to Details
-            </Button>
-            <Button
-              size="lg"
-              className="flex-1"
-              onPress={() => {
-                capture.resetBlinkState();
-                setPhase('camera');
-              }}>
-              Try Again
-            </Button>
-          </View>
         </View>
       )}
     </SafeAreaView>
