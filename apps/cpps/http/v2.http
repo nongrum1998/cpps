@@ -135,6 +135,9 @@ POST {{BASE_URL}}/logout
 ### --------------------------------------------
 # ------------ Pre-script -------------------
 < {%
+   request.variables.set('RAW_BODY', JSON.stringify({
+     ppo_no: request.environment.get('PPO_NO')
+   }));
    require("./scripts/enc-req.http.js");
 %}
 
@@ -144,9 +147,9 @@ POST {{BASE_URL}}/get_ppo_status
 # Payload
 # ----------------------------
 # {
-#   "pp_no":"[Redacted]"
+#   "ppo_no":"[Redacted]"
 # }
-{ "payload":"{{DAT_PENSION_PAYMENT_SLIP_PAYLOAD}}" }
+{ "payload": "{{ENC_PAYLOAD}}" }
 # ----------------------------
 
 # ------------ Post-script -------------------
