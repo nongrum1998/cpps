@@ -161,7 +161,7 @@ POST {{BASE_URL}}/get_ppo_status
 # Response
 # ----------------------------
 # {
-#   "payload": {
+#   "data": {
 #     "ppo_no": "string",
 #     "pname": "string",
 #     "dob": "string",
