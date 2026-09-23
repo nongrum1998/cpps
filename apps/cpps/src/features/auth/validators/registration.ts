@@ -38,3 +38,22 @@ export const RegisterSchema = z
   });
 
 export type RegisterInput = z.infer<typeof RegisterSchema>;
+
+/**
+ * Validates the payload submitted by the registration camera step
+ * (step 3 of the wizard) after PPO check and details entry.
+ *
+ * The raw (unhashed) password is validated here; `useRegisterPensioner`
+ * applies {@link formatPassword} after validation, which internally
+ * SHA-256 hashes, salts, and base64-encodes it. `image` is required —
+ * the camera always captures before submitting.
+ */
+export const RegisterPensionerSchema = z.object({
+  ppo_no: ppoNoValidation('PPO Number'),
+  dob: dateOfBirthValidation,
+  bank_accno: bankAccountValidation,
+  password: passwordValidation,
+  image: z.string('Image is Required').min(1, 'Image is Required'),
+});
+
+export type RegisterPensionerInput = z.infer<typeof RegisterPensionerSchema>;
