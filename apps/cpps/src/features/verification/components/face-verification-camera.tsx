@@ -2,8 +2,8 @@ import { type ComponentProps } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { Camera, type CameraDevice } from 'react-native-vision-camera';
 import type { Face } from 'react-native-vision-camera-face-detector';
-import { FaceVerificationPainter } from './face-verification-painter';
 import { useFaceVerificationStore } from '../store/face-verification.store';
+import { CameraPainter } from '@components/common/camera-painter';
 
 /** Outputs prop shape of the vision-camera `Camera` component. */
 type CameraOutputs = ComponentProps<typeof Camera>['outputs'];
@@ -46,7 +46,7 @@ export function FaceVerificationCamera({
   return (
     <>
       <Camera style={StyleSheet.absoluteFill} device={device} isActive={true} outputs={outputs} />
-      <FaceVerificationPainter
+      <CameraPainter
         faces={faces}
         frameWidth={frameWidth}
         frameHeight={frameHeight}

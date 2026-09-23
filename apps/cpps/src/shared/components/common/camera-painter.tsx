@@ -3,7 +3,7 @@ import { View, Text } from 'react-native';
 import type { Face } from 'react-native-vision-camera-face-detector';
 
 /** Props for {@link FaceVerificationPainter}. */
-export interface FaceVerificationPainterProps {
+interface CameraPainterProps {
   faces: Face[];
   frameWidth: number;
   frameHeight: number;
@@ -18,7 +18,7 @@ export interface FaceVerificationPainterProps {
  * presentational canvas painter owned by FaceVerificationScreen.
  * Renders nothing until all dimension props are non-zero.
  */
-export const FaceVerificationPainter: React.FC<FaceVerificationPainterProps> = ({
+export const CameraPainter: React.FC<CameraPainterProps> = ({
   faces,
   frameWidth,
   frameHeight,
