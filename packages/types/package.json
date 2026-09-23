@@ -12,10 +12,14 @@
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "typecheck": "tsc --noEmit"
   },
+  "peerDependencies": {
+    "axios": "^1.19.0"
+  },
   "devDependencies": {
     "@pension/eslint-config": "workspace:*",
     "@pension/prettier-config": "workspace:*",
     "@pension/typescript-config": "workspace:*",
+    "axios": "^1.19.0",
     "eslint": "9.39.5",
     "prettier": "3.2.5",
     "typescript": "6.0.3"

@@ -12,12 +12,18 @@
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "typecheck": "tsc --noEmit"
   },
+  "peerDependencies": {
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.6.0"
+  },
   "devDependencies": {
     "@pension/eslint-config": "workspace:*",
     "@pension/prettier-config": "workspace:*",
     "@pension/typescript-config": "workspace:*",
+    "clsx": "^2.1.1",
     "eslint": "9.39.5",
     "prettier": "3.2.5",
+    "tailwind-merge": "^3.6.0",
     "typescript": "6.0.3"
   }
 }
