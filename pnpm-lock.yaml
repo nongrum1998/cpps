@@ -578,6 +578,9 @@ importers:
       '@pension/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
+      '@types/node':
+        specifier: ^26.6.2
+        version: 26.6.2
       clsx:
         specifier: ^2.1.1
         version: 2.1.1

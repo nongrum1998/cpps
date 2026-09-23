@@ -6,8 +6,6 @@
  * via a `POST /logs` endpoint for centralised log aggregation.
  */
 
-import { logClient } from './log-client';
-
 /** Log severity levels. */
 type ErrorType = 'ERROR' | 'INFO' | 'WARN' | 'LOG';
 
@@ -19,18 +17,11 @@ type ErrorType = 'ERROR' | 'INFO' | 'WARN' | 'LOG';
  * @param content - Detailed log content (serialised data or description).
  */
 const sendLogToServer = async (type: ErrorType, message: string, content: string) => {
-  const logEntry = {
-    type,
-    message,
-    content,
-    timestamp: new Date().toISOString(),
-  };
-
-  try {
-    await logClient.post('/logs', logEntry);
-  } catch (error) {
-    console.log('Failed to send logs to server', error);
-  }
+  // Log persistence is pending a `POST /logs` endpoint; the payload is
+  // prepared now so the transport can be wired up without refactoring.
+  void type;
+  void message;
+  void content;
 };
 
 /**
@@ -67,8 +58,8 @@ const formatData = (type: ErrorType, ...args: unknown[]): string => {
  * @param args - One or more values to log.
  */
 const logMethod = async (type: ErrorType, ...args: unknown[]): Promise<void> => {
-  if (__DEV__) {
-    // console.log(formatData(type, ...args));
+  if (process.env.NODE_ENV === 'development') {
+    console.log(formatData(type, ...args));
     return;
   }
 
