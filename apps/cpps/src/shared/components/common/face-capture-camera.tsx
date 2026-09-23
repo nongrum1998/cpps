@@ -2,37 +2,43 @@ import { type ComponentProps } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { Camera, type CameraDevice } from 'react-native-vision-camera';
 import type { Face } from 'react-native-vision-camera-face-detector';
-import { useFaceVerificationStore } from '../store/face-verification.store';
 import { CameraPainter } from '@components/common/camera-painter';
 
 /** Outputs prop shape of the vision-camera `Camera` component. */
 type CameraOutputs = ComponentProps<typeof Camera>['outputs'];
 
-/** Props for {@link FaceVerificationCamera}. */
-export interface FaceVerificationCameraProps {
-  /** Front-facing camera device from `useCameraDevice('front')`. */
+/** Props for {@link FaceCaptureCamera}. */
+export interface FaceCaptureCameraProps {
+  /** Active camera device (front camera for liveness capture). */
   device: CameraDevice;
-  /** Memoized outputs array `[faceDetectorOutput, photoOutput]`. */
+  /** Detector + photo outputs from `useFaceCapture().outputs`. */
   outputs: CameraOutputs;
-  /** Latest detected faces, painted by the overlay. */
+  /** Latest detected faces from `useFaceCapture().faces`. */
   faces: Face[];
-  /** Detector frame dimensions for coordinate scaling. */
+  /** Detector-frame dimensions (for painter scaling). */
   frameWidth: number;
   frameHeight: number;
-  /** Screen-space dimensions of the wrapping `onLayout` view. */
+  /** Layout/view dimensions (for painter scaling). */
   viewWidth: number;
   viewHeight: number;
+  /** Liveness instruction shown in the bottom banner
+   *  (from `useFaceCapture().message`). */
+  message: string;
 }
 
 /**
- * Renders the active front camera full-screen, overlays detected-face
- * boxes scaled from detector space to view space via
- * {@link FaceVerificationPainter}, and shows the current liveness
- * instruction in a translucent banner. The banner text is subscribed
- * from {@link useFaceVerificationStore}; detection logic stays in the
- * parent FaceVerificationScreen.
+ * Full-screen front-camera surface for blink liveness capture.
+ *
+ * Renders the active camera preview, overlays detected-face boxes scaled
+ * from detector space to view space via {@link CameraPainter}, and shows
+ * the current liveness instruction in a translucent bottom banner. Purely
+ * presentational: detection state, the outputs, and the banner message all
+ * flow in as props from {@link useFaceCapture}, so this component has no
+ * store dependency and can be shared by face verification and registration.
+ *
+ * @param props - {@link FaceCaptureCameraProps}.
  */
-export function FaceVerificationCamera({
+export function FaceCaptureCamera({
   device,
   outputs,
   faces,
@@ -40,9 +46,8 @@ export function FaceVerificationCamera({
   frameHeight,
   viewWidth,
   viewHeight,
-}: FaceVerificationCameraProps) {
-  const message = useFaceVerificationStore((s) => s.msg);
-
+  message,
+}: FaceCaptureCameraProps) {
   return (
     <>
       <Camera style={StyleSheet.absoluteFill} device={device} isActive={true} outputs={outputs} />
