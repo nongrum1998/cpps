@@ -14,7 +14,6 @@ import { TokenStoreManager } from '@stores/token.store';
 import { ENDPOINTS } from '@utils/constants/endpoints';
 
 import { isAuthPath } from './constants';
-import { decryptRequestResponse } from './decrypt-response';
 
 /** Shape of a login response body: `{ data: { token } }` when successful. */
 type LoginResponseBody = {

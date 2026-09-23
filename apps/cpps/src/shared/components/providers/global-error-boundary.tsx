@@ -2,7 +2,7 @@ import { Component, ErrorInfo, ReactNode } from 'react';
 import { View, Text } from 'react-native';
 import * as Updates from 'expo-updates';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { logger } from '@utils/logger';
+import { logger } from '../../../../../../packages/utils/src/logger';
 import { Button, Icon } from '@components/ui';
 import { Container } from '@components/layout';
 

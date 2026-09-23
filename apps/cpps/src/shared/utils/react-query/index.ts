@@ -1,5 +1,5 @@
 import { MutationCache, QueryCache, QueriesOptions, QueryClient } from '@tanstack/react-query';
-import { logger } from '@utils/logger';
+import { logger } from '../../../../../../packages/utils/src/logger';
 
 /**
  * React Query utilities barrel module.

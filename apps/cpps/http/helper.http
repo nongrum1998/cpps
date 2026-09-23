@@ -1,14 +1,14 @@
 ### --------------------------------------------
 ### Encrypt helper
 # -------------- Pre Script -------------------------
-< {%
-   require('./scripts/enc-req.http.js');
-%}
+# < {%
+#    require('./scripts/enc-req.http.js');
+# %}
 
 POST http://localhost:3000/api/cpps/PensionersApp/v1/encrypt
 
 {
-  "data": "123"
+  "data": "gAAAAABqs3m88JDQYzKlvOCS7UZRcjGp4nFctMqosVSL7e2maFfvUaetCR54PbG58Qmpl_Nm9Wm9_9X6emrw8Hhs4AmQ-2nayw=="
 }
 
 # -------------- Post Script -------------------------

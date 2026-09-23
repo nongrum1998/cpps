@@ -9,7 +9,7 @@ import { Button } from '@components/ui';
 import { PAGE_ROUTES } from '@utils/constants';
 import { saveAndShareBase64Pdf } from '@utils/helpers/save-base64-pdf';
 import { usePdfPreviewStore } from '@stores/pdf-preview';
-import { logger } from '@utils/logger';
+import { logger } from '@pension/utils';
 
 export function PdfPreview() {
   const isDownloadable = usePdfPreviewStore((s) => s.downloadable);

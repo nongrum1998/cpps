@@ -12,8 +12,8 @@ POST {{BASE_URL}}/login
 # Payload
 # ----------------------------
 {
-  "username":"{{PPO_NO}}",
-  "password":"{{PASSWORD}}"
+  "username":"MG/11xx",  
+  "password":"D@phne123"
 }
 # ----------------------------
 

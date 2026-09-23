@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { queryClient, setupFocusManager } from '@utils/react-query';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { logger } from '@utils/logger';
+import { logger } from '../../../../../../packages/utils/src/logger';
 
 type Props = {
   children: React.ReactNode;

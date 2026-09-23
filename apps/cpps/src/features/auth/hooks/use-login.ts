@@ -15,7 +15,7 @@ export function useLogin() {
       }
     },
     onError: (error) => {
-      console.log(error);
+      console.log(error.message);
     },
   });
 }
