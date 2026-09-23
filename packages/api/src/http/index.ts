@@ -1,10 +1,14 @@
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { handleResponse } from './handle-res';
+import { handleAxiosError, handleResponse } from './handle-res';
 import { ApiResponse } from '@pension/types';
 
 export function createHttp(client: AxiosInstance) {
   const request = async <T>(executor: () => Promise<AxiosResponse<T>>): Promise<ApiResponse<T>> => {
-    return handleResponse<T>(await executor());
+    try {
+      return handleResponse<T>(await executor());
+    } catch (e) {
+      return handleAxiosError(e);
+    }
   };
 
   return {
