@@ -3,6 +3,7 @@ import { ENDPOINTS } from '@utils/constants/endpoints';
 import { http } from '@utils/http';
 import { RegistrationStatusInput } from '../validators';
 import { useRegistrationStore } from '../store/registration';
+import { useAuthStore } from '@stores/auth.store';
 
 type PPOStatus = {
   bank_accno: string;
@@ -12,11 +13,12 @@ type PPOStatus = {
 };
 
 export function useCheckPPO() {
-  const { nextStep, saveData, setValidationData } = useRegistrationStore();
+  const { user } = useAuthStore();
+  const { nextStep, setValidationData } = useRegistrationStore();
   return useMutation({
     mutationFn: (data: RegistrationStatusInput) =>
       http.post<PPOStatus>(ENDPOINTS.USER.REGISTRATION_STATUS, data),
-    onSuccess: (data, variables) => {
+    onSuccess: (data) => {
       if (!data.success) return;
       if (!data.data) return;
 
@@ -24,9 +26,10 @@ export function useCheckPPO() {
       const bank_account_no = data.data?.bank_accno;
 
       if (!dob || !bank_account_no) return;
-      saveData({ ppo_no: variables.ppo_no });
+
       setValidationData({
-        bank_account_number: bank_account_no,
+        bank_accno: bank_account_no,
+        ppo_no: user?.ppo_no,
         dob,
       });
       nextStep();

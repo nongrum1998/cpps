@@ -1,24 +1,23 @@
 import { create } from 'zustand';
-import { RegisterPensionerInput } from '../validators';
+import { RegisterInput } from '../validators';
 
-const defaultValue: RegisterPensionerInput = {
-  ppo_no: '',
+const defaultValue: Omit<RegisterInput, 'confirm_password'> = {
   dob: '',
   password: '',
-  bank_account_number: '',
+  bank_accno: '',
 };
 
 interface RegistrationStore {
   step: number;
-  formData: RegisterPensionerInput;
+  formData: Omit<RegisterInput, 'confirm_password'>;
   setStep: (step: number) => void;
   nextStep: () => void;
   prevStep: () => void;
-  saveData: (data: Partial<RegisterPensionerInput>) => void;
+  saveData: (data: Partial<RegisterInput>) => void;
   reset: () => void;
 
-  validation: Omit<RegisterPensionerInput, 'ppo_no' | 'password'> | null;
-  setValidationData: (data: Omit<RegisterPensionerInput, 'ppo_no' | 'password'>) => void;
+  validation: Omit<RegisterInput, 'confirm_password' | 'password'> | null;
+  setValidationData: (data: Omit<RegisterInput, 'confirm_password' | 'password'>) => void;
 
   isSuccess: boolean;
   setSuccess: () => void;

@@ -2,8 +2,7 @@ import { Text, View } from 'react-native';
 
 import {
   ConfirmRegistrationScreen,
-  RegistrationPasswordForm,
-  RegistrationPersonalForm,
+  RegistrationForm,
   RegistrationStatusForm,
   RegistrationStepHeader,
   RegistrationSuccessView,
@@ -11,6 +10,7 @@ import {
 import { Container } from '@components/layout';
 import { FooterImg } from '@components/common/nic-footer-img';
 import { useRegistrationStore } from '../store/registration';
+import { RegistrationCamera } from '../components/registration-camera';
 
 /**
  * Four-step pensioner registration wizard shell.
@@ -58,9 +58,8 @@ export default function RegistrationScreen() {
       {/* Active step form */}
       <View className="mt-6 w-full">
         {step === 1 && <RegistrationStatusForm />}
-        {step === 2 && <RegistrationPersonalForm />}
-        {step === 3 && <RegistrationPasswordForm />}
-        {step === 4 && <ConfirmRegistrationScreen />}
+        {step === 2 && <RegistrationForm />}
+        {step === 3 && <RegistrationCamera />}
       </View>
 
       {/* Anchored to viewport bottom when content is short */}
