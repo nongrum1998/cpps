@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { ppoNoValidation } from './common';
 import { passwordValidation } from '@validation/common';
-import { ALLOW_REGEX } from '@utils/regex-patterns';
 import { formatPassword } from '@lib/encryption';
 
 export const RegistrationStatusSchema = z.object({
@@ -17,9 +16,7 @@ const dateOfBirthValidation = z
 
 const bankAccountValidation = z
   .string('Account no is Required')
-  .min(16, 'Account no should be 16 in length')
-  .max(16, 'Account no should be not less then 16 in length')
-  .regex(ALLOW_REGEX.NUMERIC_ONLY);
+  .min(4, 'Account Number should be atleast 4 in length');
 
 export const RegisterPersonalInfoSchema = z.object({
   dob: dateOfBirthValidation,
