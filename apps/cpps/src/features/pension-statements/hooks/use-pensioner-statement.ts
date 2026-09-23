@@ -4,7 +4,7 @@ import { http } from '@utils/http';
 import { ENDPOINTS } from '@utils/constants';
 import { decryptText } from '@lib/encryption';
 import { PensionStatementResponseI, PensionerStatement } from '../types';
-import { logger } from '../../../../../../packages/utils/src/logger';
+import { logger } from '@pension/utils';
 
 export function usePensionerStatement() {
   const { user, isSignedIn } = useAuthStore();
