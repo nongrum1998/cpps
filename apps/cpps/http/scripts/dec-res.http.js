@@ -1,30 +1,11 @@
-// Decrypts the `data` field of a JSON response body.
-//
-// Fernet wire format mirrors src/shared/lib/encryption/encryption.ts exactly:
-//   token = 0x80 | timestamp(8) | iv(16) | AES-128-CBC/PKCS7 ciphertext |
-//           HMAC-SHA256(payload, signingKey)
-//   key   = base64 of 32 bytes; first 16 = signing key, last 16 = AES key
-//   token is URL-safe base64.
-//
-// IMPORTANT (Kulala.nvim): this file must stay fully self-contained. Kulala
-// executes scripts by appending them to a temp CJS bundle, so relative
-// requires (./crypto) and npm lookups (crypto-js) fail with MODULE_NOT_FOUND.
-// Only Node built-ins are safe here.
 'use strict';
 
 const nodeCrypto = require('crypto');
 
-/** Encodes a Buffer as URL-safe base64 (same output as the shared lib). */
-function urlSafeB64(buffer) {
-  return buffer.toString('base64').replace(/\+/g, '-').replace(/\//g, '_');
-}
-
-/** Decodes URL-safe base64 (padding optional) into a Buffer. */
 function b64ToBuf(value) {
   return Buffer.from(String(value).replace(/-/g, '+').replace(/_/g, '/'), 'base64');
 }
 
-/** Splits a base64 Fernet key into its 16-byte signing and encryption halves. */
 function splitFernetKey(keyBase64) {
   const raw = b64ToBuf(keyBase64);
 
@@ -38,26 +19,15 @@ function splitFernetKey(keyBase64) {
   };
 }
 
-/**
- * Decrypts a Fernet token.
- * @param {string} encryptedText URL-safe base64 Fernet token.
- * @param {string} fernetKey base64 32-byte Fernet key.
- * @returns {string} UTF-8 plaintext.
- * @throws {Error} On invalid key length, token shape, HMAC, or padding.
- */
 function decryptText(encryptedText, fernetKey) {
   if (typeof encryptedText !== 'string') {
-    throw new TypeError(
-      `decryptText expected encrypted string, got ${typeof encryptedText}: ${JSON.stringify(encryptedText)}`
-    );
+    throw new TypeError(`decryptText expected string, got ${typeof encryptedText}`);
   }
 
   const { signingKey, encryptionKey } = splitFernetKey(fernetKey);
-
   const token = b64ToBuf(encryptedText);
 
   if (token.length < 73) {
-    // 1 (version) + 8 (timestamp) + 16 (iv) + 16 (min ciphertext) + 32 (hmac)
     throw new Error('Invalid Fernet token length');
   }
 
@@ -76,40 +46,75 @@ function decryptText(encryptedText, fernetKey) {
   const iv = token.subarray(9, 25);
   const ciphertext = token.subarray(25, token.length - 32);
 
-  let decrypted;
-
-  try {
-    const decipher = nodeCrypto.createDecipheriv('aes-128-cbc', encryptionKey, iv);
-    decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
-  } catch {
-    throw new Error('Fernet decryption failed');
-  }
-
+  const decipher = nodeCrypto.createDecipheriv('aes-128-cbc', encryptionKey, iv);
+  const decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
   const result = decrypted.toString('utf8');
 
   if (!result) {
-    throw new Error('Fernet decryption failed');
+    throw new Error('Fernet decryption yielded empty string');
   }
 
   return result;
 }
 
-const encrypted = response.body && response.body.data;
+(function runPostScript() {
+  const log = typeof client !== 'undefined' && client.log ? client.log : console.log;
+  log('--- POST-SCRIPT EXECUTING ---');
 
-if (!encrypted) {
-  return;
-}
+  // 1. Resolve response body (handle both string and pre-parsed object)
+  let body = response.body;
+  if (typeof body === 'string') {
+    try {
+      body = JSON.parse(body);
+    } catch {
+      // Body is a plain string token
+    }
+  }
 
-const key = request.environment.get('FERNET_KEY');
+  if (!body) {
+    log('POST-SCRIPT WARNING: Empty response body received.');
+    return;
+  }
 
-if (!key) {
-  throw new Error('FERNET_KEY is missing');
-}
+  // 2. Extract encrypted token across data/payload fields
+  const encrypted =
+    typeof body === 'string'
+      ? body
+      : body.data ||
+        body.payload ||
+        (body.success && typeof body.data === 'string' ? body.data : null);
 
-const normalizeData = typeof encrypted === 'string' ? encrypted : JSON.stringify(encrypted);
+  if (!encrypted || typeof encrypted !== 'string') {
+    log('POST-SCRIPT INFO: No encrypted :', JSON.stringify(body));
+    return;
+  }
 
-const decrypted = decryptText(normalizeData, key);
+  // 3. Obtain key from environment or global client state
+  const key =
+    (typeof request !== 'undefined' &&
+      request.environment &&
+      request.environment.get('FERNET_KEY')) ||
+    (typeof client !== 'undefined' && client.global && client.global.get('FERNET_KEY'));
 
-const data = typeof decrypted === 'string' ? JSON.parse(decrypted) : decrypted;
+  if (!key) {
+    throw new Error('POST-SCRIPT ERROR: FERNET_KEY is missing from environment and client.global');
+  }
 
-client.log('DEC =>', JSON.stringify(data, null, 2));
+  // 4. Decrypt and output
+  try {
+    const decrypted = decryptText(encrypted, key);
+    let parsedData;
+    try {
+      parsedData = JSON.parse(decrypted);
+    } catch {
+      parsedData = decrypted;
+    }
+
+    log('DEC =>', JSON.stringify(parsedData, null, 2));
+  } catch (err) {
+    log('POST-SCRIPT DECRYPTION ERROR:', err.message);
+  }
+})();
+
+// Clear module cache to allow execution on every request
+delete require.cache[require.resolve(__filename)];

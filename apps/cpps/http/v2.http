@@ -3,6 +3,10 @@
 ### --------------------------------------------
 # ------------ Pre-script -------------------
 < {%
+   request.variables.set('RAW_BODY', JSON.stringify({
+     username: request.environment.get('PPO_NO'),
+     password: request.environment.get('PASSWORD')
+   }));
    require("./scripts/enc-req.http.js");
 %}
 
@@ -12,8 +16,7 @@ POST {{BASE_URL}}/login
 # Payload
 # ----------------------------
 {
-  "username":"MG/11xx",  
-  "password":"D@phne123"
+  "payload": "{{ENC_PAYLOAD}}"
 }
 # ----------------------------
 

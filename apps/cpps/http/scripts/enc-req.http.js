@@ -1,30 +1,15 @@
-// Encrypts a request body and wraps it as { "payload": "<fernet token>" }.
-//
-// Fernet wire format mirrors src/shared/lib/encryption/encryption.ts exactly:
-//   token = 0x80 | timestamp(8) | iv(16) | AES-128-CBC/PKCS7 ciphertext |
-//           HMAC-SHA256(payload, signingKey)
-//   key   = base64 of 32 bytes; first 16 = signing key, last 16 = AES key
-//   token is URL-safe base64.
-//
-// IMPORTANT (Kulala.nvim): this file must stay fully self-contained. Kulala
-// executes scripts by appending them to a temp CJS bundle, so relative
-// requires (./crypto) and npm lookups (crypto-js) fail with MODULE_NOT_FOUND.
-// Only Node built-ins are safe here.
 'use strict';
 
 const nodeCrypto = require('crypto');
 
-/** Encodes a Buffer as URL-safe base64 (same output as the shared lib). */
 function urlSafeB64(buffer) {
   return buffer.toString('base64').replace(/\+/g, '-').replace(/\//g, '_');
 }
 
-/** Decodes URL-safe base64 (padding optional) into a Buffer. */
 function b64ToBuf(value) {
   return Buffer.from(String(value).replace(/-/g, '+').replace(/_/g, '/'), 'base64');
 }
 
-/** Splits a base64 Fernet key into its 16-byte signing and encryption halves. */
 function splitFernetKey(keyBase64) {
   const raw = b64ToBuf(keyBase64);
 
@@ -38,14 +23,6 @@ function splitFernetKey(keyBase64) {
   };
 }
 
-/**
- * Encrypts a plaintext string into a Fernet token.
- * @param {string} plainText UTF-8 plaintext.
- * @param {string} fernetKey base64 32-byte Fernet key.
- * @returns {string} URL-safe base64 Fernet token.
- * @throws {TypeError} When plainText is not a string.
- * @throws {Error} On invalid key length.
- */
 function encryptText(plainText, fernetKey) {
   if (typeof plainText !== 'string') {
     throw new TypeError(`encryptText expected string plaintext, got ${typeof plainText}`);
@@ -67,34 +44,56 @@ function encryptText(plainText, fernetKey) {
   return urlSafeB64(Buffer.concat([payload, hmac]));
 }
 
-const key = request.environment.get('FERNET_KEY');
+(function runPreScript() {
+  const log = typeof client !== 'undefined' && client.log ? client.log : console.log;
+  log('--- PRE-SCRIPT EXECUTING ---');
 
-if (!key) {
-  throw new Error('FERNET_KEY is missing');
-}
+  // 1. Obtain key from environment or global client state
+  const key =
+    (typeof request !== 'undefined' &&
+      request.environment &&
+      request.environment.get('FERNET_KEY')) ||
+    (typeof client !== 'undefined' && client.global && client.global.get('FERNET_KEY'));
 
-// Kulala exposes request.body as a read-only accessor object
-// ({ getRaw, tryGetSubstituted, getComputed }); the JetBrains HTTP client
-// exposes the raw body string. Read whichever shape is present.
-const body =
-  typeof request.body === 'object' && typeof request.body.getComputed === 'function'
-    ? request.body.getComputed() || request.body.tryGetSubstituted() || request.body.getRaw()
-    : request.body;
+  if (!key) {
+    throw new Error('PRE-SCRIPT ERROR: FERNET_KEY is missing from environment and client.global');
+  }
 
-const payload = typeof body === 'string' ? body : JSON.stringify(body || {});
+  // 2. Resolve raw payload to encrypt (reads RAW_BODY variable or request.body)
+  let rawData =
+    typeof request !== 'undefined' && request.variables ? request.variables.get('RAW_BODY') : null;
 
-const encrypted = encryptText(payload, key);
+  if (!rawData) {
+    const body =
+      typeof request !== 'undefined' &&
+      typeof request.body === 'object' &&
+      typeof request.body.getComputed === 'function'
+        ? request.body.getComputed() || request.body.tryGetSubstituted() || request.body.getRaw()
+        : request.body;
 
-if (typeof encrypted !== 'string') {
-  throw new Error('encryptText() did not return a string');
-}
+    rawData = typeof body === 'string' ? body : JSON.stringify(body || {});
+  }
 
-// JetBrains HTTP client: mutating request.body replaces the outgoing body.
-// Kulala.nvim pre-request scripts cannot mutate the request body; to encrypt
-// under Kulala, pre-compute the token into a request variable and reference it
-// from the body instead:
-//   request.variables.set('ENC_PAYLOAD', encrypted);
-//   body: { "payload": "{{ENC_PAYLOAD}}" }
-request.body = JSON.stringify({ payload: encrypted });
+  if (typeof rawData !== 'string') {
+    rawData = JSON.stringify(rawData);
+  }
 
-client.log('BODY =>', request.body);
+  log('--- Body ---');
+  log(rawData);
+  log('------------');
+  // 3. Encrypt payload
+  const encrypted = encryptText(rawData, key);
+
+  // 4. Store encrypted result in request variables and client global
+  if (typeof request !== 'undefined' && request.variables) {
+    request.variables.set('ENC_PAYLOAD', encrypted);
+  }
+  if (typeof client !== 'undefined' && client.global) {
+    client.global.set('ENC_PAYLOAD', encrypted);
+  }
+
+  log('ENC PAYLOAD =>', encrypted);
+})();
+
+// Clear module cache to allow execution on every request
+delete require.cache[require.resolve(__filename)];
