@@ -1,6 +1,7 @@
 import { Text, View } from 'react-native';
 
 import {
+  RegistrationCamera,
   RegistrationForm,
   RegistrationStatusForm,
   RegistrationStepHeader,
@@ -8,13 +9,17 @@ import {
 } from '../components';
 import { Container } from '@components/layout';
 import { useRegistrationStore } from '../store/registration';
-import { RegistrationCamera } from '../components/registration-camera';
 
 /**
- * Four-step pensioner registration wizard shell.
+ * Three-step pensioner registration wizard shell.
  *
  * Renders a large-print step header with progress bar and the active step
  * form. Content is top-aligned so the keyboard cannot shift layout.
+ *
+ * Step 1 checks the PPO number, step 2 collects details (DOB, bank account,
+ * password), and step 3 captures a liveness face photo and submits
+ * automatically. The step-3 header is hidden so the camera fills the
+ * screen.
  *
  * After a successful submit, the entire step content (header, form, footer)
  * is replaced by the success view, which resets the wizard and returns the

@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 import { cn } from '@pension/utils';
 
 /** Total number of steps in the registration wizard. */
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 3;
 
 /**
  * Per-step orientation copy shown above the active form.
@@ -21,12 +21,8 @@ const STEP_CONTENT: Record<number, { title: string; subtitle: string }> = {
     subtitle: 'Enter your date of birth and your pension bank account number.',
   },
   3: {
-    title: 'Create a Password',
-    subtitle: 'You will use this password every time you log in.',
-  },
-  4: {
-    title: 'Confirm & Submit',
-    subtitle: 'Check your details below, then tap Confirm & Submit.',
+    title: 'Capture & Submit',
+    subtitle: 'Position your face within the frame and blink to complete registration.',
   },
 };
 
@@ -38,14 +34,17 @@ interface RegistrationStepHeaderProps {
 /**
  * Large-print orientation header designed for elderly users.
  *
- * Renders "Step X of 4", the step title, one plain-language instruction,
+ * Renders "Step X of 3", the step title, one plain-language instruction,
  * and a segmented progress bar where filled segments equal completed or
  * active steps. All text is >=16px and uses theme tokens so dark mode
  * stays legible. The bar is decorative (`accessible={false}`); screen
- * readers get position from the "Step X of 4" text.
+ * readers get position from the "Step X of 3" text.
+ *
+ * The header hides entirely on the camera step (step 3) so the live view
+ * gets the full screen.
  *
  * @param props - Component props.
- * @param props.step - Current step; values outside 1..4 are clamped.
+ * @param props.step - Current step; values outside 1..3 are clamped.
  * @returns The rendered step header.
  */
 export function RegistrationStepHeader({ step }: RegistrationStepHeaderProps) {
