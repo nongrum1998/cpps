@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-
+import { useEffect, useState } from 'react';
 import {
   RegistrationCamera,
   RegistrationForm,
@@ -30,7 +30,13 @@ import { useRegistrationStore } from '../store/registration';
  * @returns The rendered registration screen.
  */
 export default function RegistrationScreen() {
-  const { step, isSuccess } = useRegistrationStore();
+  const [isMounted, setIsMounted] = useState(false);
+  const { step, isSuccess, reset } = useRegistrationStore();
+
+  useEffect(() => {
+    if (!isMounted) reset();
+    return () => setIsMounted(true);
+  }, [reset, isMounted]);
 
   if (isSuccess) {
     return (

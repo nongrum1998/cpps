@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 import { FaceCaptureCamera } from '@components/common/face-capture-camera';
 import { useFaceCapture } from '@hooks/use-face-capture';
@@ -50,7 +50,6 @@ export function RegistrationCamera() {
   const { formData, prevStep, setSuccess } = useRegistrationStore();
   const { hasPermission, requestPermission } = useCameraPermission();
   const device = useCameraDevice('front');
-  const insets = useSafeAreaInsets();
   const [phase, setPhase] = useState<RegistrationCameraPhase>('camera');
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -132,8 +131,8 @@ export function RegistrationCamera() {
 
           {/* Back to details — top-left over the live preview; inset below
               the status bar because the camera runs full-bleed */}
-          <View className="absolute left-5" style={{ top: insets.top + 12 }}>
-            <Button variant="outline" size="lg" onPress={prevStep}>
+          <View className="absolute bottom-5 left-5 right-5">
+            <Button size="lg" onPress={prevStep}>
               Back
             </Button>
           </View>

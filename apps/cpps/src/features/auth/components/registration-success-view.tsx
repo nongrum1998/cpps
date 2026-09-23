@@ -23,8 +23,8 @@ export function RegistrationSuccessView() {
   };
 
   return (
-    <View className="w-full gap-y-5">
-      <View className="rounded-md border border-emerald-500/30 bg-emerald-500/10 p-5">
+    <View className="w-full flex-1 flex-row gap-y-5">
+      <View className="gap-5 rounded-md border border-emerald-500/30 bg-emerald-500/10 p-5">
         <View className="flex-row items-center gap-3">
           <View className="h-10 w-10 items-center justify-center rounded-full bg-emerald-500">
             <Text className="text-lg font-black text-white">✓</Text>
@@ -42,7 +42,7 @@ export function RegistrationSuccessView() {
         <Text className="text-center text-lg font-medium leading-relaxed text-emerald-950/80">
           You can now log in with your PPO Number and the password you just created.
         </Text>
-        <Button size="lg" onPress={handleDone} className="mt-2 w-full">
+        <Button size="lg" onPress={handleDone} className="w-full">
           Go to Login
         </Button>
       </View>

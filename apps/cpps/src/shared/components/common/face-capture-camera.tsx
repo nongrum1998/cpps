@@ -60,7 +60,7 @@ export function FaceCaptureCamera({
         isFrontCamera={true}
       />
       {/* Bottom overlay message */}
-      <View className="absolute bottom-5 left-5 right-5 rounded-xl bg-black/75 p-4">
+      <View className="absolute left-5 right-5 top-5 rounded-xl bg-black/75 p-4">
         <Text className="text-center text-lg font-bold text-white">{message}</Text>
       </View>
     </>
