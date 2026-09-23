@@ -9,6 +9,7 @@ import {
 } from '../components';
 import { Container } from '@components/layout';
 import { useRegistrationStore } from '../store/registration';
+import { RegistrationErrorView } from '../components/registration-error-view';
 
 /**
  * Three-step pensioner registration wizard shell.
@@ -30,20 +31,18 @@ import { useRegistrationStore } from '../store/registration';
  * @returns The rendered registration screen.
  */
 export default function RegistrationScreen() {
-  const [isMounted, setIsMounted] = useState(false);
   const { step, isSuccess, isError, reset } = useRegistrationStore();
 
   useEffect(() => {
-    if (!isMounted) reset();
-    return () => setIsMounted(true);
-  }, [reset, isMounted]);
+    reset();
+  }, [reset]);
 
   if (isError) {
     return (
       <Container className="flex-1 gap-5">
         <View className="gap-2">
           <View className="bg-primary/10 self-start py-1">
-            <Text className="text-xs font-bold uppercase tracking-wider text-primary">Success</Text>
+            <Text className="text-xs font-bold uppercase tracking-wider text-primary">Error</Text>
           </View>
 
           <Text className="text-2xl font-extrabold tracking-tight text-foreground">
@@ -51,11 +50,11 @@ export default function RegistrationScreen() {
           </Text>
 
           <Text className="text-sm font-medium text-muted-foreground">
-            Your registration was successful. You can now log in with your details.
+            Your registration was unsuccessful.
           </Text>
         </View>
         <View className="mt-6 w-full">
-          <RegistrationSuccessView />
+          <RegistrationErrorView />
         </View>
       </Container>
     );

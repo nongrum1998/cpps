@@ -51,7 +51,6 @@ export function RegistrationCamera() {
   const { hasPermission, requestPermission } = useCameraPermission();
   const device = useCameraDevice('front');
   const [phase, setPhase] = useState<RegistrationCameraPhase>('camera');
-  const [errorMsg, setErrorMsg] = useState('');
 
   const register = useRegisterPensioner();
 
@@ -67,8 +66,7 @@ export function RegistrationCamera() {
   const handleCaptured = (cleanBase64: string) => {
     const parsed = RegisterPensionerSchema.safeParse({ ...formData, image: cleanBase64 });
     if (!parsed.success) {
-      setErrorMsg(parsed.error.issues[0]?.message ?? 'Invalid registration details');
-      setPhase('error');
+      setIsError();
       return;
     }
 
@@ -78,12 +76,10 @@ export function RegistrationCamera() {
         if (data.success) {
           setSuccess();
         } else {
-          setErrorMsg(data.message || 'Registration failed');
           setIsError();
         }
       },
       onError: () => {
-        setErrorMsg('Something went wrong. Please try again.');
         setIsError();
       },
     });

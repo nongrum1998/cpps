@@ -34,7 +34,7 @@ POST http://localhost:3000/api/echo
 
 {
   "url":"/facial_registration",
-  "status_code":400,
+  "status_code":200,
   "data":{ 
      "data":"gAAAAABqtAYJVyW7g5bwqc567aYs_TWJIfsU08BlEmK9er9OyPt_mXgBa4njfawCinxtoMZf_mcNgjWvLqNboxdEcQmJat70MNkQ0GAMvBYZXtKJRU9wEgu7tmOu70Msq4B-88PaT-eRYH8d90KkiJSsVPCFFrwK9CUdBCBa-4FcD3jXVVNCy4Cv9L2AqqLBO6wkYVzPbKk7" 
   }

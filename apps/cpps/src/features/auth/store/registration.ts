@@ -55,5 +55,6 @@ export const useRegistrationStore = create<RegistrationStore>((set, get) => ({
 
   setSuccess: () => set({ isSuccess: true }),
 
-  reset: () => set({ step: 1, formData: defaultValue, validation: null, isSuccess: false }),
+  reset: () =>
+    set({ step: 1, formData: defaultValue, validation: null, isSuccess: false, isError: false }),
 }));
