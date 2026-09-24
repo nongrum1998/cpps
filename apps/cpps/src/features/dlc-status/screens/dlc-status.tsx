@@ -3,11 +3,11 @@ import { Container } from '@components/layout';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AlertDescription, Alert, AlertTitle, Icon } from '@components/ui';
 import { FooterImg } from '@components/common';
-import { useVerificationStatus } from '@hooks/use-verification-status';
+import { useDlcStatus } from '@hooks/use-dlc-status';
 import { SubmitDLCCard } from '@components/common/submit-dlc-card';
 
 export const DLCStatusScreen = () => {
-  const { isLoading, isFetching, refetch, data } = useVerificationStatus();
+  const { isLoading, isFetching, refetch, data } = useDlcStatus();
 
   const isPhotoSubmitted = data?.is_valid === '03';
 

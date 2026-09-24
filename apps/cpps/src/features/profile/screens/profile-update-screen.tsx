@@ -25,8 +25,8 @@ export function ProfileUpdateScreen() {
   } = useForm<ProfileUpdateInput>({
     resolver: zodResolver(ProfileUpdateSchema),
     defaultValues: {
-      name: user?.name ?? '',
-      username: user?.username ?? '',
+      name: user?.pname ?? '',
+      username: user?.ppo_no ?? '',
     },
   });
 

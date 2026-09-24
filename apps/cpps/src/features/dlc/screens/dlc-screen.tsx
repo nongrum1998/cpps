@@ -2,7 +2,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { FooterImg } from '@components/common';
 import { DLCHeader, DLCInstructions } from '../components';
 import { Container } from '@components/layout';
-import { useInitializeVerification } from '@hooks/use-init-verification';
 import { SubmitDLCCard } from '@components/common/submit-dlc-card';
 
 /**
@@ -30,8 +29,8 @@ import { SubmitDLCCard } from '@components/common/submit-dlc-card';
  * @returns The DLC screen wrapped in a safe area and scroll view.
  */
 export function DLCScreen() {
-  const { msg } = useInitializeVerification();
-
+  // TODO: proper configure this
+  const msg = '';
   return (
     <SafeAreaView className="flex-1" edges={['left', 'right']}>
       {/* Main Content Area */}

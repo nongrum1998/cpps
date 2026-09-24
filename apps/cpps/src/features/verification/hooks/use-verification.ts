@@ -24,8 +24,7 @@ const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
 const mockImage = process.env.EXPO_PUBLIC_TEST_IMAGE as string;
 
 export function useSubmitVerification() {
-  // TODO: change and saperate this
-  const { setUser, user } = useAuthStore();
+  const { user, refresh } = useAuthStore();
   return useMutation({
     mutationFn: async (payload: VerificationPayload) => {
       const data = new URLSearchParams({
@@ -42,17 +41,17 @@ export function useSubmitVerification() {
     onSuccess: async (res) => {
       const data = res.data;
       if (res.success) {
-        const regStatus = user?.approval;
-        if (data?.self_ver_code !== '03' && regStatus !== '00') {
-          setUser({
-            approval: '01',
-            username: user?.username || '',
-            uid: user?.uid || '',
-            name: user?.name || '',
-            has_dlc: user?.has_dlc || '',
-            ppo_no: user?.username || '',
-          });
-        }
+        // const regStatus = user?.approval;
+        // if (data?.self_ver_code !== '03' && regStatus !== '00') {
+        //   setUser({
+        //     approval: '01',
+        //     username: user?.username || '',
+        //     uid: user?.uid || '',
+        //     name: user?.name || '',
+        //     has_dlc: user?.has_dlc || '',
+        //     ppo_no: user?.username || '',
+        //   });
+        // }
       }
       return data;
     },

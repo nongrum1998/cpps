@@ -4,7 +4,7 @@ import { http } from '@utils/http';
 import { ENDPOINTS } from '@utils/constants';
 import { VerificationStatusT } from '@features/verification';
 
-export function useVerificationStatus() {
+export function useDlcStatus() {
   const { user, isSignedIn } = useAuthStore();
 
   const ppo_id = user?.ppo_id;
@@ -13,7 +13,7 @@ export function useVerificationStatus() {
   return useQuery({
     queryKey: ['verificationStatus', ppo_id],
     queryFn: () =>
-      http.post<VerificationStatusT>(ENDPOINTS.VERIFICATION.STATUS, { ppo_id: ppo_id }),
+      http.post<VerificationStatusT>(ENDPOINTS.VERIFICATION.DLC_STATUS, { ppo_id: ppo_id }),
     select: (d) => d.data,
     enabled: isEnabled,
   });

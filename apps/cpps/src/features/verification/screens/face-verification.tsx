@@ -21,13 +21,12 @@ import type {
 import { FooterImg } from '@components/common';
 import { Container } from '@components/layout';
 import { useSnackbar } from '@hooks/use-snackbar';
-import { useInitializeVerification } from '@hooks/use-init-verification';
 
 type FaceVerificationScreenProps = FaceVerificationRouteParams;
 
 export function FaceVerificationScreen() {
-  const { regStatus } = useInitializeVerification();
-
+  // TODO: Change this
+  const regStatus = '03';
   const isRegistrationRequired = regStatus === '03' || regStatus === '02';
   const registrationStatus: number = isRegistrationRequired ? 1 : 0;
   const { hasPermission, requestPermission } = useCameraPermission();

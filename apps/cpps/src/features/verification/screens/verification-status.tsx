@@ -3,15 +3,14 @@ import { Container } from '@components/layout';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AlertDescription, Alert, AlertTitle, Icon } from '@components/ui';
 import { FooterImg } from '@components/common';
-import { useVerificationStatus } from '@hooks/use-verification-status';
+import { useDlcStatus } from '@hooks/use-dlc-status';
 import { LoadingScreen } from '@components/screens';
-import { useInitializeVerification } from '@hooks/use-init-verification';
 import { SubmitDLCCard } from '@components/common/submit-dlc-card';
 
 /**
  * Renders the "Verification Status" screen for a pensioner.
  *
- * Fetches the current verification status via {@link useVerificationStatus}
+ * Fetches the current verification status via {@link useDlcStatus}
  * and presents it in a scrollable, pull-to-refresh layout. The screen shows a
  * header introduction, a status badge displaying the raw `ver_status` code, a
  * dynamic section subtitle, and a "Record Overview" card listing the
@@ -31,10 +30,11 @@ import { SubmitDLCCard } from '@components/common/submit-dlc-card';
  * @returns The verification status screen within a safe area and container.
  */
 export function VerificationStatusScreen() {
-  const { data, isFetching, isLoading, refetch } = useVerificationStatus();
+  const { data, isFetching, isLoading, refetch } = useDlcStatus();
 
-  const { msg } = useInitializeVerification();
+  //TODO: proper configure this
 
+  const msg = '';
   if (isLoading || isFetching) {
     return <LoadingScreen />;
   }

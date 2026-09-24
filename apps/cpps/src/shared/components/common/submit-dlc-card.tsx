@@ -6,10 +6,13 @@ import { Ternary } from './ternary';
 import { useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 import * as Linking from 'expo-linking';
 import { useNetworkStatus } from '@hooks/use-network-status';
+import { useAuthStore } from '@stores/auth.store';
+import { isWithinProcessingPeriod } from '@utils/helpers/is-within-processing-period';
 
 export const SubmitDLCCard = () => {
   const { navigate } = useSafeNavigation();
   const { hasPermission, requestPermission, canRequestPermission } = useCameraPermission();
+  const { user } = useAuthStore();
 
   const frontCamera = useCameraDevice('front');
   const { isOffline } = useNetworkStatus();
@@ -38,7 +41,11 @@ export const SubmitDLCCard = () => {
         condition={hasPermission}
         ifTrue={
           <Button
-            disabled={isDisableCapture || isOffline}
+            disabled={
+              isDisableCapture ||
+              isOffline ||
+              isWithinProcessingPeriod(user?.app_date, user?.app_exp)
+            }
             size="lg"
             onPress={handleCapturePress}
             activeOpacity={0.8}>
