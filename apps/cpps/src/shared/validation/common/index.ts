@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { PAGE_SIZE } from '@utils/constants/common';
+import { ALLOW_REGEX } from '@utils/regex-patterns';
 
 export const uuidValidation = z.uuid('Invalid ID');
 
@@ -28,3 +29,14 @@ export const passwordValidation = z
   .string('Password is required')
   .min(8, 'Password must be at least 8 characters')
   .max(50, 'Password must be at most 50 characters');
+
+/**
+ * Validates a PPO number / username string against the allowed-character
+ * regex (ALLOW_REGEX.USERNAME) and trims the result. Shared by the login
+ * and registration validators.
+ */
+export const ppoNoValidation = (message?: string) =>
+  z
+    .string(`${message || 'PPO No'} is Required`)
+    .regex(ALLOW_REGEX.USERNAME, `Invalid ${message || 'PPO No'}`)
+    .trim();
