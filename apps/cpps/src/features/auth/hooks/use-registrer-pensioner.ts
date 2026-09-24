@@ -39,6 +39,5 @@ export function useRegisterPensioner() {
       };
       return http.post<RegisterPensionerData>(ENDPOINTS.USER.CREATE_PENSIONER, payload);
     },
-    onSuccess: (data) => console.log('useRegisterPensioner Res', data),
   });
 }
