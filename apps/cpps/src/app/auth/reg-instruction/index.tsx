@@ -1,4 +1,4 @@
-import { RegistrationInstructionScreen } from '@features/auth/screens';
+import { RegistrationInstructionScreen } from '@features/registration';
 
 export default function page() {
   return <RegistrationInstructionScreen />;
