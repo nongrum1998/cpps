@@ -4,7 +4,7 @@
   "main": "expo-router/entry",
   "scripts": {
     "dev": "expo start --clear --localhost",
-    "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
+    "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\" && tsc --noEmit",
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "preview:local": "eas build --profile preview --platform android --local --output 'build-preview-$(date +%d-%m-%Y-%H%M).apk'",
     "preview": "eas build --profile preview --platform android --output 'build-preview-$(date +%d-%m-%Y-%H%M).apk'",
@@ -13,12 +13,14 @@
     "export": "expo export",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "5.9.1",
     "@hugeicons/core-free-icons": "4.3.0",
     "@hugeicons/react-native": "1.0.16",
+    "@pension/core": "workspace:*",
     "@pension/api": "workspace:*",
     "@pension/utils": "workspace:*",
     "@react-native-community/netinfo": "12.0.1",
