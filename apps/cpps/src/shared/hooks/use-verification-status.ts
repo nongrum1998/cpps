@@ -14,7 +14,7 @@ export function useVerificationStatus() {
     queryKey: ['verificationStatus', ppo_id],
     queryFn: () =>
       http.post<VerificationStatusT>(ENDPOINTS.VERIFICATION.STATUS, { ppo_id: ppo_id }),
-    select: (d) => console.log(d),
+    select: (d) => d.data,
     enabled: isEnabled,
   });
 }
