@@ -10,6 +10,9 @@ import {
 import { Container } from '@components/layout';
 import { useRegistrationStore } from '../store/registration';
 import { RegistrationErrorView } from '../components/registration-error-view';
+import { useRegisterPensioner } from '../hooks';
+import { LoadingScreen } from '@components/screens';
+import { RegisterPensionerInput } from '../validators';
 
 /**
  * Three-step pensioner registration wizard shell.
@@ -31,13 +34,23 @@ import { RegistrationErrorView } from '../components/registration-error-view';
  * @returns The rendered registration screen.
  */
 export default function RegistrationScreen() {
-  const { step, isSuccess, isError, reset } = useRegistrationStore();
+  const { step, reset } = useRegistrationStore();
+  const { mutate, data, isPending, isSuccess } = useRegisterPensioner();
 
+  const onSubmit = (value: RegisterPensionerInput) => {
+    mutate(value, {
+      onSuccess: () => {},
+    });
+  };
   useEffect(() => {
     reset();
   }, [reset]);
 
-  if (isError) {
+  if (isPending) {
+    return <LoadingScreen />;
+  }
+
+  if (isSuccess && !data?.success) {
     return (
       <Container className="flex-1 gap-5">
         <View className="gap-2">
@@ -48,19 +61,16 @@ export default function RegistrationScreen() {
           <Text className="text-2xl font-extrabold tracking-tight text-foreground">
             Registration
           </Text>
-
-          <Text className="text-sm font-medium text-muted-foreground">
-            Your registration was unsuccessful.
-          </Text>
+          <Text className="text-sm font-medium text-muted-foreground">Something when wrong</Text>
         </View>
         <View className="mt-6 w-full">
-          <RegistrationErrorView />
+          <RegistrationErrorView message={data?.message} />
         </View>
       </Container>
     );
   }
 
-  if (isSuccess) {
+  if (isSuccess && data.success) {
     return (
       <Container className="flex-1 gap-5">
         <View className="gap-2">
@@ -77,7 +87,7 @@ export default function RegistrationScreen() {
           </Text>
         </View>
         <View className="mt-6 w-full">
-          <RegistrationSuccessView />
+          <RegistrationSuccessView message={data.message} />
         </View>
       </Container>
     );
@@ -86,7 +96,7 @@ export default function RegistrationScreen() {
   // Step 3 renders outside the Container so the camera gets a definite
   // height (see the doc comment above).
   if (step === 3) {
-    return <RegistrationCamera />;
+    return <RegistrationCamera onSubmit={onSubmit} />;
   }
 
   return (

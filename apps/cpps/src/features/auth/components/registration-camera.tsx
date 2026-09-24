@@ -8,8 +8,9 @@ import { Button } from '@components/ui';
 import { FooterImg } from '@components/common';
 import { Container } from '@components/layout';
 import { useRegisterPensioner } from '../hooks';
-import { RegisterPensionerSchema } from '../validators';
+import { RegisterPensionerInput, RegisterPensionerSchema } from '../validators';
 import { useRegistrationStore } from '../store';
+import { useImageCompressor } from '@hooks/use-image-compressor';
 
 /**
  * Camera phases of the registration submit step.
@@ -46,13 +47,15 @@ type RegistrationCameraPhase = 'camera' | 'capturing' | 'submitting' | 'error';
  *
  * @returns The rendered registration camera step.
  */
-export function RegistrationCamera() {
-  const { formData, prevStep, setSuccess, setIsError } = useRegistrationStore();
+type RegistrationCameraProps = {
+  onSubmit: (data: RegisterPensionerInput) => void;
+};
+
+export function RegistrationCamera({ onSubmit }: RegistrationCameraProps) {
+  const { formData, prevStep } = useRegistrationStore();
   const { hasPermission, requestPermission } = useCameraPermission();
   const device = useCameraDevice('front');
   const [phase, setPhase] = useState<RegistrationCameraPhase>('camera');
-
-  const register = useRegisterPensioner();
 
   useEffect(() => {
     if (!hasPermission) requestPermission();
@@ -63,26 +66,13 @@ export function RegistrationCamera() {
    * registration. Called by {@link useFaceCapture} after capture + compress
    * complete, so the capture gate is already released when this runs.
    */
-  const handleCaptured = (cleanBase64: string) => {
+  const handleCaptured = async (cleanBase64: string) => {
+    setPhase('submitting');
     const parsed = RegisterPensionerSchema.safeParse({ ...formData, image: cleanBase64 });
     if (!parsed.success) {
-      setIsError();
       return;
     }
-
-    setPhase('submitting');
-    register.mutate(parsed.data, {
-      onSuccess: (data) => {
-        if (data.success) {
-          setSuccess();
-        } else {
-          setIsError();
-        }
-      },
-      onError: () => {
-        setIsError();
-      },
-    });
+    onSubmit(parsed.data);
   };
 
   // Shared blink-liveness capture pipeline; inactive outside the camera

@@ -13,7 +13,11 @@ import { PAGE_ROUTES } from '@utils/constants';
  *
  * @returns The rendered success view.
  */
-export function RegistrationSuccessView() {
+type RegistrationSuccessViewProps = {
+  message: string;
+};
+
+export function RegistrationSuccessView({ message }: RegistrationSuccessViewProps) {
   const reset = useRegistrationStore((state) => state.reset);
   const { navigate } = useSafeNavigation();
 
@@ -40,7 +44,7 @@ export function RegistrationSuccessView() {
         <View className="h-[1px] w-full bg-emerald-500/20" />
 
         <Text className="text-center text-lg font-medium leading-relaxed text-emerald-950/80">
-          You can now log in with your PPO Number and the password you just created.
+          {message}
         </Text>
         <Button size="lg" onPress={handleDone} className="w-full">
           Go to Login

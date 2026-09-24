@@ -13,7 +13,12 @@ import { PAGE_ROUTES } from '@utils/constants';
  *
  * @returns The rendered success view.
  */
-export function RegistrationErrorView() {
+type RegistrationErrorViewProps = {
+  message?: string;
+};
+export function RegistrationErrorView({
+  message = 'Please try again',
+}: RegistrationErrorViewProps) {
   const reset = useRegistrationStore((state) => state.reset);
   const { navigate } = useSafeNavigation();
 
@@ -31,14 +36,16 @@ export function RegistrationErrorView() {
           </View>
           <View className="flex-1">
             <Text className="text-base font-bold text-red-900">Registration Failed</Text>
-            <Text className="text-sm font-semibold text-red-700">Your account was not created</Text>
+            <Text className="text-sm font-semibold text-red-700">
+              Face verification was unable to complete
+            </Text>
           </View>
         </View>
 
         <View className="h-[1px] w-full bg-red-500/20" />
 
         <Text className="text-center text-lg font-medium leading-relaxed text-emerald-950/80">
-          Please try again
+          {message}
         </Text>
         <Button variant={'destructive'} size="lg" onPress={handleDone} className="w-full">
           Try again

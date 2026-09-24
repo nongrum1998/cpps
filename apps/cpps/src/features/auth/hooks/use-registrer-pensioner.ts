@@ -8,12 +8,10 @@ import { RegisterPensionerInput } from '../validators';
  * Response payload of `POST {USER.CREATE_PENSIONER}` — callers currently
  * only consume the envelope's `success` and `message` fields.
  */
+
 interface RegisterPensionerData {
   ppo_no?: string | null;
 }
-
-const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
-const mockImage = process.env.EXPO_PUBLIC_TEST_IMAGE as string;
 
 /**
  * Registers a pensioner after the PPO check, details entry, and face capture.
@@ -32,18 +30,15 @@ const mockImage = process.env.EXPO_PUBLIC_TEST_IMAGE as string;
 export function useRegisterPensioner() {
   return useMutation({
     mutationFn: (data: RegisterPensionerInput) => {
-      const payload = new URLSearchParams({
+      const payload = {
         ppo_no: data.ppo_no,
         dob: data.dob,
         bank_accno: data.bank_accno,
         password: formatPassword(data.password),
-        image: __DEV__ ? mockImage : data.image,
-      });
-
-      return http.post<RegisterPensionerData>(ENDPOINTS.USER.CREATE_PENSIONER, payload, {
-        headers,
-        timeout: 30_000,
-      });
+        image: data.image,
+      };
+      return http.post<RegisterPensionerData>(ENDPOINTS.USER.CREATE_PENSIONER, payload);
     },
+    onSuccess: (data) => console.log('useRegisterPensioner Res', data),
   });
 }

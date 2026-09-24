@@ -72,9 +72,7 @@ export const handleErrorResponse = () => {
         JSON.stringify(
           {
             method: error?.config?.method,
-            baseURL: error?.config?.baseURL,
             url: error?.config?.url,
-            data: error?.config?.data,
             status: error?.status,
           },
           null,

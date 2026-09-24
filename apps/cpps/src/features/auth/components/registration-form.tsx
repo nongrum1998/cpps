@@ -76,8 +76,8 @@ export const RegistrationForm = () => {
                 const digits = v.replace(/\D/g, '').slice(0, 8);
 
                 const formatted = digits
-                  .replace(/^(\d{2})(\d)/, '$1-$2')
-                  .replace(/^(\d{2})-(\d{2})(\d)/, '$1-$2-$3');
+                  .replace(/^(\d{2})(\d)/, '$1/$2')
+                  .replace(/^(\d{2}\/\d{2})(\d)/, '$1/$2');
 
                 onChange(formatted);
               }}
