@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { ppoNoValidation } from './common';
-import { passwordValidation } from '@validation/common';
+import { passwordValidation, ppoNoValidation } from '@validation/common';
 import { ZodIssueCode } from 'zod/v3';
 
 export const RegistrationStatusSchema = z.object({
