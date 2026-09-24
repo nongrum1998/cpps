@@ -8,11 +8,35 @@ jest.mock('expo-secure-store', () => ({
   deleteItemAsync: jest.fn(),
 }));
 jest.mock('expo-router', () => ({ router: { replace: jest.fn() } }));
-jest.mock('@lib/encryption', () => ({ encryptFields: jest.fn((v: unknown) => v) }));
-jest.mock('@utils/http/client', () => ({
-  __esModule: true,
-  default: { get: jest.fn(), post: jest.fn(), put: jest.fn(), delete: jest.fn() },
+jest.mock('@lib/encryption', () => ({
+  encryptFields: jest.fn((v: unknown) => v),
+  decryptFields: jest.fn((v: unknown) => v),
 }));
+
+jest.mock('axios', () => {
+  const actual = jest.requireActual('axios') as typeof import('axios');
+  const request = jest.fn().mockRejectedValue(new Error('not implemented'));
+  const client = {
+    get: request,
+    post: request,
+    put: request,
+    delete: request,
+    interceptors: {
+      request: { use: jest.fn() },
+      response: { use: jest.fn() },
+    },
+  };
+  const create = jest.fn(() => client);
+
+  return {
+    ...actual,
+    create,
+    default: {
+      ...(actual.default as object),
+      create,
+    },
+  };
+});
 
 const mockClient = apiClient as jest.Mocked<typeof apiClient>;
 const okResponse = { status: 200, data: { id: 1 }, headers: {}, config: {} } as any;
