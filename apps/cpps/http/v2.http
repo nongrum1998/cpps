@@ -261,7 +261,7 @@ Content-Type: application/json
     ver_mode_code: "01",
     self_ver_code: "01",
     place: "New Delhi",
-    image:"image"
+    image:""
    }));
    require("./scripts/enc-req.http.js");
 %}
