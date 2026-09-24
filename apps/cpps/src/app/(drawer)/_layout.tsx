@@ -26,7 +26,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
           </View>
 
           <View className="items-center">
-            <Text className="text-sm font-semibold text-white">{user?.name}</Text>
+            <Text className="text-sm font-semibold text-white">{user?.pname}</Text>
           </View>
         </View>
       </View>

@@ -12,6 +12,7 @@ const getRegStatusMessage = (currentReg: string | null | undefined): string => {
 
 export function useInitializeVerification() {
   const { user, isSignedIn } = useAuthStore();
+
   const initData = {
     regStatus: user?.approval,
     dlc: user?.has_dlc,

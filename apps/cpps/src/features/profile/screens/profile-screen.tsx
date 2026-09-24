@@ -31,12 +31,12 @@ export function ProfileScreen() {
   }
 
   const fields: { label: string; value: string }[] = [
-    { label: 'Name', value: user.name },
+    { label: 'Name', value: user.pname },
     { label: 'Username', value: user.ppo_no },
-    { label: 'Approval', value: user.approval },
-    { label: 'Has DLC', value: user.has_dlc },
-    { label: 'Phone No', value: user.phone_no || '—' },
-    { label: 'Organization', value: user.organization || '—' },
+    { label: 'Date of birth', value: user.dob },
+    { label: 'Gender', value: user.gender },
+    { label: 'Pension Class', value: user.pclass || '—' },
+    { label: 'Treasury', value: user.treasury_name || '—' },
   ];
 
   return (
@@ -52,10 +52,10 @@ export function ProfileScreen() {
           </View>
 
           <Text className="text-2xl font-extrabold tracking-tight text-foreground">
-            {user.name}
+            {user.pname}
           </Text>
           <Text className="text-sm font-medium text-muted-foreground">
-            {user.organization ?? '-'}
+            {user.treasury_name ?? '-'}
           </Text>
         </View>
         {/* Field list */}
