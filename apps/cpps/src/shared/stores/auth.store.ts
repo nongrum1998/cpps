@@ -33,6 +33,7 @@ export const useAuthStore = create<AuthStore>()(
           try {
             const { data, success } = await http.post<UserT>(ENDPOINTS.AUTH.USER, {});
             if (data && success) {
+              console.log(data);
               set({
                 user: data,
                 isSignedIn: true,

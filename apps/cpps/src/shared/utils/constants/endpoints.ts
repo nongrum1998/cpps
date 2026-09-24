@@ -35,9 +35,9 @@ export const ENDPOINTS = {
   /** Verification-related endpoints. */
   VERIFICATION: {
     /** Submits or retrieves verification data. */
-    VERIFICATION: '/verification',
+    VERIFICATION: '/dlc',
     /** Retrieves verification status. */
-    STATUS: '/verification_status',
+    STATUS: '/dlc_status',
   },
 
   /** DLC (life certificate) endpoints. */

@@ -39,7 +39,6 @@ export const encryptReqBody = () => {
         payload: JSON.stringify(config.data),
       });
     }
-
     return config;
   };
 };
@@ -48,6 +47,7 @@ export const attachReqHeaderAccessToken = () => {
   return async (config: InternalAxiosRequestConfig) => {
     const accessToken = await TokenStoreManager.getAccessToken();
 
+    console.log(accessToken);
     if (accessToken && !config.headers.Authorization) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }

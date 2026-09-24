@@ -7,14 +7,14 @@ import { VerificationStatusT } from '@features/verification';
 export function useVerificationStatus() {
   const { user, isSignedIn } = useAuthStore();
 
-  const ppo_no = user?.ppo_no;
+  const ppo_id = user?.ppo_id;
 
-  const isEnabled = isSignedIn && !!ppo_no;
-
+  const isEnabled = isSignedIn && !!ppo_id;
   return useQuery({
-    queryKey: ['verificationStatus', ppo_no],
-    queryFn: () => http.post<VerificationStatusT>(ENDPOINTS.VERIFICATION.STATUS, { ppo_no }),
-    select: (d) => d.data,
+    queryKey: ['verificationStatus', ppo_id],
+    queryFn: () =>
+      http.post<VerificationStatusT>(ENDPOINTS.VERIFICATION.STATUS, { ppo_id: ppo_id }),
+    select: (d) => console.log(d),
     enabled: isEnabled,
   });
 }

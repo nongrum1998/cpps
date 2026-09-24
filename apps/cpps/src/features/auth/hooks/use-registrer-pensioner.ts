@@ -1,8 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
 import { ENDPOINTS } from '@utils/constants';
 import { http } from '@utils/http';
-import { formatPassword } from '@lib/encryption';
+import { formatPassword, sha256 } from '@lib/encryption';
 import { RegisterPensionerInput } from '../validators';
+import { logger } from '@pension/utils';
 
 /**
  * Response payload of `POST {USER.CREATE_PENSIONER}` — callers currently
@@ -34,10 +35,13 @@ export function useRegisterPensioner() {
         ppo_no: data.ppo_no,
         dob: data.dob,
         bank_accno: data.bank_accno,
-        password: formatPassword(data.password),
-        image: data.image,
+        password: sha256(data.password),
+        image: '',
       };
-      return http.post<RegisterPensionerData>(ENDPOINTS.USER.CREATE_PENSIONER, payload);
+      return http.post<RegisterPensionerData>(ENDPOINTS.USER.CREATE_PENSIONER, payload, {
+        timeout: 60_000,
+      });
     },
+    onSuccess: (data) => logger.log('UseRegiserPensioner', data),
   });
 }
