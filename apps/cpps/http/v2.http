@@ -5,20 +5,17 @@
 < {%
    request.variables.set('RAW_BODY', JSON.stringify({
      username: request.environment.get('PPO_NO'),
-     password: request.environment.get('PASSWORD')
+     password: request.environment.get('FORMAT_PASSWORD')
    }));
    require("./scripts/enc-req.http.js");
 %}
 
 POST {{BASE_URL}}/login
+Content-Type: application/json
 
-# ----------------------------
-# Payload
-# ----------------------------
 {
   "payload": "{{ENC_PAYLOAD}}"
 }
-# ----------------------------
 
 # ------------ Post-script -------------------
 > {%
@@ -26,7 +23,7 @@ POST {{BASE_URL}}/login
 %}
 
 # ----------------------------
-# Response
+# Response Schema Reference
 # ----------------------------
 # {
 #   "data": {
@@ -36,26 +33,24 @@ POST {{BASE_URL}}/login
 #   "success": true
 # }
 # ----------------------------
-### --------------------------------------------
 
 ### --------------------------------------------
 ### Pension statement
 ### --------------------------------------------
 # ------------ Pre-script -------------------
 < {%
+   request.variables.set('RAW_BODY', JSON.stringify({
+     pp_no: request.environment.get('PPO_NO')
+   }));
    require("./scripts/enc-req.http.js");
 %}
 
 POST {{BASE_URL}}/paymentslip
+Content-Type: application/json
 
-# ----------------------------
-# Payload
-# ----------------------------
-# {
-#   "pp_no":"[Redacted]"
-# }
-{ "payload":"{{DAT_PENSION_PAYMENT_SLIP_PAYLOAD}}" }
-# ----------------------------
+{
+  "payload": "{{ENC_PAYLOAD}}"
+}
 
 # ------------ Post-script -------------------
 > {%
@@ -63,7 +58,7 @@ POST {{BASE_URL}}/paymentslip
 %}
 
 # ----------------------------
-# Response
+# Response Schema Reference
 # ----------------------------
 # {
 #   "pdf": "string",
@@ -97,23 +92,24 @@ POST {{BASE_URL}}/paymentslip
 #   "success": true
 # }
 # ----------------------------
-### --------------------------------------------
 
 ### --------------------------------------------
 ### Pension logout
 ### --------------------------------------------
 # ------------ Pre-script -------------------
 < {%
+   request.variables.set('RAW_BODY', JSON.stringify({
+     token: request.environment.get('ACCESS_TOKEN')
+   }));
    require("./scripts/enc-req.http.js");
 %}
 
 POST {{BASE_URL}}/logout
+Content-Type: application/json
 
-# ----------------------------
-# Payload
-# ----------------------------
-{ "token":"{{ACCESS_TOKEN}}" }
-# ----------------------------
+{
+  "payload": "{{ENC_PAYLOAD}}"
+}
 
 # ------------ Post-script -------------------
 > {%
@@ -121,14 +117,13 @@ POST {{BASE_URL}}/logout
 %}
 
 # ----------------------------
-# Response
+# Response Schema Reference
 # ----------------------------
 # {
 #   "message": "success",
 #   "status": true
 # }
 # ----------------------------
-### --------------------------------------------
 
 ### --------------------------------------------
 ### get-ppo-status
@@ -142,15 +137,11 @@ POST {{BASE_URL}}/logout
 %}
 
 POST {{BASE_URL}}/get_ppo_status
+Content-Type: application/json
 
-# ----------------------------
-# Payload
-# ----------------------------
-# {
-#   "ppo_no":"[Redacted]"
-# }
-{ "payload": "{{ENC_PAYLOAD}}" }
-# ----------------------------
+{
+  "payload": "{{ENC_PAYLOAD}}"
+}
 
 # ------------ Post-script -------------------
 > {%
@@ -158,7 +149,7 @@ POST {{BASE_URL}}/get_ppo_status
 %}
 
 # ----------------------------
-# Response
+# Response Schema Reference
 # ----------------------------
 # {
 #   "data": {
@@ -167,26 +158,25 @@ POST {{BASE_URL}}/get_ppo_status
 #     "dob": "string",
 #     "bank_accno": "string"
 #   },
-#   "success": true | false
+#   "success": true
 # }
 # ----------------------------
-### --------------------------------------------
 
 ### --------------------------------------------
 ### get-user
 ### --------------------------------------------
 # ------------ Pre-script -------------------
 < {%
+   request.variables.set('RAW_BODY', JSON.stringify({}));
    require("./scripts/enc-req.http.js");
 %}
 
 POST {{BASE_URL}}/user
+Content-Type: application/json
 
-# ----------------------------
-# Payload
-# ----------------------------
-{}
-# ----------------------------
+{
+  "payload": "{{ENC_PAYLOAD}}"
+}
 
 # ------------ Post-script -------------------
 > {%
@@ -194,56 +184,54 @@ POST {{BASE_URL}}/user
 %}
 
 # ----------------------------
-# Response
+# Response Schema Reference
 # ----------------------------
 # {
-# "data": {
-#   "app_date": "string",
-#   "app_exp": "string",
-#   "bank_accno": "string",
-#   "dob": "string",
-#   "gender": "string",
-#   "member_id": "string",
-#   "mtype": "string",
-#   "pclass": "string",
-#   "pclass_cd": "string",
-#   "photo": "string",
-#   "pname": "string",
-#   "ppo_id": "string",
-#   "ppo_no": "string",
-#   "ptype_cd": "string",
-#   "rela": "string",
-#   "trea_code": "string",
-#   "treasury_name": "string"
-#  },
-#  "message": "string",
-#  "status": "boolean"
+#   "data": {
+#     "app_date": "string",
+#     "app_exp": "string",
+#     "bank_accno": "string",
+#     "dob": "string",
+#     "gender": "string",
+#     "member_id": "string",
+#     "mtype": "string",
+#     "pclass": "string",
+#     "pclass_cd": "string",
+#     "photo": "string",
+#     "pname": "string",
+#     "ppo_id": "string",
+#     "ppo_no": "string",
+#     "ptype_cd": "string",
+#     "rela": "string",
+#     "trea_code": "string",
+#     "treasury_name": "string"
+#   },
+#   "message": "string",
+#   "status": true
 # }
 # ----------------------------
-### --------------------------------------------
 
 ### --------------------------------------------
 ### facial-registration
 ### --------------------------------------------
 # ------------ Pre-script -------------------
 < {%
+   request.variables.set('RAW_BODY', JSON.stringify({
+     ppo_no: request.environment.get('PPO_NO'),
+     dob: request.environment.get('DOB'),
+     bank_accno: request.environment.get('BANK_ACCNO'),
+     password: request.environment.get('FORMAT_PASSWORD'),
+     image: request.environment.get('EXPO_PUBLIC_TEST_IMAGE')
+   }));
    require("./scripts/enc-req.http.js");
 %}
 
 POST {{BASE_URL}}/facial_registration
+Content-Type: application/json
 
-# ----------------------------
-# Payload
-# ----------------------------
-# {
-#   "ppo_no": "[Redacted]",
-#   "dob": "[Redacted]",
-#   "bank_accno": "[Redacted]",
-#   "password":"[Redacted]",
-#   "image":"{{EXPO_PUBLIC_TEST_IMAGE}}"
-# }
-{ "payload":"{{FACIAL_REG_PAYLOAD}}" }
-# ----------------------------
+{
+  "payload": "{{ENC_PAYLOAD}}"
+}
 
 # ------------ Post-script -------------------
 > {%
@@ -251,32 +239,39 @@ POST {{BASE_URL}}/facial_registration
 %}
 
 # ----------------------------
-# Response
+# Response Schema Reference
 # ----------------------------
 # {
-#  "data": {},
-#  "message": "string",
-#  "status": "boolean"
+#   "data": {},
+#   "message": "string",
+#   "status": true
 # }
 # ----------------------------
-### --------------------------------------------
 
 ### --------------------------------------------
 ### submit-dlc
 ### --------------------------------------------
 # ------------ Pre-script -------------------
 < {%
+   request.variables.set('RAW_BODY', JSON.stringify({ 
+    selfVerNec: "NA",
+    selfVerNmc: "NA",
+    device: "Pixel 7 Pro",
+    device_id: "8f3b92e1-4c10-4d87-9a02-b2e18f943c21",
+    ver_mode_code: "01",
+    self_ver_code: "01",
+    place: "New Delhi",
+    image:"image"
+   }));
    require("./scripts/enc-req.http.js");
 %}
 
 POST {{BASE_URL}}/dlc
+Content-Type: application/json
 
-# ----------------------------
-# Payload
-# ----------------------------
-# {}
-{ "payload":"{{FACIAL_REG_PAYLOAD}}" }
-# ----------------------------
+{
+  "payload": "{{ENC_PAYLOAD}}"
+}
 
 # ------------ Post-script -------------------
 > {%
@@ -284,32 +279,33 @@ POST {{BASE_URL}}/dlc
 %}
 
 # ----------------------------
-# Response
+# Response Schema Reference
 # ----------------------------
 # {
-#  "data": {},
-#  "message": "string",
-#  "status": "boolean"
+#   "data": {},
+#   "message": "string",
+#   "status": true
 # }
 # ----------------------------
-### --------------------------------------------
 
 ### --------------------------------------------
 ### dlc-status
 ### --------------------------------------------
 # ------------ Pre-script -------------------
 < {%
+   request.variables.set('RAW_BODY', JSON.stringify({
+     ppo_id: request.environment.get('PPO_ID')
+   }));
    require("./scripts/enc-req.http.js");
 %}
 
 POST {{BASE_URL}}/dlc_status
+Authorization: Bearer {{ACCESS_TOKEN}}
+Content-Type: application/json
 
-# ----------------------------
-# Payload
-# ----------------------------
-# {}
-{ "payload":"{{FACIAL_REG_PAYLOAD}}" }
-# ----------------------------
+{
+  "payload": "{{ENC_PAYLOAD}}"
+}
 
 # ------------ Post-script -------------------
 > {%
@@ -317,12 +313,23 @@ POST {{BASE_URL}}/dlc_status
 %}
 
 # ----------------------------
-# Response
+# Response Schema Reference
 # ----------------------------
 # {
-#  "data": {},
-#  "message": "string",
-#  "status": "boolean"
+#   "data": { 
+#     "app_date": null,
+#     "app_exp": null,
+#     "certificate_datetime": null,
+#     "certificate_id": null,
+#     "device_id": null,
+#     "device_name": null,
+#     "facial_regn_date": "[Redacted]",
+#     "facial_regn_no": "[Redacted]",
+#     "facial_status": "Approved",
+#     "nec": "NA",
+#     "nmc": "NA"
+#   },
+#   "message": "string",
+#   "status": true
 # }
 # ----------------------------
-### --------------------------------------------
