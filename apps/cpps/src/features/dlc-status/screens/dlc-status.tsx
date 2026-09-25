@@ -9,7 +9,7 @@ import { SubmitDLCCard } from '@components/common/submit-dlc-card';
 export const DLCStatusScreen = () => {
   const { isLoading, isFetching, refetch, data } = useDlcStatus();
 
-  const isPhotoSubmitted = data?.is_valid === '03';
+  const isPhotoSubmitted = data?.facial_status === 'Approved';
 
   return (
     <SafeAreaView className="flex-1" edges={['left', 'right']}>
@@ -48,21 +48,23 @@ export const DLCStatusScreen = () => {
               {/* Date */}
               <View className="bg-muted/40 flex-row items-center justify-between rounded-md px-3.5 py-3">
                 <Text className="text-sm font-medium text-muted-foreground">Date</Text>
-                <Text className="text-sm font-bold text-foreground">{data?.ver_date || '—'}</Text>
+                <Text className="text-sm font-bold text-foreground">
+                  {data?.facial_regn_date || '—'}
+                </Text>
               </View>
 
               {/* Time */}
               <View className="bg-muted/40 flex-row items-center justify-between rounded-md px-3.5 py-3">
-                <Text className="text-sm font-medium text-muted-foreground">Time</Text>
-                <Text className="text-sm font-bold text-foreground">{data?.ver_time || '—'}</Text>
+                <Text className="text-sm font-medium text-muted-foreground">Next DLC (before)</Text>
+                <Text className="text-sm font-bold text-foreground">{data?.app_exp || '—'}</Text>
               </View>
 
               <>
                 {/* Place */}
                 <View className="bg-muted/40 flex-row items-center justify-between rounded-md px-3.5 py-3">
-                  <Text className="text-sm font-medium text-muted-foreground">Place</Text>
+                  <Text className="text-sm font-medium text-muted-foreground">Time</Text>
                   <Text className="text-sm font-bold text-foreground">
-                    {data?.ver_place || '—'}
+                    {data?.certificate_datetime || '—'}
                   </Text>
                 </View>
 
@@ -74,7 +76,7 @@ export const DLCStatusScreen = () => {
 
                   <View className="items-end rounded-md bg-secondary px-2.5 py-1">
                     <Text className="text-sm font-bold text-secondary-foreground">
-                      {data?.ver_nec || '—'}
+                      {data?.nec || '—'}
                     </Text>
                   </View>
                 </View>
@@ -86,7 +88,7 @@ export const DLCStatusScreen = () => {
                   </Text>
                   <View className="items-end rounded-md bg-secondary px-2.5 py-1">
                     <Text className="text-sm font-bold text-secondary-foreground">
-                      {data?.ver_nec || '—'}
+                      {data?.nmc || '—'}
                     </Text>
                   </View>
                 </View>

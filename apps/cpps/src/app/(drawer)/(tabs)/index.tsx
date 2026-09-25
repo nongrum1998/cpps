@@ -1,11 +1,11 @@
 import { StackHeader } from '@components/layout';
-import { VerificationStatusScreen } from '@features/verification/screens/verification-status';
+import { HomeScreen } from '@features/home/screens';
 
 export default function Home() {
   return (
     <>
       <StackHeader />
-      <VerificationStatusScreen />
+      <HomeScreen />
     </>
   );
 }

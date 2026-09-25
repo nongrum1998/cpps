@@ -1,9 +1,13 @@
 export interface VerificationStatusT {
-  ver_status: string;
-  is_valid: string;
-  ver_date: string;
-  ver_time: string;
-  ver_place: string;
-  ver_nec: string;
-  ver_nmc: string;
+  app_date: string | null;
+  app_exp: string | null;
+  certificate_datetime: string | null;
+  certificate_id: string | null;
+  device_id: string | null;
+  device_name: string | null;
+  facial_regn_date: string | null;
+  facial_regn_no: string | null;
+  facial_status: 'Approved' | 'Rejected';
+  nec: string | null;
+  nmc: string | null;
 }

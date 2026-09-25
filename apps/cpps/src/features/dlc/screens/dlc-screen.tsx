@@ -29,7 +29,7 @@ import { SubmitDLCCard } from '@components/common/submit-dlc-card';
  * @returns The DLC screen wrapped in a safe area and scroll view.
  */
 export function DLCScreen() {
-  // TODO: proper configure this
+  // TODO:proper configure this
   const msg = '';
   return (
     <SafeAreaView className="flex-1" edges={['left', 'right']}>

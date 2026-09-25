@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Drawer,
@@ -15,14 +15,19 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
   const { user, logout } = useAuthStore();
   const inset = useSafeAreaInsets();
   const { navigate } = useSafeNavigation();
-
+  const base64Image = user?.photo;
+  const image = `data:image/png;base64,${base64Image}`;
   return (
     <View className="flex-1">
       {/* Header Section */}
       <View className="items-center bg-primary p-5 pt-12">
         <View style={{ marginTop: inset.top }} className="items-center gap-3">
           <View className="h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-white/20">
-            <Icon name="user-01" size={32} color="#FFFFFF" />
+            <Image
+              source={{ uri: image }}
+              resizeMode="cover"
+              className="h-16 w-16 object-cover object-center"
+            />
           </View>
 
           <View className="items-center">

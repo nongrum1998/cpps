@@ -29,12 +29,15 @@ import { SubmitDLCCard } from '@components/common/submit-dlc-card';
  *
  * @returns The verification status screen within a safe area and container.
  */
-export function VerificationStatusScreen() {
+export function HomeScreen() {
   const { data, isFetching, isLoading, refetch } = useDlcStatus();
 
-  //TODO: proper configure this
+  const isApproved = data?.facial_status === 'Approved';
 
-  const msg = '';
+  const msg = isApproved
+    ? `Your photo was approved on ${data.facial_regn_date}. Your next DLC is due on ${data.app_date ?? '-'}`
+    : `Your photo was not approved. Please complete your DLC before ${data?.app_exp}.`;
+
   if (isLoading || isFetching) {
     return <LoadingScreen />;
   }
@@ -51,19 +54,19 @@ export function VerificationStatusScreen() {
             <View className="flex-row items-center gap-2">
               <View className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
               <Text className="text-sm font-bold uppercase tracking-wider text-emerald-800">
-                Verification Status
+                Digital Life Status
               </Text>
             </View>
             <Text className="text-center text-xl font-semibold text-emerald-950">
-              {data?.ver_status || '—'}
+              {data?.facial_status || '—'}
             </Text>
           </View>
 
           {msg !== '' && (
-            <Alert variant={'destructive'}>
+            <Alert variant={isApproved ? 'default' : 'destructive'}>
               <Icon name="alert-circle" size={18} className="text-destructive" />
               <View className="flex-1">
-                <AlertTitle>Warning</AlertTitle>
+                <AlertTitle>{isApproved ? 'Info' : 'Warning'}</AlertTitle>
                 <AlertDescription className="flex-1">{msg}</AlertDescription>
               </View>
             </Alert>

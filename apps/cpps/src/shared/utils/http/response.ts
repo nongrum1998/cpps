@@ -87,7 +87,7 @@ export const handleErrorResponse = () => {
 
     const requestPath = error.config.url ?? '';
 
-    if (requestPath === ENDPOINTS.AUTH.USER) {
+    if (requestPath !== ENDPOINTS.AUTH.USER && error.status === 401) {
       await TokenStoreManager.removeTokens();
     }
 
