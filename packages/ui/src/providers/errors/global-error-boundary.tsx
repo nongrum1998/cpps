@@ -1,10 +1,9 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import { View, Text } from 'react-native';
-import * as Updates from 'expo-updates';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { logger } from '@pension/utils';
-import { Button, Icon } from '@components/ui';
-import { Container } from '@components/layout';
+import { Button } from '../../ui';
+import { Container } from '../../layout';
 
 interface Props {
   children?: ReactNode;
@@ -36,8 +35,6 @@ export class GlobalErrorBoundary extends Component<Props, State> {
       if (__DEV__) {
         // In dev, we can't easily "restart" but we can clear state
         this.setState({ hasError: false, error: null });
-      } else {
-        await Updates.reloadAsync();
       }
     } catch {
       this.setState({ hasError: false, error: null });

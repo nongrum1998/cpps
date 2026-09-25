@@ -3,16 +3,17 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
+import { LocationProvider, TQueryProvider } from '@pension/ui';
 
 // Internal Providers
 import { AuthInitializer } from './auth-provider';
-import { TQueryProvider } from './query-provider';
-import { RootProvider } from './root-provider';
+import { RootProvider } from '@pension/ui';
 // Shared Components & Redirects
 import { AuthRedirect } from '@components/common';
 import { UpdateModal } from './update-modal';
 import { GlobalErrorBoundary } from './global-error-boundary';
 import { usePreventScreenCapture } from 'expo-screen-capture';
+import { queryClient } from '@utils/react-query';
 
 type Props = {
   children: React.ReactNode;
@@ -35,19 +36,21 @@ export const ProviderWrapper = ({ children }: Props) => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider className="flex-1">
         <RootProvider>
-          <GlobalErrorBoundary>
-            <TQueryProvider>
-              <QueryErrorResetBoundary>
-                <AuthInitializer>
-                  <AuthRedirect>
-                    <StatusBar style="auto" animated />
-                    {children}
-                    <UpdateModal />
-                  </AuthRedirect>
-                </AuthInitializer>
-              </QueryErrorResetBoundary>
-            </TQueryProvider>
-          </GlobalErrorBoundary>
+          <LocationProvider>
+            <GlobalErrorBoundary>
+              <TQueryProvider queryClient={queryClient}>
+                <QueryErrorResetBoundary>
+                  <AuthInitializer>
+                    <AuthRedirect>
+                      <StatusBar style="auto" animated />
+                      {children}
+                      <UpdateModal />
+                    </AuthRedirect>
+                  </AuthInitializer>
+                </QueryErrorResetBoundary>
+              </TQueryProvider>
+            </GlobalErrorBoundary>
+          </LocationProvider>
         </RootProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

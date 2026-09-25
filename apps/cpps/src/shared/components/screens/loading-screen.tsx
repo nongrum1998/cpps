@@ -1,12 +1,18 @@
-import { cn } from '@pension/utils';
-import { ActivityIndicator, Text } from 'react-native';
-import { Container } from '../layout/container';
+import { LoadingScreen as GlobalLoading } from '@pension/ui';
 
-export const LoadingScreen = () => {
-  return (
-    <Container className={cn('flex-1 items-center justify-center gap-4')}>
-      <ActivityIndicator size="large" className="text-primary" />
-      <Text className="text-lg font-bold uppercase tracking-wider text-primary">Loading</Text>
-    </Container>
-  );
-};
+/**
+ * App-level loading screen.
+ *
+ * Thin re-export of the shared {@link GlobalLoading} primitive from
+ * `@pension/ui`, exposed under the app's `@components/screens` alias so
+ * feature screens have a single import path for common screens.
+ *
+ * Declared as a component (`() => <GlobalLoading />`) rather than a bare
+ * element (`<GlobalLoading />`). A bare element would evaluate once at module
+ * load and be a fixed `Element` value, which cannot be mounted as `<LoadingScreen />`
+ * and loses the parent-tree context it is rendered in.
+ *
+ * @example
+ * if (isLoading) return <LoadingScreen />;
+ */
+export const LoadingScreen = () => <GlobalLoading />;

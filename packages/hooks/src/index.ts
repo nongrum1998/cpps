@@ -7,4 +7,5 @@
  */
 
 /** Canonical npm package name for the hooks package. */
-export const HOOKS_PACKAGE_NAME = '@pension/hooks';
+export * from './use-current-location';
+export * from './use-root-detection';

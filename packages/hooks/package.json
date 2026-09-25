@@ -12,7 +12,13 @@
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "typecheck": "tsc --noEmit"
   },
+  "peerDependencies": {
+    "expo-location": "~57.0.20",
+    "jail-monkey": "^3.0.0",
+    "react": "~19.2.3"
+  },
   "devDependencies": {
+    "@types/react": "^19.0.0",
     "@pension/eslint-config": "workspace:*",
     "@pension/prettier-config": "workspace:*",
     "@pension/typescript-config": "workspace:*",

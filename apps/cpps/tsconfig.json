@@ -3,7 +3,6 @@
   "compilerOptions": {
     "strict": true,
     "types": ["jest"],
-
     "paths": {
       "@hooks/*": ["./src/shared/hooks/*"],
       "@utils/*": ["./src/shared/utils/*"],
@@ -22,9 +21,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-
     "expo-env.d.ts",
     "css-env.d.ts",
     "nativewind-env.d.ts"
-, "src/features/home/screens/home-screen.tsx"  ]
+  ]
 }

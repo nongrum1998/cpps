@@ -84,6 +84,12 @@ const config: ExpoConfig = {
 
     'expo-sharing',
     [
+      'expo-location',
+      {
+        locationAlwaysAndWhenInUsePermission: 'Allow $(PRODUCT_NAME) to use your location.',
+      },
+    ],
+    [
       'expo-splash-screen',
       {
         image: './src/shared/assets/images/logo.jpg',

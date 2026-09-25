@@ -1,7 +1,8 @@
 import React from 'react';
-import { useRootDetection } from '@hooks/use-root-detection';
-import { BlockedDeviceScreen } from '@components/screens/blocked-device-screen';
-import { LoadingScreen } from '@components/screens';
+import { View } from 'react-native';
+import { useRootDetection } from '@pension/hooks';
+import { BlockedDeviceScreen } from '../../screen/block-device-screen';
+import { LoadingScreen } from '../../screen/loading';
 
 interface Props {
   children: React.ReactNode;
@@ -34,11 +35,21 @@ export const RootProvider = ({ children }: Props) => {
   const { isChecking, isBlocked } = useRootDetection();
 
   if (isChecking) {
-    return <LoadingScreen />;
+    return (
+      <>
+        <LoadingScreen />
+      </>
+    );
   }
 
   if (isBlocked) {
-    return <BlockedDeviceScreen />;
+    return (
+      <>
+        <View className="flex-1 bg-background items-center justify-center">
+          <BlockedDeviceScreen />
+        </View>
+      </>
+    );
   }
 
   return <>{children}</>;
