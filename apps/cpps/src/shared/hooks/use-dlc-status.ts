@@ -12,8 +12,7 @@ export function useDlcStatus() {
   const isEnabled = isSignedIn && !!ppo_id;
   return useQuery({
     queryKey: ['verificationStatus', ppo_id],
-    queryFn: () =>
-      http.post<VerificationStatusT>(ENDPOINTS.VERIFICATION.DLC_STATUS, { ppo_id: ppo_id }),
+    queryFn: () => http.post<VerificationStatusT>(ENDPOINTS.DLC.STATUS, { ppo_id: ppo_id }),
     select: (d) => d.data,
     enabled: isEnabled,
   });

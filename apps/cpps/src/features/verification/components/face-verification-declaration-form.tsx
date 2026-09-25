@@ -1,26 +1,23 @@
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { Button } from '@components/ui';
 import { Container } from '@components/layout';
 import { FooterImg } from '@components/common';
+import { useAuthStore } from '@stores/auth.store';
 /** Allowed answers for each self-declaration question. */
-type SelfVerAnswer = 'Yes' | 'No' | '';
+type SelfVerAnswer = '0' | '1' | '2';
 
 /** Props for {@link FaceVerificationDeclarationForm}. */
 export interface FaceVerificationDeclarationFormProps {
-  /** Server verification code; `'4'` additionally shows the re-marriage question. */
-  selfVerCode: string;
   /** Answer for the non-employment question. Empty string = unanswered. */
-  selfVerNec: SelfVerAnswer;
+  nec: '0' | '1' | '2';
   /** Answer for the re-marriage question. Empty string = unanswered. */
-  selfVerNmc: SelfVerAnswer;
+  nmc: '0' | '1' | '2';
   /** Called when the user answers the non-employment question. */
-  onChangeNec: (value: 'Yes' | 'No') => void;
+  onChangeNec: (value: SelfVerAnswer) => void;
   /** Called when the user answers the re-marriage question. */
-  onChangeNmc: (value: 'Yes' | 'No') => void;
+  onChangeNmc: (value: SelfVerAnswer) => void;
   /** Called when the user presses the Submit button. */
   onSubmit: () => void;
-  /** Captured photo data URI above the form; empty string hides it. */
-  previewUri: string;
 }
 
 /**
@@ -28,22 +25,21 @@ export interface FaceVerificationDeclarationFormProps {
  * simplified copy, and fixed state handlers.
  */
 export function FaceVerificationDeclarationForm({
-  selfVerCode,
-  selfVerNec = 'No',
-  selfVerNmc = 'No',
+  nec: selfVerNec = '0',
+  nmc: selfVerNmc = '1',
   onChangeNec,
   onChangeNmc,
   onSubmit,
-  previewUri,
 }: FaceVerificationDeclarationFormProps) {
-  const showMarriageQuestion = selfVerCode === '4';
+  const { user } = useAuthStore();
+  const showMarriageQuestion = user?.pclass === 'f';
 
   // Default selection is 'No' when unanswered
-  const isNecNo = selfVerNec === 'No' || selfVerNec === '';
-  const isNecYes = selfVerNec === 'Yes';
+  const isNecNo = selfVerNec === '0';
+  const isNecYes = selfVerNec === '1';
 
-  const isNmcNo = selfVerNmc === 'No' || selfVerNmc === '';
-  const isNmcYes = selfVerNmc === 'Yes';
+  const isNmcNo = selfVerNmc === '0';
+  const isNmcYes = selfVerNmc === '1';
 
   return (
     <Container className="gap-5">
@@ -63,15 +59,6 @@ export function FaceVerificationDeclarationForm({
         </Text>
       </View>
 
-      {previewUri ? (
-        <View className="items-center justify-center">
-          <Image
-            source={{ uri: previewUri }}
-            className="mb-4 h-52 w-44 rounded-md border border-primary"
-          />
-        </View>
-      ) : null}
-
       <View className="w-full gap-y-2 rounded-md border-gray-500 bg-muted p-4">
         {/* Employment Section */}
         <Text className="text-center font-bold text-primary">EMPLOYMENT STATUS</Text>
@@ -82,7 +69,7 @@ export function FaceVerificationDeclarationForm({
           <View className="flex-row items-center gap-3">
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => onChangeNec('Yes')}
+              onPress={() => onChangeNec('1')}
               className="flex-row items-center gap-1.5 px-2 py-1">
               <View
                 className={`h-5 w-5 items-center justify-center rounded-full border-2 ${
@@ -94,7 +81,7 @@ export function FaceVerificationDeclarationForm({
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => onChangeNec('No')}
+              onPress={() => onChangeNec('0')}
               className="flex-row items-center gap-1.5 px-2 py-1">
               <View
                 className={`h-5 w-5 items-center justify-center rounded-full border-2 ${
@@ -119,7 +106,7 @@ export function FaceVerificationDeclarationForm({
               <View className="flex-row items-center gap-3">
                 <TouchableOpacity
                   activeOpacity={0.7}
-                  onPress={() => onChangeNmc('Yes')}
+                  onPress={() => onChangeNmc('1')}
                   className="flex-row items-center gap-1.5 px-2 py-1">
                   <View
                     className={`h-5 w-5 items-center justify-center rounded-full border-2 ${
@@ -131,7 +118,7 @@ export function FaceVerificationDeclarationForm({
                 </TouchableOpacity>
                 <TouchableOpacity
                   activeOpacity={0.7}
-                  onPress={() => onChangeNmc('No')}
+                  onPress={() => onChangeNmc('0')}
                   className="flex-row items-center gap-1.5 px-2 py-1">
                   <View
                     className={`h-5 w-5 items-center justify-center rounded-full border-2 ${
@@ -147,7 +134,7 @@ export function FaceVerificationDeclarationForm({
         )}
 
         <Button size="lg" className="mt-3 w-full" onPress={onSubmit}>
-          <Text className="text-base font-bold text-white">Submit</Text>
+          <Text className="text-base font-bold text-white">Scan Face</Text>
         </Button>
       </View>
       <FooterImg />

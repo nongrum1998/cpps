@@ -32,18 +32,11 @@ export const ENDPOINTS = {
     UPDATE_PROFILE: '/api/update_profile/',
   },
 
-  /** Verification-related endpoints. */
-  VERIFICATION: {
-    /** Submits or retrieves verification data. */
-    VERIFICATION: '/dlc',
-    /** Retrieves verification status. */
-    DLC_STATUS: '/dlc_status',
-  },
-
   /** DLC (life certificate) endpoints. */
   DLC: {
     /** Creates a life certificate. */
-    CREATE: '/api/lc/',
+    CREATE: '/dlc',
+    STATUS: '/dlc_status',
   },
 
   /** External documentation URLs. */

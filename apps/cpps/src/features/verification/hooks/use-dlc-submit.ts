@@ -6,9 +6,10 @@ import { Platform } from 'react-native';
 import * as Application from 'expo-application';
 
 interface DLCPayload {
-  selfVerNec: 'Yes' | 'No';
-  selfVerNmc: 'Yes' | 'No' | '';
+  selfVerNec: '1' | '2' | '0';
+  selfVerNmc: '1' | '2' | '0';
   self_ver_code: string;
+  image: string;
 }
 
 /** Device metadata attached to every DLC submission. */

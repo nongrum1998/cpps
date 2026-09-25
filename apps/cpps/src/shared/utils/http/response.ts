@@ -14,6 +14,7 @@ import { TokenStoreManager } from '@stores/token.store';
 import { ENDPOINTS } from '@utils/constants/endpoints';
 
 import { isAuthPath } from './constants';
+import { logger } from '@pension/utils';
 
 /** Shape of a login response body: `{ data: { token } }` when successful. */
 type LoginResponseBody = {
@@ -88,6 +89,7 @@ export const handleErrorResponse = () => {
     const requestPath = error.config.url ?? '';
 
     if (requestPath !== ENDPOINTS.AUTH.USER && error.status === 401) {
+      logger.info('Auth Error: Removing tokens');
       await TokenStoreManager.removeTokens();
     }
 

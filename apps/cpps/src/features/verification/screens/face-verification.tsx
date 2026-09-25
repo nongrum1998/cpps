@@ -12,7 +12,7 @@ import {
   FaceVerificationLoadingView,
   FaceVerificationErrorView,
 } from '../components';
-import { useSubmitVerification, useSubmitDLC } from '../hooks';
+import { useSubmitDLC } from '../hooks';
 import type {
   FaceVerificationPhase,
   FaceVerificationRouteParams,
@@ -20,75 +20,35 @@ import type {
 } from '../types';
 import { FooterImg } from '@components/common';
 import { Container } from '@components/layout';
-import { useSnackbar } from '@hooks/use-snackbar';
+import { useDlcStatus } from '@hooks/use-dlc-status';
 
 type FaceVerificationScreenProps = FaceVerificationRouteParams;
 
 export function FaceVerificationScreen() {
-  // TODO: Change this
-  const regStatus = '03';
-  const isRegistrationRequired = regStatus === '03' || regStatus === '02';
-  const registrationStatus: number = isRegistrationRequired ? 1 : 0;
   const { hasPermission, requestPermission } = useCameraPermission();
-  const { showSnackbar } = useSnackbar();
   const device = useCameraDevice('front');
+  const { data: dlcStatus } = useDlcStatus();
 
   // State machine
-  const [phase, setPhase] = useState<FaceVerificationPhase>('camera');
+  const [phase, setPhase] = useState<FaceVerificationPhase>('declaration');
   const [previewUri, setPreviewUri] = useState('');
   const [image1, setImage1] = useState('');
-  const [image2, setImage2] = useState('');
   const [verResponse, setVerResponse] = useState<VerificationResponseT | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
 
   // Declaration form
-  const [selfVerNec, setSelfVerNec] = useState<'Yes' | 'No' | ''>('No');
-  const [selfVerNmc, setSelfVerNmc] = useState<'Yes' | 'No' | ''>('No');
+  const [selfVerNec, setSelfVerNec] = useState<'1' | '2' | '0'>('0');
+  const [selfVerNmc, setSelfVerNmc] = useState<'1' | '2' | '0'>('0');
 
   // Dialogs
   const [dlcDialogOpen, setDlcDialogOpen] = useState(false);
 
   // API hooks
-  const verificationMutation = useSubmitVerification();
   const dlcMutation = useSubmitDLC();
 
   useEffect(() => {
     if (!hasPermission) requestPermission();
   }, [hasPermission, requestPermission]);
-
-  const submitVerification = useCallback(
-    async (img1: string, img2?: string) => {
-      setPhase('submitting');
-
-      verificationMutation.mutate(
-        { image_1: img1, image_2: img2 },
-        {
-          onSuccess: (data) => {
-            if (data.success) {
-              if (data.data) {
-                setVerResponse(data.data);
-                const selfVerCode: string = data.data.self_ver_code;
-                if (selfVerCode === '00' || selfVerCode === '22') {
-                  setPhase('result');
-                } else if (selfVerCode === '4' || selfVerCode === '04') {
-                  setPhase('declaration');
-                } else if (img2 !== '') {
-                  setPhase('result');
-                } else {
-                  setPhase('result');
-                  setErrorMsg(data.message || 'Verification failed');
-                }
-              }
-            } else {
-              setErrorMsg(data.message || 'Verification failed');
-              setPhase('error');
-            }
-          },
-        }
-      );
-    },
-    [verificationMutation]
-  );
 
   // Shared blink-liveness capture pipeline: detection, capture, and
   // compression now live in `useFaceCapture`. The screen keeps the
@@ -98,28 +58,7 @@ export function FaceVerificationScreen() {
     onCaptured: async (cleanBase64) => {
       const uri = `data:image/jpeg;base64,${cleanBase64}`;
       setPreviewUri(uri);
-
-      // Registration mode: first photo → preview confirmation screen.
-      if (registrationStatus === 1 && !image1) {
-        setImage1(cleanBase64);
-        setPhase('preview');
-        return;
-      }
-
-      // Registration mode: second photo → preview confirmation (submitted
-      // after approval).
-      if (registrationStatus === 1 && image1 && !image2) {
-        setImage2(cleanBase64);
-        setPhase('preview');
-        return;
-      }
-
-      // Normal mode: single photo → submit.
-      if (registrationStatus === 0) {
-        setImage1(cleanBase64);
-        await submitVerification(cleanBase64, '');
-        return;
-      }
+      setPhase('preview');
     },
     onError: (message) => {
       setErrorMsg(message);
@@ -127,20 +66,7 @@ export function FaceVerificationScreen() {
     },
   });
 
-  const handleSubmitDLC = useCallback(() => {
-    const selfVerCode = verResponse?.self_ver_code ?? '';
-
-    if (selfVerNec === '') {
-      showSnackbar('Please select Yes or No', 'alert-triangle');
-      return;
-    }
-    if (selfVerCode === '4' && selfVerNmc === '') {
-      showSnackbar('Please select Yes or No', 'alert-triangle');
-      return;
-    }
-
-    setDlcDialogOpen(true);
-  }, [selfVerNec, selfVerNmc, verResponse, showSnackbar]);
+  const handleSubmitDLC = () => setDlcDialogOpen(true);
 
   const confirmDLCSubmission = useCallback(() => {
     setDlcDialogOpen(false);
@@ -148,9 +74,10 @@ export function FaceVerificationScreen() {
 
     dlcMutation.mutate(
       {
-        selfVerNec: selfVerNec as 'Yes' | 'No',
-        selfVerNmc: selfVerNmc as 'Yes' | 'No' | '',
+        selfVerNec: selfVerNec,
+        selfVerNmc: selfVerNmc,
         self_ver_code: verResponse?.self_ver_code ?? '',
+        image: '',
       },
       {
         onSuccess: ({ data, ...restData }) => {
@@ -213,43 +140,27 @@ export function FaceVerificationScreen() {
         {phase === 'preview' && (
           <FaceVerificationPhotoPreviewStep
             previewUri={previewUri}
-            actionLabel={
-              registrationStatus === 1 && image1 && !image2 ? 'Take Second Photo' : 'Submit Photo'
-            }
-            onSubmitPress={() => {
-              if (registrationStatus === 1 && image1 && !image2) {
-                // Approved the first photo; return to camera to capture the second.
-                capture.resetBlinkState();
-                setPreviewUri('');
-                setPhase('camera');
-              } else if (registrationStatus === 1 && image1 && image2) {
-                // Approved the second photo; submit both images.
-                void submitVerification(image1, image2);
-              }
-            }}
+            actionLabel={'Submit Photo'}
+            onSubmitPress={handleSubmitDLC}
           />
         )}
 
         {/* PHASE: result — server response display */}
-        {phase === 'result' && verResponse && (
+        {phase === 'result' && (
           <FaceVerificationResultView
-            verResponse={verResponse}
-            previewUri={previewUri}
-            hasSecondImage={image2 !== ''}
-            onProceedToDeclaration={resetForSecondCapture}
+            isSuccess={dlcMutation.data?.success || false}
+            msg={dlcMutation.data?.message || ''}
           />
         )}
 
         {/* PHASE: declaration — self-declaration form */}
-        {phase === 'declaration' && verResponse && (
+        {phase === 'declaration' && (
           <FaceVerificationDeclarationForm
-            selfVerCode={verResponse.self_ver_code}
-            selfVerNec={selfVerNec}
-            selfVerNmc={selfVerNmc}
+            nec={dlcStatus?.nec || ('0' as any)}
+            nmc={dlcStatus?.nmc || ('0' as any)}
             onChangeNec={setSelfVerNec}
             onChangeNmc={setSelfVerNmc}
-            onSubmit={handleSubmitDLC}
-            previewUri={previewUri}
+            onSubmit={() => setPhase('camera')}
           />
         )}
 
