@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 import { FaceCaptureCamera } from '@components/common/face-capture-camera';
@@ -14,113 +14,253 @@ import {
 } from '../components';
 import { useSubmitDLC } from '../hooks';
 import type {
+  DeclarationAnswer,
+  DlcDeclarationDetails,
   FaceVerificationPhase,
   FaceVerificationRouteParams,
-  VerificationResponseT,
 } from '../types';
-import { FooterImg } from '@components/common';
-import { Container } from '@components/layout';
 import { useDlcStatus } from '@hooks/use-dlc-status';
+import { useAuthStore } from '@stores/auth.store';
 
+const CAMERA_PERMISSION_ERROR =
+  'Camera access is required to capture your face photo. Please enable camera access in your device settings.';
+const CAMERA_UNAVAILABLE_ERROR = 'The front camera is unavailable on this device.';
+const CAPTURE_ERROR = 'We could not capture your photo. Please try again.';
+const SUBMISSION_ERROR = 'We could not submit your face verification right now. Please try again.';
+
+/** Props accepted by {@link FaceVerificationScreen}. */
 type FaceVerificationScreenProps = FaceVerificationRouteParams;
 
+/** Envelope-derived result state retained by the screen. */
+type FaceVerificationResultState = {
+  isSuccess: boolean;
+  message: string;
+};
+
+/**
+ * Normalizes a server declaration value to the only values supported by the
+ * current DLC contract. Unknown, missing, and legacy values fail closed to
+ * the safe `No` answer.
+ */
+function normalizeDeclarationAnswer(value: string | null | undefined): DeclarationAnswer {
+  return value === '1' ? '1' : '0';
+}
+
+/**
+ * Orchestrates the face-verification declaration, camera, preview, submission,
+ * result, and technical-error phases.
+ *
+ * Camera permission is requested only after the user taps Scan Face. The
+ * captured JPEG base64 and declarations remain in memory until submission
+ * completes; a failed result or technical retry resets the capture pipeline
+ * and returns to the same screen without changing the user's declarations.
+ *
+ * @returns The active face-verification phase for the current screen.
+ */
 export function FaceVerificationScreen() {
-  const { hasPermission, requestPermission } = useCameraPermission();
+  const { hasPermission, canRequestPermission, requestPermission } = useCameraPermission();
   const device = useCameraDevice('front');
   const { data: dlcStatus } = useDlcStatus();
+  const { user } = useAuthStore();
 
-  // State machine
   const [phase, setPhase] = useState<FaceVerificationPhase>('declaration');
-  const [previewUri, setPreviewUri] = useState('');
-  const [image1, setImage1] = useState('');
-  const [verResponse, setVerResponse] = useState<VerificationResponseT | null>(null);
+  const [capturedImageBase64, setCapturedImageBase64] = useState('');
+  const [nec, setNec] = useState<DeclarationAnswer>('0');
+  const [nmc, setNmc] = useState<DeclarationAnswer>('0');
+  const [result, setResult] = useState<FaceVerificationResultState | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
-
-  // Declaration form
-  const [selfVerNec, setSelfVerNec] = useState<'1' | '2' | '0'>('0');
-  const [selfVerNmc, setSelfVerNmc] = useState<'1' | '2' | '0'>('0');
-
-  // Dialogs
   const [dlcDialogOpen, setDlcDialogOpen] = useState(false);
 
-  // API hooks
-  const dlcMutation = useSubmitDLC();
+  const hasEditedNec = useRef(false);
+  const hasEditedNmc = useRef(false);
+  const scanRequestInFlight = useRef(false);
+  const submissionInFlight = useRef(false);
+
+  const { mutateAsync, isPending: isSubmitPending, reset: resetSubmission } = useSubmitDLC();
 
   useEffect(() => {
-    if (!hasPermission) requestPermission();
-  }, [hasPermission, requestPermission]);
+    if (!dlcStatus) return;
 
-  // Shared blink-liveness capture pipeline: detection, capture, and
-  // compression now live in `useFaceCapture`. The screen keeps the
-  // post-capture business rules (registration preview vs. direct submit).
-  const capture = useFaceCapture({
-    isActive: phase === 'camera',
-    onCaptured: async (cleanBase64) => {
-      const uri = `data:image/jpeg;base64,${cleanBase64}`;
-      setPreviewUri(uri);
-      setPhase('preview');
-    },
-    onError: (message) => {
-      setErrorMsg(message);
-      setPhase('error');
-    },
-  });
+    if (!hasEditedNec.current) {
+      setNec(normalizeDeclarationAnswer(dlcStatus.nec));
+    }
+    if (!hasEditedNmc.current) {
+      setNmc(normalizeDeclarationAnswer(dlcStatus.nmc));
+    }
+  }, [dlcStatus]);
 
-  const handleSubmitDLC = () => setDlcDialogOpen(true);
-
-  const confirmDLCSubmission = useCallback(() => {
-    setDlcDialogOpen(false);
-    setPhase('submitting');
-
-    dlcMutation.mutate(
-      {
-        selfVerNec: selfVerNec,
-        selfVerNmc: selfVerNmc,
-        self_ver_code: verResponse?.self_ver_code ?? '',
-        image: '',
-      },
-      {
-        onSuccess: ({ data, ...restData }) => {
-          if (restData.success) {
-            if (data) {
-              setVerResponse(data);
-              setPhase('result');
-            }
-          } else {
-            setErrorMsg(restData.message || 'DLC submission failed');
-            setPhase('error');
-          }
-        },
-      }
-    );
-  }, [dlcMutation, selfVerNec, selfVerNmc, verResponse]);
-
-  const resetForSecondCapture = useCallback(() => {
-    setPhase('declaration');
+  const handleNecChange = useCallback((value: DeclarationAnswer) => {
+    hasEditedNec.current = true;
+    setNec(value);
   }, []);
 
-  if (!hasPermission || !device) {
-    return (
-      <Container>
-        <SafeAreaView className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" />
-          <Text className="mt-4 text-base text-muted-foreground">Loading Camera...</Text>
-          <FooterImg />
-        </SafeAreaView>
-      </Container>
-    );
-  }
+  const handleNmcChange = useCallback((value: DeclarationAnswer) => {
+    hasEditedNmc.current = true;
+    setNmc(value);
+  }, []);
+
+  const showTechnicalError = useCallback((message: string) => {
+    setResult(null);
+    setErrorMsg(message);
+    setPhase('error');
+  }, []);
+
+  const handleCapturedImage = useCallback(
+    (rawBase64: string) => {
+      if (!rawBase64) {
+        showTechnicalError(CAPTURE_ERROR);
+        return;
+      }
+
+      setCapturedImageBase64(rawBase64);
+      setResult(null);
+      setErrorMsg('');
+      setPhase('preview');
+    },
+    [showTechnicalError]
+  );
+
+  const handleCaptureError = useCallback(() => {
+    showTechnicalError(CAPTURE_ERROR);
+  }, [showTechnicalError]);
+
+  const capture = useFaceCapture({
+    isActive: phase === 'camera',
+    onCaptured: handleCapturedImage,
+    onError: handleCaptureError,
+  });
+  const { resetCaptureState } = capture;
+
+  const handleScanFace = useCallback(async () => {
+    if (scanRequestInFlight.current || submissionInFlight.current) return;
+
+    scanRequestInFlight.current = true;
+
+    try {
+      if (!hasPermission) {
+        if (!canRequestPermission) {
+          showTechnicalError(CAMERA_PERMISSION_ERROR);
+          return;
+        }
+
+        const permissionGranted = await requestPermission();
+        if (!permissionGranted) {
+          showTechnicalError(CAMERA_PERMISSION_ERROR);
+          return;
+        }
+      }
+
+      if (!device) {
+        showTechnicalError(CAMERA_UNAVAILABLE_ERROR);
+        return;
+      }
+
+      setResult(null);
+      setErrorMsg('');
+      setPhase('camera');
+    } catch {
+      showTechnicalError(CAMERA_PERMISSION_ERROR);
+    } finally {
+      scanRequestInFlight.current = false;
+    }
+  }, [canRequestPermission, device, hasPermission, requestPermission, showTechnicalError]);
+
+  const handleOpenConfirmation = useCallback(() => {
+    if (!capturedImageBase64) {
+      showTechnicalError(CAPTURE_ERROR);
+      return;
+    }
+
+    setDlcDialogOpen(true);
+  }, [capturedImageBase64, showTechnicalError]);
+
+  const handleConfirmedSubmit = useCallback(async () => {
+    if (submissionInFlight.current || isSubmitPending) return;
+
+    setDlcDialogOpen(false);
+    setResult(null);
+    setErrorMsg('');
+
+    if (!capturedImageBase64) {
+      showTechnicalError(CAPTURE_ERROR);
+      return;
+    }
+
+    const ppoId = user?.ppo_id;
+    const ppoNo = user?.ppo_no;
+    if (!ppoId || !ppoNo) {
+      setCapturedImageBase64('');
+      resetSubmission();
+      showTechnicalError(SUBMISSION_ERROR);
+      return;
+    }
+
+    submissionInFlight.current = true;
+    setPhase('submitting');
+
+    try {
+      const response = await mutateAsync({
+        nec,
+        nmc,
+        image: capturedImageBase64,
+      });
+
+      if (
+        !response ||
+        typeof response.success !== 'boolean' ||
+        typeof response.message !== 'string'
+      ) {
+        throw new Error('Invalid DLC response envelope');
+      }
+
+      setResult({
+        isSuccess: response.success,
+        message: response.message,
+      });
+      setPhase('result');
+    } catch {
+      setErrorMsg(SUBMISSION_ERROR);
+      setPhase('error');
+    } finally {
+      // The raw image is needed only for this one request and is not retained
+      // in screen state or the TanStack mutation variables after completion.
+      setCapturedImageBase64('');
+      resetSubmission();
+      submissionInFlight.current = false;
+    }
+  }, [
+    capturedImageBase64,
+    isSubmitPending,
+    mutateAsync,
+    nec,
+    nmc,
+    resetSubmission,
+    showTechnicalError,
+    user?.ppo_id,
+    user?.ppo_no,
+  ]);
+
+  const handleRetake = useCallback(() => {
+    setCapturedImageBase64('');
+    setResult(null);
+    setErrorMsg('');
+    resetSubmission();
+    resetCaptureState();
+    void handleScanFace();
+  }, [handleScanFace, resetCaptureState, resetSubmission]);
+
+  const declaration: DlcDeclarationDetails = { nec, nmc };
+  const showMarriageQuestion = user?.pclass === 'f';
 
   return (
     <SafeAreaView className="flex-1" edges={['left', 'right']}>
       <View
         className="flex-1"
-        onLayout={(e) => {
-          const { width, height } = e.nativeEvent.layout;
+        onLayout={(event) => {
+          const { width, height } = event.nativeEvent.layout;
           capture.onLayout({ width, height });
         }}>
-        {/* PHASE: camera — live feed with blink detection */}
-        {phase === 'camera' && (
+        {phase === 'camera' && device ? (
           <FaceCaptureCamera
             device={device}
             outputs={capture.outputs}
@@ -131,49 +271,50 @@ export function FaceVerificationScreen() {
             viewHeight={capture.layoutSize.height}
             message={capture.message}
           />
-        )}
+        ) : null}
 
-        {/* PHASE: capturing / submitting — loading spinner */}
+        {phase === 'camera' && !device ? (
+          <FaceVerificationErrorView
+            errorMsg={CAMERA_UNAVAILABLE_ERROR}
+            onTryAgainPress={handleRetake}
+          />
+        ) : null}
+
         {(phase === 'capturing' || phase === 'submitting') && <FaceVerificationLoadingView />}
 
-        {/* PHASE: preview — first/second photo confirmation (registration mode only) */}
         {phase === 'preview' && (
           <FaceVerificationPhotoPreviewStep
-            previewUri={previewUri}
-            actionLabel={'Submit Photo'}
-            onSubmitPress={handleSubmitDLC}
+            previewUri={capturedImageBase64 ? `data:image/jpeg;base64,${capturedImageBase64}` : ''}
+            declaration={declaration}
+            showMarriageQuestion={showMarriageQuestion}
+            actionLabel="Submit Photo"
+            onSubmitPress={handleOpenConfirmation}
           />
         )}
 
-        {/* PHASE: result — server response display */}
-        {phase === 'result' && (
+        {phase === 'result' && result && (
           <FaceVerificationResultView
-            isSuccess={dlcMutation.data?.success || false}
-            msg={dlcMutation.data?.message || ''}
+            isSuccess={result.isSuccess}
+            message={result.message}
+            onRetakePress={result.isSuccess ? undefined : handleRetake}
           />
         )}
 
-        {/* PHASE: declaration — self-declaration form */}
         {phase === 'declaration' && (
           <FaceVerificationDeclarationForm
-            nec={dlcStatus?.nec || ('0' as any)}
-            nmc={dlcStatus?.nmc || ('0' as any)}
-            onChangeNec={setSelfVerNec}
-            onChangeNmc={setSelfVerNmc}
-            onSubmit={() => setPhase('camera')}
+            nec={nec}
+            nmc={nmc}
+            onNecChange={handleNecChange}
+            onNmcChange={handleNmcChange}
+            onSubmit={() => void handleScanFace()}
           />
         )}
 
-        {/* PHASE: error */}
         {phase === 'error' && (
-          <FaceVerificationErrorView
-            errorMsg={errorMsg}
-            onTryAgainPress={() => setPhase('camera')}
-          />
+          <FaceVerificationErrorView errorMsg={errorMsg} onTryAgainPress={handleRetake} />
         )}
       </View>
 
-      {/* DLC TERMS DIALOG */}
       <FaceVerificationConfirmDialog
         open={dlcDialogOpen}
         onOpenChange={setDlcDialogOpen}
@@ -183,7 +324,7 @@ export function FaceVerificationScreen() {
           'information furnished by you is true.\n\nAre you sure you want to submit?'
         }
         destructive
-        onConfirm={confirmDLCSubmission}
+        onConfirm={() => void handleConfirmedSubmit()}
       />
     </SafeAreaView>
   );

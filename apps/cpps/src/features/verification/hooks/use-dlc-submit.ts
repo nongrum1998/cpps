@@ -5,12 +5,10 @@ import type { ApiResponse } from '@sharedTypes/api';
 import { useAuthStore } from '@stores/auth.store';
 import { ENDPOINTS } from '@utils/constants';
 import { http } from '@utils/http';
-import type { DeclarationAnswer, DlcDeclarationDetails, DlcSubmitPayload } from '../types';
+import type { DlcDeclarationDetails, DlcSubmitPayload } from '../types';
 
 /** Values supplied by the face-verification screen for one DLC submission. */
-type DlcSubmitInput = Omit<DlcDeclarationDetails, 'nec' | 'nmc'> & {
-  nec: DeclarationAnswer | '2';
-  nmc: DeclarationAnswer | '2';
+type DlcSubmitInput = DlcDeclarationDetails & {
   image: string;
 };
 
@@ -65,10 +63,6 @@ export function useSubmitDLC() {
 
       if (!ppoId || !ppoNo) {
         throw new Error('Authenticated PPO details are required');
-      }
-
-      if (nec === '2' || nmc === '2') {
-        throw new Error('DLC declaration answers must be 0 or 1');
       }
 
       const { deviceName, deviceId } = await resolveDeviceMetadata();
