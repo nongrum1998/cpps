@@ -1,7 +1,8 @@
 {
   "extends": "@pension/typescript-config/tsconfig.base.json",
   "compilerOptions": {
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx"
   },
-  "include": ["src"]
+  "include": ["src", "nativewind.d.ts"]
 }
