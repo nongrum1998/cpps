@@ -57,6 +57,13 @@ export interface UseFaceCaptureResult {
    *  message back to `'Please blink!!'` (e.g. after preview approval or a
    *  retry). Does NOT touch the capture gate. */
   resetBlinkState: () => void;
+  /**
+   * Resets the complete capture pipeline for a same-screen retake.
+   *
+   * Clears the capture gate, blink/eye state, processing and detection
+   * timestamps, detected faces, compressor state, and the liveness message.
+   */
+  resetCaptureState: () => void;
 }
 
 /**
@@ -325,6 +332,14 @@ export function useFaceCapture({
     setMessage('Please blink!!');
   }, []);
 
+  const resetCaptureState = useCallback(() => {
+    resetBlinkState();
+    isCapturing.current = false;
+    lastDetectionTime.current = 0;
+    setFaces([]);
+    reset();
+  }, [reset, resetBlinkState]);
+
   return {
     faces,
     message,
@@ -336,5 +351,6 @@ export function useFaceCapture({
     photoOutput,
     outputs,
     resetBlinkState,
+    resetCaptureState,
   };
 }
