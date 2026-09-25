@@ -16,6 +16,7 @@ export interface FaceVerificationPhotoPreviewStepProps {
   onSubmitPress: () => void;
   /** Label for the action button; defaults to "Submit Photo". */
   actionLabel?: string;
+  /** Called when the user chooses to discard the captured preview. */
   onReset: () => void;
 }
 

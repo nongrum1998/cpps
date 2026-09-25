@@ -106,7 +106,9 @@ export function RegistrationCamera({ onSubmit }: RegistrationCameraProps) {
           }}>
           <FaceCaptureCamera
             device={device}
+            onReset={prevStep}
             outputs={capture.outputs}
+
             faces={capture.faces}
             frameWidth={capture.frameSize.width}
             frameHeight={capture.frameSize.height}

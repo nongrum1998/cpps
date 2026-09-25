@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system/legacy';
 import { MAX_IMAGE_SIZE_IN_KB } from '@utils/constants';
@@ -51,6 +51,50 @@ export function useImageCompressor() {
   const [isCompressing, setIsCompressing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<CompressedImageResult | null>(null);
+  const pendingFileUris = useRef<Set<string>>(new Set());
+
+  /**
+   * Deletes compressor-owned temporary files that have not yet been removed.
+   *
+   * A URI remains tracked when deletion fails so reset or unmount can retry it.
+   * Every URI is attempted even when one deletion fails.
+   */
+  const cleanupPendingFiles = useCallback(async (): Promise<void> => {
+    const uris = Array.from(pendingFileUris.current);
+    if (uris.length === 0) return;
+
+    let firstError: unknown;
+    let hasError = false;
+
+    await Promise.all(
+      uris.map(async (uri) => {
+        try {
+          await FileSystem.deleteAsync(uri, { idempotent: true });
+          pendingFileUris.current.delete(uri);
+        } catch (deleteError) {
+          if (!hasError) {
+            firstError = deleteError;
+            hasError = true;
+          }
+        }
+      })
+    );
+
+    if (hasError) {
+      throw firstError;
+    }
+  }, []);
+
+  /** Retries failed compressor temp-file deletion without leaking a rejection. */
+  const retryPendingFileCleanup = useCallback(() => {
+    void cleanupPendingFiles().catch(() => undefined);
+  }, [cleanupPendingFiles]);
+
+  useEffect(() => {
+    return () => {
+      retryPendingFileCleanup();
+    };
+  }, [retryPendingFileCleanup]);
 
   const compressImageToBase64 = useCallback(
     async (
@@ -84,6 +128,7 @@ export function useImageCompressor() {
             format: SaveFormat.JPEG,
             base64: true,
           });
+          pendingFileUris.current.add(savedImage.uri);
 
           if (!savedImage.base64) {
             throw new Error('Failed to generate base64 image');
@@ -108,7 +153,7 @@ export function useImageCompressor() {
           }
 
           // Overshooting iteration: remove its temp output before retrying lower.
-          await FileSystem.deleteAsync(savedImage.uri, { idempotent: true });
+          await cleanupPendingFiles();
 
           quality -= qualityStep;
         }
@@ -119,6 +164,7 @@ export function useImageCompressor() {
           format: SaveFormat.JPEG,
           base64: true,
         });
+        pendingFileUris.current.add(finalImage.uri);
 
         if (!finalImage.base64) {
           throw new Error('Failed to generate base64 image');
@@ -127,7 +173,7 @@ export function useImageCompressor() {
         const bytes = Math.ceil((finalImage.base64.length * 3) / 4);
 
         if (bytes > maxSizeBytes) {
-          await FileSystem.deleteAsync(finalImage.uri, { idempotent: true });
+          await cleanupPendingFiles();
           throw new Error(
             `Unable to compress image below ${maxSizeKB} KB. ` +
               `Final size: ${(bytes / 1024).toFixed(2)} KB`
@@ -149,6 +195,7 @@ export function useImageCompressor() {
         const message = err instanceof Error ? err.message : 'Failed to compress image';
 
         setError(message);
+        retryPendingFileCleanup();
 
         throw err;
       } finally {

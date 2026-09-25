@@ -252,6 +252,16 @@ export function FaceVerificationScreen() {
     void handleScanFace();
   }, [handleScanFace, resetCaptureState, resetSubmission]);
 
+  const handleReset = useCallback(() => {
+    setCapturedImageBase64('');
+    setResult(null);
+    setErrorMsg('');
+    setDlcDialogOpen(false);
+    resetSubmission();
+    resetCaptureState();
+    setPhase('declaration');
+  }, [resetCaptureState, resetSubmission]);
+
   const declaration: DlcDeclarationDetails = { nec, nmc };
   const showMarriageQuestion = user?.pclass === 'f';
 
@@ -266,7 +276,8 @@ export function FaceVerificationScreen() {
         {phase === 'camera' && device ? (
           <FaceCaptureCamera
             device={device}
-            onReset={() => setPhase('declaration')}
+            onReset={handleReset}
+
             outputs={capture.outputs}
             faces={capture.faces}
             frameWidth={capture.frameSize.width}
@@ -293,7 +304,7 @@ export function FaceVerificationScreen() {
             showMarriageQuestion={showMarriageQuestion}
             actionLabel="Submit Photo"
             onSubmitPress={handleOpenConfirmation}
-            onReset={() => setPhase('declaration')}
+            onReset={handleReset}
           />
         )}
 

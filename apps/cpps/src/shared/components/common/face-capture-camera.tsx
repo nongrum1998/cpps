@@ -10,6 +10,7 @@ type CameraOutputs = ComponentProps<typeof Camera>['outputs'];
 
 /** Props for {@link FaceCaptureCamera}. */
 export interface FaceCaptureCameraProps {
+  /** Called when the user taps the camera overlay's reset action. */
   onReset: () => void;
   /** Active camera device (front camera for liveness capture). */
   device: CameraDevice;
