@@ -1,7 +1,8 @@
 import { View, Text } from 'react-native';
 import { cn } from '@pension/utils';
 import { Container } from '../layout/container';
-import { Button, Icon } from '@components/ui';
+import { Button } from '@pension/ui';
+import { Icon } from '@components/ui';
 
 interface EmptyScreenProps {
   title: string;

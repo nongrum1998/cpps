@@ -4,7 +4,8 @@ import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { Container } from '@components/layout';
-import { Button, Input, Icon, AlertTitle, Alert, AlertDescription } from '@components/ui';
+import { Button } from '@pension/ui';
+import { Input, Icon, AlertTitle, Alert, AlertDescription } from '@components/ui';
 import { FooterImg, Ternary } from '@components/common';
 
 import { ChangePasswrodSchema } from '../validators';

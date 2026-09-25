@@ -1,6 +1,7 @@
 import { View, Text } from 'react-native';
 import { useSafeNavigation } from '@hooks/use-safe-navigation';
-import { Button, Icon } from '@components/ui';
+import { Button } from '@pension/ui';
+import { Icon } from '@components/ui';
 import { PAGE_ROUTES } from '@utils/constants';
 import { Container } from '@components/layout';
 

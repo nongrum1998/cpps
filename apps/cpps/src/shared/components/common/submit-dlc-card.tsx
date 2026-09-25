@@ -1,4 +1,5 @@
-import { Alert, AlertTitle, AlertDescription, Icon, Button } from '@components/ui';
+import { Button } from '@pension/ui';
+import { Alert, AlertTitle, AlertDescription, Icon } from '@components/ui';
 import { useSafeNavigation } from '@hooks/use-safe-navigation';
 import { PAGE_ROUTES } from '@utils/constants';
 import { View, Text } from 'react-native';

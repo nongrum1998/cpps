@@ -1,5 +1,6 @@
 import { View, Text } from 'react-native';
-import { Button, Icon } from '@components/ui';
+import { Button } from '@pension/ui';
+import { Icon } from '@components/ui';
 import { Stack } from 'expo-router';
 import { useSafeNavigation } from '@hooks/use-safe-navigation';
 import { PAGE_ROUTES } from '@utils/constants/routes';
