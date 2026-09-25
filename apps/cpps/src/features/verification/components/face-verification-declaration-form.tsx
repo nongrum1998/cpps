@@ -3,43 +3,48 @@ import { Button } from '@components/ui';
 import { Container } from '@components/layout';
 import { FooterImg } from '@components/common';
 import { useAuthStore } from '@stores/auth.store';
-/** Allowed answers for each self-declaration question. */
-type SelfVerAnswer = '0' | '1' | '2';
+import type { DeclarationAnswer } from '../types';
 
 /** Props for {@link FaceVerificationDeclarationForm}. */
 export interface FaceVerificationDeclarationFormProps {
-  /** Answer for the non-employment question. Empty string = unanswered. */
-  nec: '0' | '1' | '2';
-  /** Answer for the re-marriage question. Empty string = unanswered. */
-  nmc: '0' | '1' | '2';
+  /** Answer for the non-employment question. */
+  nec: DeclarationAnswer;
+  /** Answer for the re-marriage question. */
+  nmc: DeclarationAnswer;
   /** Called when the user answers the non-employment question. */
-  onChangeNec: (value: SelfVerAnswer) => void;
+  onNecChange: (value: DeclarationAnswer) => void;
   /** Called when the user answers the re-marriage question. */
-  onChangeNmc: (value: SelfVerAnswer) => void;
-  /** Called when the user presses the Submit button. */
+  onNmcChange: (value: DeclarationAnswer) => void;
+  /** Called when the user presses the Scan Face button. */
   onSubmit: () => void;
 }
 
 /**
- * Enhanced DLC self-declaration form with side-by-side radio buttons,
- * simplified copy, and fixed state handlers.
+ * Renders the controlled DLC declaration form for the current user.
+ *
+ * The component only presents the supplied answers and reports literal `0` or
+ * `1` selections to its parent. Permission, status queries, mutations, and
+ * phase transitions remain the screen's responsibility. Missing or unexpected
+ * runtime values are displayed as `0` (No) so the form always has a safe
+ * selection.
  */
 export function FaceVerificationDeclarationForm({
-  nec: selfVerNec = '0',
-  nmc: selfVerNmc = '1',
-  onChangeNec,
-  onChangeNmc,
+  nec = '0',
+  nmc = '0',
+  onNecChange,
+  onNmcChange,
   onSubmit,
 }: FaceVerificationDeclarationFormProps) {
   const { user } = useAuthStore();
   const showMarriageQuestion = user?.pclass === 'f';
+  const selectedNec: DeclarationAnswer = nec === '1' ? '1' : '0';
+  const selectedNmc: DeclarationAnswer = nmc === '1' ? '1' : '0';
 
-  // Default selection is 'No' when unanswered
-  const isNecNo = selfVerNec === '0';
-  const isNecYes = selfVerNec === '1';
+  const isNecNo = selectedNec === '0';
+  const isNecYes = selectedNec === '1';
 
-  const isNmcNo = selfVerNmc === '0';
-  const isNmcYes = selfVerNmc === '1';
+  const isNmcNo = selectedNmc === '0';
+  const isNmcYes = selectedNmc === '1';
 
   return (
     <Container className="gap-5">
@@ -69,7 +74,7 @@ export function FaceVerificationDeclarationForm({
           <View className="flex-row items-center gap-3">
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => onChangeNec('1')}
+              onPress={() => onNecChange('1')}
               className="flex-row items-center gap-1.5 px-2 py-1">
               <View
                 className={`h-5 w-5 items-center justify-center rounded-full border-2 ${
@@ -81,7 +86,7 @@ export function FaceVerificationDeclarationForm({
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => onChangeNec('0')}
+              onPress={() => onNecChange('0')}
               className="flex-row items-center gap-1.5 px-2 py-1">
               <View
                 className={`h-5 w-5 items-center justify-center rounded-full border-2 ${
@@ -106,7 +111,7 @@ export function FaceVerificationDeclarationForm({
               <View className="flex-row items-center gap-3">
                 <TouchableOpacity
                   activeOpacity={0.7}
-                  onPress={() => onChangeNmc('1')}
+                  onPress={() => onNmcChange('1')}
                   className="flex-row items-center gap-1.5 px-2 py-1">
                   <View
                     className={`h-5 w-5 items-center justify-center rounded-full border-2 ${
@@ -118,7 +123,7 @@ export function FaceVerificationDeclarationForm({
                 </TouchableOpacity>
                 <TouchableOpacity
                   activeOpacity={0.7}
-                  onPress={() => onChangeNmc('0')}
+                  onPress={() => onNmcChange('0')}
                   className="flex-row items-center gap-1.5 px-2 py-1">
                   <View
                     className={`h-5 w-5 items-center justify-center rounded-full border-2 ${
