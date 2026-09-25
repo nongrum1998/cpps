@@ -19,31 +19,54 @@ export type FaceVerificationPhase =
   | 'error';
 
 /**
- * Server response from `POST /api/verification/`.
+ * Values accepted by the declaration controls and sent in a DLC request.
  *
- * `msg` is the human-readable message displayed to the user.
- * `self_ver_code` drives result screen branching:
- * - `'00'` → accepted (green success box)
- * - `'22'` → rejected (photo + rejection reason)
- * - `'4'`  → show both non-employment AND re-marriage declarations
- * - other  → show non-employment declaration only
+ * The API represents the answers as literal strings: `'0'` means no and
+ * `'1'` means yes. The narrow union prevents unsupported declaration values
+ * from entering the typed request contract.
  */
-export interface VerificationResponseT {
-  msg: string;
-  self_ver_code: '00' | '22' | '4' | '1' | string;
+export type DeclarationAnswer = '0' | '1';
+
+/**
+ * The two declaration answers carried from screen state to the preview and
+ * submission request.
+ *
+ * The object keeps the declaration labels (`nec` and `nmc`) aligned with the
+ * `/dlc` API body and prevents a second declaration representation from being
+ * introduced.
+ */
+export interface DlcDeclarationDetails {
+  /** Non-employment declaration answer. */
+  nec: DeclarationAnswer;
+  /** Re-marriage declaration answer. */
+  nmc: DeclarationAnswer;
 }
 
 /**
- * Payload sent to `POST /api/lc/` for DLC (Digital Life Certificate) submission.
+ * Exact plain-object body sent to `POST /dlc` for a DLC submission.
+ *
+ * `DlcSubmitPayload` is passed directly to the shared HTTP client; its
+ * interceptor performs Fernet encryption before transport. `image` is the raw
+ * captured JPEG base64 and is neither transformed nor persisted by this
+ * contract.
  */
-export interface DLCSubmitPayload {
-  selfVerNec: 'Yes' | 'No';
-  selfVerNmc: 'Yes' | 'No' | '';
-  self_ver_code: string;
-  device: string;
-  device_id: string;
-  ver_mode_code: '01';
+export interface DlcSubmitPayload {
+  /** Application name reported by the current device. */
+  deviceName: string;
+  /** Platform device identifier, with the hook's existing fallback. */
+  deviceId: string;
+  /** Authenticated user's PPO identifier. */
+  ppo_id: string;
+  /** Authenticated user's PPO number. */
+  ppo_no: string;
+  /** Non-employment declaration answer. */
+  nec: DeclarationAnswer;
+  /** Re-marriage declaration answer. */
+  nmc: DeclarationAnswer;
+  /** Reserved place value required by the current API contract. */
   place: '';
+  /** Raw captured JPEG base64, kept in memory only. */
+  image: string;
 }
 
 /**

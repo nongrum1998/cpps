@@ -1,16 +1,18 @@
 import { useMutation } from '@tanstack/react-query';
+import * as Application from 'expo-application';
+import { Platform } from 'react-native';
+import type { ApiResponse } from '@sharedTypes/api';
+import { useAuthStore } from '@stores/auth.store';
 import { ENDPOINTS } from '@utils/constants';
 import { http } from '@utils/http';
-import type { VerificationResponseT } from '../types';
-import { Platform } from 'react-native';
-import * as Application from 'expo-application';
+import type { DeclarationAnswer, DlcDeclarationDetails, DlcSubmitPayload } from '../types';
 
-interface DLCPayload {
-  selfVerNec: '1' | '2' | '0';
-  selfVerNmc: '1' | '2' | '0';
-  self_ver_code: string;
+/** Values supplied by the face-verification screen for one DLC submission. */
+type DlcSubmitInput = Omit<DlcDeclarationDetails, 'nec' | 'nmc'> & {
+  nec: DeclarationAnswer | '2';
+  nmc: DeclarationAnswer | '2';
   image: string;
-}
+};
 
 /** Device metadata attached to every DLC submission. */
 interface DeviceMetadata {
@@ -41,28 +43,47 @@ async function resolveDeviceMetadata(): Promise<DeviceMetadata> {
 }
 
 /**
- * Submits the Digital Life Certificate (DLC) self-declaration to `POST /api/lc/`.
+ * Submits a DLC declaration and captured image to `POST /dlc`.
  *
- * Device metadata (device name, device ID) is sent as plain strings;
- * the request interceptor auto-encrypts all plain-object fields via Fernet.
- * `ver_mode_code` is fixed at `'01'`; `place` is always empty string.
+ * The hook reads PPO identity from the authenticated user, resolves the
+ * platform device metadata, and constructs one {@link DlcSubmitPayload}. The
+ * plain object is passed to the existing HTTP client so its Fernet interceptor
+ * encrypts the request. The captured image is forwarded unchanged and is not
+ * logged or persisted by this hook.
  *
- * @returns TanStack Query mutation with `VerificationResponseT` result.
+ * @returns A TanStack Query mutation that resolves to the shared
+ * {@link ApiResponse} envelope. The mutation rejects when authenticated PPO
+ * details or device metadata cannot be resolved.
  */
 export function useSubmitDLC() {
-  return useMutation({
-    mutationFn: async (payload: DLCPayload) => {
-      const { deviceName, deviceId } = await resolveDeviceMetadata();
+  const { user } = useAuthStore();
 
-      return http.post<VerificationResponseT>(ENDPOINTS.DLC.CREATE, {
-        selfVerNec: payload.selfVerNec,
-        selfVerNmc: payload.selfVerNmc,
-        device: deviceName,
-        device_id: deviceId,
-        ver_mode_code: '01',
-        self_ver_code: payload.self_ver_code,
+  return useMutation<ApiResponse<unknown>, Error, DlcSubmitInput>({
+    mutationFn: async ({ nec, nmc, image }) => {
+      const ppoId = user?.ppo_id;
+      const ppoNo = user?.ppo_no;
+
+      if (!ppoId || !ppoNo) {
+        throw new Error('Authenticated PPO details are required');
+      }
+
+      if (nec === '2' || nmc === '2') {
+        throw new Error('DLC declaration answers must be 0 or 1');
+      }
+
+      const { deviceName, deviceId } = await resolveDeviceMetadata();
+      const requestBody: DlcSubmitPayload = {
+        deviceName,
+        deviceId,
+        ppo_id: ppoId,
+        ppo_no: ppoNo,
+        nec,
+        nmc,
         place: '',
-      });
+        image,
+      };
+
+      return http.post<unknown>(ENDPOINTS.DLC.CREATE, requestBody);
     },
   });
 }
