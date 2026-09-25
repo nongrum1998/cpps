@@ -12,11 +12,26 @@
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@pension/hooks": "workspace:*",
+    "@pension/utils": "workspace:*",
+    "class-variance-authority": "0.7.1"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "5.101.4",
+    "expo": "57.0.18",
+    "nativewind": "^4.2.0",
+    "react": "~19.2.3",
+    "react-native": "0.86.3",
+    "react-native-safe-area-context": "5.7.0"
+  },
   "devDependencies": {
     "@pension/eslint-config": "workspace:*",
     "@pension/prettier-config": "workspace:*",
     "@pension/typescript-config": "workspace:*",
+    "@types/react": "^19.0.0",
     "eslint": "9.39.5",
+    "nativewind": "4.2.6",
     "prettier": "3.2.5",
     "typescript": "6.0.3"
   }
