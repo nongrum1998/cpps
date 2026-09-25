@@ -191,6 +191,7 @@ export function FaceVerificationScreen() {
     if (!ppoId || !ppoNo) {
       setCapturedImageBase64('');
       resetSubmission();
+      resetCaptureState();
       showTechnicalError(SUBMISSION_ERROR);
       return;
     }
@@ -226,6 +227,7 @@ export function FaceVerificationScreen() {
       // in screen state or the TanStack mutation variables after completion.
       setCapturedImageBase64('');
       resetSubmission();
+      resetCaptureState();
       submissionInFlight.current = false;
     }
   }, [
@@ -234,6 +236,7 @@ export function FaceVerificationScreen() {
     mutateAsync,
     nec,
     nmc,
+    resetCaptureState,
     resetSubmission,
     showTechnicalError,
     user?.ppo_id,
@@ -263,6 +266,7 @@ export function FaceVerificationScreen() {
         {phase === 'camera' && device ? (
           <FaceCaptureCamera
             device={device}
+            onReset={() => setPhase('declaration')}
             outputs={capture.outputs}
             faces={capture.faces}
             frameWidth={capture.frameSize.width}
@@ -289,6 +293,7 @@ export function FaceVerificationScreen() {
             showMarriageQuestion={showMarriageQuestion}
             actionLabel="Submit Photo"
             onSubmitPress={handleOpenConfirmation}
+            onReset={() => setPhase('declaration')}
           />
         )}
 

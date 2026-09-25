@@ -70,6 +70,24 @@ export interface DlcSubmitPayload {
 }
 
 /**
+ * Decrypted application envelope returned by `POST /dlc`.
+ *
+ * The shared HTTP wrapper exposes this body through `ApiResponse.data` while
+ * keeping its outer HTTP success flag separate. The `/dlc` contract requires a
+ * boolean application-level `status` and a human-readable message; the
+ * submission hook normalizes `status` into `ApiResponse.success` before the
+ * screen renders a result.
+ */
+export interface DlcResponseEnvelope {
+  /** Application-level processing result from the backend. */
+  status: boolean;
+  /** Human-readable result or rejection reason from the backend. */
+  message: string;
+  /** Optional opaque result data; the current flow does not consume it. */
+  data?: unknown;
+}
+
+/**
  * Props passed to the FaceVerificationScreen from the route.
  */
 export interface FaceVerificationRouteParams {

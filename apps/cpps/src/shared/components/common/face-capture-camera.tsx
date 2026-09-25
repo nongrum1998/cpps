@@ -3,12 +3,14 @@ import { StyleSheet, View, Text } from 'react-native';
 import { Camera, type CameraDevice } from 'react-native-vision-camera';
 import type { Face } from 'react-native-vision-camera-face-detector';
 import { CameraPainter } from '@components/common/camera-painter';
+import { Button } from '@components/ui';
 
 /** Outputs prop shape of the vision-camera `Camera` component. */
 type CameraOutputs = ComponentProps<typeof Camera>['outputs'];
 
 /** Props for {@link FaceCaptureCamera}. */
 export interface FaceCaptureCameraProps {
+  onReset: () => void;
   /** Active camera device (front camera for liveness capture). */
   device: CameraDevice;
   /** Detector + photo outputs from `useFaceCapture().outputs`. */
@@ -47,6 +49,7 @@ export function FaceCaptureCamera({
   viewWidth,
   viewHeight,
   message,
+  onReset,
 }: FaceCaptureCameraProps) {
   return (
     <>
@@ -60,9 +63,18 @@ export function FaceCaptureCamera({
         isFrontCamera={true}
       />
       {/* Bottom overlay message */}
-      <View className="absolute left-5 right-5 top-5 rounded-xl bg-black/75 p-4">
-        <Text className="text-center text-lg font-bold text-white">{message}</Text>
+      <View className="absolute left-5 right-5 top-5 flex-row items-center rounded-xl bg-black/75 p-4">
+        <View className="flex-1">
+          <Text className="text-center text-lg font-bold text-white">{message}</Text>
+        </View>
+        <View>
+          <Button variant={'secondary'} size={'lg'} onPress={onReset}>
+            Cancel
+          </Button>
+        </View>
       </View>
+
+      <View className="absolute bottom-0 left-5 right-5 rounded-xl p-4"></View>
     </>
   );
 }

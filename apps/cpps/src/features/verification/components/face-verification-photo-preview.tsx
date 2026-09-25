@@ -16,6 +16,7 @@ export interface FaceVerificationPhotoPreviewStepProps {
   onSubmitPress: () => void;
   /** Label for the action button; defaults to "Submit Photo". */
   actionLabel?: string;
+  onReset: () => void;
 }
 
 /**
@@ -32,6 +33,7 @@ export function FaceVerificationPhotoPreviewStep({
   showMarriageQuestion,
   onSubmitPress,
   actionLabel = 'Submit Photo',
+  onReset,
 }: FaceVerificationPhotoPreviewStepProps) {
   const formatAnswer = (answer: DlcDeclarationDetails['nec']) => (answer === '1' ? 'Yes' : 'No');
 
@@ -77,6 +79,9 @@ export function FaceVerificationPhotoPreviewStep({
       </Text>
       <Button size="lg" className="mt-6" onPress={onSubmitPress}>
         <Text className="text-base font-bold text-white">{actionLabel}</Text>
+      </Button>
+      <Button variant={'outline'} size="lg" onPress={onReset}>
+        Reset
       </Button>
       <FooterImg />
     </Container>

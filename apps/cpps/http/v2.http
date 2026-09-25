@@ -254,13 +254,13 @@ Content-Type: application/json
 # ------------ Pre-script -------------------
 < {%
    request.variables.set('RAW_BODY', JSON.stringify({ 
-    selfVerNec: "NA",
-    selfVerNmc: "NA",
-    device: "Pixel 7 Pro",
-    device_id: "8f3b92e1-4c10-4d87-9a02-b2e18f943c21",
-    ver_mode_code: "01",
-    self_ver_code: "01",
-    place: "New Delhi",
+    deviceName:"",
+    deviceId:"",
+    ppo_id:'',
+    ppo_no:""
+    nec:"0",
+    nmc:"0",
+    place: "",
     image:""
    }));
    require("./scripts/enc-req.http.js");

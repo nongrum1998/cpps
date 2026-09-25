@@ -62,6 +62,7 @@ export interface UseFaceCaptureResult {
    *
    * Clears the capture gate, blink/eye state, processing and detection
    * timestamps, detected faces, compressor state, and the liveness message.
+   * It also retries any temporary file cleanup that previously failed.
    */
   resetCaptureState: () => void;
 }
@@ -117,11 +118,59 @@ export function useFaceCapture({
   const lastDetectionTime = useRef(0);
   const eyesClosed = useRef(false);
   const blinkCount = useRef(0);
+  const pendingFileUris = useRef<Set<string>>(new Set());
 
   // Keep the detection gate in sync with the parent's phase machine.
   useEffect(() => {
     activeRef.current = isActive;
   });
+
+  /**
+   * Deletes every temporary file that has not yet been confirmed removed.
+   *
+   * A failed delete is intentionally left in {@link pendingFileUris} so a later
+   * reset or unmount can retry it. All pending files are attempted even when
+   * one URI fails, and the first cleanup error is reported to the caller.
+   */
+  const cleanupPendingFiles = useCallback(async (): Promise<void> => {
+    const uris = Array.from(pendingFileUris.current);
+    if (uris.length === 0) return;
+
+    let firstError: unknown;
+    let hasError = false;
+
+    await Promise.all(
+      uris.map(async (uri) => {
+        try {
+          await FileSystem.deleteAsync(uri, { idempotent: true });
+          pendingFileUris.current.delete(uri);
+        } catch (error) {
+          if (!hasError) {
+            firstError = error;
+            hasError = true;
+          }
+        }
+      })
+    );
+
+    if (hasError) {
+      throw firstError;
+    }
+  }, []);
+
+  /**
+   * Retries pending cleanup without surfacing an unhandled promise rejection.
+   * Failed URIs remain tracked for a later reset or unmount attempt.
+   */
+  const retryPendingFileCleanup = useCallback(() => {
+    void cleanupPendingFiles().catch(() => undefined);
+  }, [cleanupPendingFiles]);
+
+  useEffect(() => {
+    return () => {
+      retryPendingFileCleanup();
+    };
+  }, [retryPendingFileCleanup]);
 
   /**
    * Captures a single photo, compresses it to ≤500 KB base64, deletes the
@@ -142,25 +191,30 @@ export function useFaceCapture({
       const filePath = photoFile.filePath.startsWith('file://')
         ? photoFile.filePath
         : `file://${photoFile.filePath}`;
+      pendingFileUris.current.add(filePath);
 
       // Clear stale result/error state left by a previous capture.
       reset();
 
       // 2. Always compress to ≤500 KB before base64-encoding.
-      let compressed: Awaited<ReturnType<typeof compressImageToBase64>>;
+      let cleanBase64 = '';
       try {
-        compressed = await compressImageToBase64(filePath);
+        const compressed = await compressImageToBase64(filePath);
+        pendingFileUris.current.add(compressed.uri);
+
+        // ImageManipulator emits whitespace-free base64; strip defensively to
+        // keep the exact payload format the API previously received.
+        cleanBase64 = compressed.base64.replace(/[\r\n\s]/g, '');
       } finally {
-        // Delete the original capture file, even when compression fails.
-        await FileSystem.deleteAsync(filePath, { idempotent: true });
+        // Delete both temporary files before notifying the parent. This keeps
+        // biometric files out of the filesystem for the entire time the
+        // parent is processing the captured image.
+        await cleanupPendingFiles();
       }
 
-      // The re-encoded output file is only needed while reading base64.
-      await FileSystem.deleteAsync(compressed.uri, { idempotent: true });
-
-      // ImageManipulator emits whitespace-free base64; strip defensively to
-      // keep the exact payload format the API previously received.
-      const cleanBase64 = compressed.base64.replace(/[\r\n\s]/g, '');
+      if (!cleanBase64) {
+        throw new Error('Failed to generate base64 image');
+      }
 
       await onCaptured(cleanBase64);
     } catch (e) {
@@ -168,11 +222,21 @@ export function useFaceCapture({
       // the loading spinner up forever and deadlocks the blink-capture gate
       // (`blinkCount.current > 0 && !isCapturing.current`).
       isCapturing.current = false;
+      reset();
+      retryPendingFileCleanup();
       const message = e instanceof Error ? e.message : 'Failed to capture image';
       setMessage(message);
       onError?.(message);
     }
-  }, [photoOutput, compressImageToBase64, reset, onCaptured, onError]);
+  }, [
+    photoOutput,
+    compressImageToBase64,
+    cleanupPendingFiles,
+    reset,
+    onCaptured,
+    onError,
+    retryPendingFileCleanup,
+  ]);
 
   // Face detection callback
   const handleDetectedFaces = useCallback(
@@ -338,7 +402,8 @@ export function useFaceCapture({
     lastDetectionTime.current = 0;
     setFaces([]);
     reset();
-  }, [reset, resetBlinkState]);
+    retryPendingFileCleanup();
+  }, [reset, resetBlinkState, retryPendingFileCleanup]);
 
   return {
     faces,
