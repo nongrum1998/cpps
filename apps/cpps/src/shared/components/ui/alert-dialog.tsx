@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from './dialog';
-import { Button } from './button';
+import { Button } from '@pension/ui';
 import { cn } from '@pension/utils';
 
 /**

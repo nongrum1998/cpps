@@ -4,9 +4,6 @@
 export * from './alert';
 export * from './alert-dialog';
 
-// Buttons
-export * from './button';
-
 // Dialogs
 export * from './dialog';
 

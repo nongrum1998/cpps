@@ -20,7 +20,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { cn } from '@pension/utils';
 import { Ternary } from '@components/common';
-import { Button } from './button';
+import { Button } from '@pension/ui';
 import { Icon } from './icon';
 
 /**
