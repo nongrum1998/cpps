@@ -7,14 +7,20 @@ import { Ternary } from '@components/common';
 
 /** Props for {@link FaceVerificationResultView}. */
 export interface FaceVerificationResultViewProps {
-  /** Server response driving the branch: '00' success, '22' rejected. */
+  /** Envelope success flag that selects the result card. */
   isSuccess: boolean;
-  /** Data URI of the latest photo; shown only on the rejection branch. */
-  msg: string;
+  /** Backend message to display unchanged. */
+  message: string;
+  /** Called when the user chooses to retake after a failed result. */
+  onRetakePress?: () => void;
 }
 
 /**
- * Enhanced verification result screen with structured status cards instead of simple alert boxes.
+ * Renders the successful verification card and its existing home navigation.
+ *
+ * The card keeps the backend message unchanged when present and uses a local
+ * fallback only for an empty message. It is exported for reuse by the result
+ * container and does not submit or capture data.
  */
 export const SuccessStatusCard = ({ message }: { message: string }) => {
   const { navigate } = useSafeNavigation();
@@ -55,12 +61,22 @@ export const SuccessStatusCard = ({ message }: { message: string }) => {
   );
 };
 
+/** Props for {@link RejectStatusCard}. */
 export interface RejectStatusCardProps {
+  /** Backend failure message to display unchanged. */
   message: string;
-  onRetakePhoto?: () => void;
+  /** Optional same-screen retake callback. */
+  onRetakePress?: () => void;
 }
 
-export const RejectStatusCard = ({ message, onRetakePhoto }: RejectStatusCardProps) => {
+/**
+ * Renders a backend failure card with no internal navigation.
+ *
+ * The retake action is rendered only when the screen supplies a callback. The
+ * card preserves the backend message and uses a local fallback only when the
+ * message is empty.
+ */
+export const RejectStatusCard = ({ message, onRetakePress }: RejectStatusCardProps) => {
   return (
     <View className="items-center gap-y-4 rounded-md border border-red-500/20 bg-red-500/20 p-5">
       <View className="mt-2 w-full items-center">
@@ -73,17 +89,26 @@ export const RejectStatusCard = ({ message, onRetakePhoto }: RejectStatusCardPro
         </Text>
       </View>
 
-      {onRetakePhoto && (
-        <Button size={'lg'} variant="destructive" onPress={onRetakePhoto} className="w-full">
+      {onRetakePress ? (
+        <Button size="lg" variant="destructive" onPress={onRetakePress} className="w-full">
           Retake Photo
         </Button>
-      )}
+      ) : null}
     </View>
   );
 };
 
-export function FaceVerificationResultView({ isSuccess, msg }: FaceVerificationResultViewProps) {
-  const { navigate } = useSafeNavigation();
+/**
+ * Presents the envelope-driven result for a completed DLC submission.
+ *
+ * Only `isSuccess` chooses between the cards. A failed result delegates
+ * retake to `onRetakePress`, keeping technical error handling in the screen.
+ */
+export function FaceVerificationResultView({
+  isSuccess,
+  message,
+  onRetakePress,
+}: FaceVerificationResultViewProps) {
   return (
     <Container className="gap-y-5">
       {/* Header Section */}
@@ -105,13 +130,8 @@ export function FaceVerificationResultView({ isSuccess, msg }: FaceVerificationR
 
       <Ternary
         condition={isSuccess}
-        ifTrue={<SuccessStatusCard message={msg} />}
-        ifFalse={
-          <RejectStatusCard
-            message={msg}
-            onRetakePhoto={() => navigate(PAGE_ROUTES.FACE_RECOGNITION)}
-          />
-        }
+        ifTrue={<SuccessStatusCard message={message} />}
+        ifFalse={<RejectStatusCard message={message} onRetakePress={onRetakePress} />}
       />
     </Container>
   );
