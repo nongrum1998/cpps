@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Button } from '@components/ui';
+import { Button } from '@pension/ui';
 import { Container } from '@components/layout';
 import { FooterImg } from '@components/common';
 import { useAuthStore } from '@stores/auth.store';

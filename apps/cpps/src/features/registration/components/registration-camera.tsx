@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 import { FaceCaptureCamera } from '@components/common/face-capture-camera';
 import { useFaceCapture } from '@hooks/use-face-capture';
-import { Button } from '@components/ui';
+import { Button } from '@pension/ui';
 import { FooterImg } from '@components/common';
 import { Container } from '@components/layout';
 import { useRegisterPensioner } from '../hooks';

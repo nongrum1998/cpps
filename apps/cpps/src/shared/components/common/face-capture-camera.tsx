@@ -3,7 +3,7 @@ import { StyleSheet, View, Text } from 'react-native';
 import { Camera, type CameraDevice } from 'react-native-vision-camera';
 import type { Face } from 'react-native-vision-camera-face-detector';
 import { CameraPainter } from '@components/common/camera-painter';
-import { Button } from '@components/ui';
+import { Button } from '@pension/ui';
 
 /** Outputs prop shape of the vision-camera `Camera` component. */
 type CameraOutputs = ComponentProps<typeof Camera>['outputs'];

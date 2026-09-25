@@ -5,7 +5,7 @@ import { View } from 'react-native';
 import { useSafeNavigation } from '@hooks/use-safe-navigation';
 import { Container } from '@components/layout';
 import { EmptyScreen } from '@components/screens';
-import { Button } from '@components/ui';
+import { Button } from '@pension/ui';
 import { PAGE_ROUTES } from '@utils/constants';
 import { saveAndShareBase64Pdf } from '@utils/helpers/save-base64-pdf';
 import { usePdfPreviewStore } from '@stores/pdf-preview';

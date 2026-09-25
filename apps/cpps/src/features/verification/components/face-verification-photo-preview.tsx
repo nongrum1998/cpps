@@ -1,5 +1,5 @@
 import { Text, Image, View } from 'react-native';
-import { Button } from '@components/ui';
+import { Button } from '@pension/ui';
 import { Container } from '@components/layout';
 import { FooterImg } from '@components/common';
 import type { DlcDeclarationDetails } from '../types';
