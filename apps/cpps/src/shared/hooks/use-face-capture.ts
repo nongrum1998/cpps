@@ -62,7 +62,8 @@ export interface UseFaceCaptureResult {
    *
    * Clears the capture gate, blink/eye state, processing and detection
    * timestamps, detected faces, compressor state, and the liveness message.
-   * It also retries any temporary file cleanup that previously failed.
+   * It also invalidates in-flight captures and retries any temporary file
+   * cleanup that previously failed.
    */
   resetCaptureState: () => void;
 }
@@ -118,7 +119,12 @@ export function useFaceCapture({
   const lastDetectionTime = useRef(0);
   const eyesClosed = useRef(false);
   const blinkCount = useRef(0);
+  const captureGeneration = useRef(0);
+  const isMountedRef = useRef(true);
   const pendingFileUris = useRef<Set<string>>(new Set());
+  // Latest-ref holder so the natively-captured callback always reaches the
+  // freshest `handleDetectedFaces` without changing output identity.
+  const detectedFacesHandlerRef = useRef<{ current?: (faces: Face[]) => void }>({});
 
   // Keep the detection gate in sync with the parent's phase machine.
   useEffect(() => {
@@ -167,18 +173,38 @@ export function useFaceCapture({
   }, [cleanupPendingFiles]);
 
   useEffect(() => {
+    isMountedRef.current = true;
+    const facesHandlerRef = detectedFacesHandlerRef;
+
     return () => {
+      isMountedRef.current = false;
+      activeRef.current = false;
+      captureGeneration.current += 1;
+      facesHandlerRef.current.current = undefined;
       retryPendingFileCleanup();
     };
   }, [retryPendingFileCleanup]);
 
   /**
+   * Checks whether an asynchronous capture still belongs to the active mount.
+   * Reset and unmount increment the generation, invalidating late callbacks.
+   */
+  const isCaptureCurrent = useCallback(
+    (generation: number) =>
+      isMountedRef.current && activeRef.current && generation === captureGeneration.current,
+    []
+  );
+
+  /**
    * Captures a single photo, compresses it to ≤500 KB base64, deletes the
    * temp files, and hands the trimmed base64 to `onCaptured`. On any
    * failure the capture gate is released, the banner message is updated,
-   * and `onError` is invoked.
+   * and `onError` is invoked. Captures invalidated by reset or unmount are
+   * cleaned without notifying the parent.
    */
   const capturePhoto = useCallback(async () => {
+    const generation = captureGeneration.current;
+
     try {
       isCapturing.current = true;
       setMessage('Capturing photo...');
@@ -186,12 +212,19 @@ export function useFaceCapture({
       // 1. Capture snapshot while <Camera /> is still mounted and active
       const photoFile = await photoOutput.capturePhotoToFile({}, {});
 
-      setMessage('Please wait...');
-
       const filePath = photoFile.filePath.startsWith('file://')
         ? photoFile.filePath
         : `file://${photoFile.filePath}`;
       pendingFileUris.current.add(filePath);
+
+      if (!isCaptureCurrent(generation)) {
+        await cleanupPendingFiles();
+        isCapturing.current = false;
+        if (isMountedRef.current) reset();
+        return;
+      }
+
+      setMessage('Please wait...');
 
       // Clear stale result/error state left by a previous capture.
       reset();
@@ -201,6 +234,12 @@ export function useFaceCapture({
       try {
         const compressed = await compressImageToBase64(filePath);
         pendingFileUris.current.add(compressed.uri);
+
+        if (!isCaptureCurrent(generation)) {
+          isCapturing.current = false;
+          if (isMountedRef.current) reset();
+          return;
+        }
 
         // ImageManipulator emits whitespace-free base64; strip defensively to
         // keep the exact payload format the API previously received.
@@ -216,14 +255,30 @@ export function useFaceCapture({
         throw new Error('Failed to generate base64 image');
       }
 
+      if (!isCaptureCurrent(generation)) {
+        isCapturing.current = false;
+        if (isMountedRef.current) reset();
+        return;
+      }
+
       await onCaptured(cleanBase64);
+      activeRef.current = false;
+      isCapturing.current = false;
     } catch (e) {
+      const captureIsCurrent = isCaptureCurrent(generation);
+
       // CRITICAL: both statements below are required. Dropping either leaves
       // the loading spinner up forever and deadlocks the blink-capture gate
       // (`blinkCount.current > 0 && !isCapturing.current`).
       isCapturing.current = false;
-      reset();
       retryPendingFileCleanup();
+
+      if (!captureIsCurrent) {
+        if (isMountedRef.current) reset();
+        return;
+      }
+
+      reset();
       const message = e instanceof Error ? e.message : 'Failed to capture image';
       setMessage(message);
       onError?.(message);
@@ -232,6 +287,7 @@ export function useFaceCapture({
     photoOutput,
     compressImageToBase64,
     cleanupPendingFiles,
+    isCaptureCurrent,
     reset,
     onCaptured,
     onError,
@@ -241,7 +297,12 @@ export function useFaceCapture({
   // Face detection callback
   const handleDetectedFaces = useCallback(
     (detectedFaces: Face[]) => {
-      if (isCapturing.current || isProcessing.current || !activeRef.current) {
+      if (
+        !isMountedRef.current ||
+        isCapturing.current ||
+        isProcessing.current ||
+        !activeRef.current
+      ) {
         return;
       }
 
@@ -351,10 +412,6 @@ export function useFaceCapture({
   // `useFaceDetectorOutput()` must NOT be used here.
   const [faceDetectorOutput, setFaceDetectorOutput] = useState<CameraOutput | null>(null);
 
-  // Latest-ref holder so the natively-captured callback always reaches the
-  // freshest `handleDetectedFaces` without changing output identity.
-  const detectedFacesHandlerRef = useRef<{ current?: (faces: Face[]) => void }>({});
-
   useEffect(() => {
     const output = createFaceDetectorOutput({
       performanceMode: 'accurate',
@@ -397,8 +454,11 @@ export function useFaceCapture({
   }, []);
 
   const resetCaptureState = useCallback(() => {
+    captureGeneration.current += 1;
+    activeRef.current = false;
     resetBlinkState();
-    isCapturing.current = false;
+    // Keep an in-flight capture gate closed until its stale run reaches its
+    // own finally block, so a replacement capture cannot overlap cleanup.
     lastDetectionTime.current = 0;
     setFaces([]);
     reset();

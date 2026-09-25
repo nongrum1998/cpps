@@ -27,6 +27,9 @@ const CAMERA_PERMISSION_ERROR =
 const CAMERA_UNAVAILABLE_ERROR = 'The front camera is unavailable on this device.';
 const CAPTURE_ERROR = 'We could not capture your photo. Please try again.';
 const SUBMISSION_ERROR = 'We could not submit your face verification right now. Please try again.';
+const CONFIRMATION_DESC =
+  'By submitting this Declaration, you have agreed that the ' +
+  'information furnished by you is true.\n\nAre you sure you want to submit?';
 
 /** Props accepted by {@link FaceVerificationScreen}. */
 type FaceVerificationScreenProps = FaceVerificationRouteParams;
@@ -277,7 +280,6 @@ export function FaceVerificationScreen() {
           <FaceCaptureCamera
             device={device}
             onReset={handleReset}
-
             outputs={capture.outputs}
             faces={capture.faces}
             frameWidth={capture.frameSize.width}
@@ -335,10 +337,7 @@ export function FaceVerificationScreen() {
         open={dlcDialogOpen}
         onOpenChange={setDlcDialogOpen}
         title="Terms and Conditions."
-        description={
-          'By submitting this Declaration, you have agreed that the ' +
-          'information furnished by you is true.\n\nAre you sure you want to submit?'
-        }
+        description={CONFIRMATION_DESC}
         destructive
         onConfirm={() => void handleConfirmedSubmit()}
       />

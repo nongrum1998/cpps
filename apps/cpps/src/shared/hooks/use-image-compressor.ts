@@ -45,7 +45,8 @@ export interface CompressImageOptions {
  * first).
  *
  * @returns `compressImageToBase64` plus reactive `isCompressing`, `error`,
- * `result`, and `reset` state for callers that render progress status.
+ * `result`, and `reset` state for callers that render progress status. Reset
+ * also retries cleanup of any compressor-owned temporary file.
  */
 export function useImageCompressor() {
   const [isCompressing, setIsCompressing] = useState(false);
@@ -202,14 +203,15 @@ export function useImageCompressor() {
         setIsCompressing(false);
       }
     },
-    []
+    [cleanupPendingFiles, retryPendingFileCleanup]
   );
 
   const reset = useCallback(() => {
     setResult(null);
     setError(null);
     setIsCompressing(false);
-  }, []);
+    retryPendingFileCleanup();
+  }, [retryPendingFileCleanup]);
 
   return {
     compressImageToBase64,
