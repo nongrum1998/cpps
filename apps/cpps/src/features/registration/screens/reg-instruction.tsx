@@ -1,6 +1,6 @@
 import { useSafeNavigation } from '@hooks/use-safe-navigation';
 import { Text, View } from 'react-native';
-import { Button } from '@components/ui/button';
+import { Button } from '@pension/ui';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FooterImg } from '@components/common/nic-footer-img';
 import { Alert, AlertDescription, AlertTitle } from '@components/ui/alert';

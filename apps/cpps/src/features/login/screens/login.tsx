@@ -2,7 +2,7 @@ import { View, Text, Image } from 'react-native';
 import { useSafeNavigation } from '@hooks/use-safe-navigation';
 
 import { LoginForm } from '../components';
-import { Button } from '@components/ui/button';
+import { Button } from '@pension/ui';
 import { Container } from '@components/layout';
 import { FooterImg } from '@components/common/nic-footer-img';
 import { PAGE_ROUTES } from '@utils/constants/routes';
