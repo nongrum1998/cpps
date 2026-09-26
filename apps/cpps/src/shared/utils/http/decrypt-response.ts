@@ -1,4 +1,4 @@
-import { decryptFields } from '@lib/encryption';
+import { decryptFields } from '@pension/lib';
 import { AxiosResponse } from 'axios';
 
 export function decryptRequestResponse(response: AxiosResponse) {

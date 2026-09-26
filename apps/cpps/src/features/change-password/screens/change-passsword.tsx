@@ -11,7 +11,7 @@ import { FooterImg, Ternary } from '@components/common';
 import { ChangePasswrodSchema } from '../validators';
 import { useChangePassword } from '../hooks';
 import { ChangePasswordConfirmDialog, PasswordRequiredments } from '../components';
-import { formatPassword, sha256 } from '@lib/encryption';
+import { formatPassword, sha256 } from '@pension/lib';
 
 /**
  * The type of the change password form fields.

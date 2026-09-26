@@ -25,6 +25,7 @@
     "@pension/hooks": "workspace:*",
     "@pension/storage": "workspace:*",
     "@pension/ui": "workspace:*",
+    "@pension/lib": "workspace:*",
     "@pension/utils": "workspace:*",
     "@react-native-community/netinfo": "12.0.1",
     "@tanstack/react-query": "5.101.4",

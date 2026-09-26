@@ -8,7 +8,7 @@
  */
 
 import { encryptReqBody } from '@utils/http/request';
-import { encryptFields } from '@lib/encryption';
+import { encryptFields } from '../@pension/lib';
 import type { InternalAxiosRequestConfig } from 'axios';
 
 const mockEncryptFields = encryptFields as jest.Mock;

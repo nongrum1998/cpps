@@ -8,8 +8,14 @@
  * — the sync one is pinned deliberately so it is not "fixed" by accident.
  */
 
-import { decryptFields, encryptFields } from '@lib/encryption/transform';
-import { decryptText, encryptText } from '@lib/encryption/encryption';
+import {
+  decryptFields,
+  encryptFields,
+} from '../@pension/lib/transform';
+import {
+  decryptText,
+  encryptText,
+} from '../@pension/lib/encryption';
 
 const mockEncryptText = encryptText as jest.Mock;
 const mockDecryptText = decryptText as jest.Mock;

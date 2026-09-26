@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { ENDPOINTS } from '@utils/constants';
 import { http } from '@utils/http';
-import { formatPassword, sha256 } from '@lib/encryption';
+import { formatPassword, sha256 } from '@pension/lib';
 import { RegisterPensionerInput } from '../validators';
 import { logger } from '@pension/utils';
 

@@ -12,10 +12,16 @@
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "typecheck": "tsc --noEmit"
   },
+  "peerDependencies": {
+    "crypto-js": "~4.2.0",
+    "expo-crypto": "~57.0.3"
+  },
   "devDependencies": {
     "@pension/eslint-config": "workspace:*",
     "@pension/prettier-config": "workspace:*",
     "@pension/typescript-config": "workspace:*",
+    "@types/react": "19.2.18",
+    "@types/crypto-js": "4.2.2",
     "eslint": "9.39.5",
     "prettier": "3.2.5",
     "typescript": "6.0.3"

@@ -1,4 +1,4 @@
-import { formatPassword } from '@lib/encryption';
+import { formatPassword } from '@pension/lib';
 import { passwordValidation, ppoNoValidation } from '@validation/common';
 import { z } from 'zod';
 

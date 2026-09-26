@@ -20,6 +20,10 @@ export async function encryptFields<T>(value: T): Promise<T> {
   return (await transformAsync(value, encryptText)) as T;
 }
 
+export async function ecryptObject<T>(value: T): Promise<T> {
+  return (await encryptText(JSON.stringify(value))) as T;
+}
+
 /**
  * Recursively decrypts every string in a value.
  *

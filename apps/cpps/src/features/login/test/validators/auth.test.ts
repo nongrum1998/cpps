@@ -1,5 +1,5 @@
 import { LoginSchema } from '@features/login/validators';
-import { formatPassword } from '@lib/encryption';
+import { formatPassword } from '../@pension/lib';
 
 jest.mock('@lib/encryption', () => ({
   formatPassword: jest.fn((value: string) => `formatted:${value}`),

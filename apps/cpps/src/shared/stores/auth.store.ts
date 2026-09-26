@@ -104,7 +104,7 @@ export const useAuthStore = createPersistedStore<AuthStore>(
       isSignedIn: state.isSignedIn,
       // Never restore a loading state from disk; a persisted `true` would
       // strand the app behind a spinner with no in-flight request.
-      isAuthLoading: false,
+      isAuthLoading: true,
     }),
   }
 );

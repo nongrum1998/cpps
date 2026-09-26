@@ -2,7 +2,7 @@ import { useAuthStore } from '@stores/auth.store';
 import { useQuery } from '@tanstack/react-query';
 import { http } from '@utils/http';
 import { ENDPOINTS } from '@utils/constants';
-import { decryptText } from '@lib/encryption';
+import { decryptText } from '@pension/lib';
 import { PensionStatementResponseI, PensionerStatement } from '../types';
 import { logger } from '@pension/utils';
 

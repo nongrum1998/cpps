@@ -15,7 +15,7 @@ const FERNET_KEY = '29fuUgagIGhDtyGqzrg1r39nKeWfGEobhXWwkaXMlTo=';
 
 const IV_BYTE_LENGTH = 16;
 
-type EncryptionModule = typeof import('@lib/encryption');
+type EncryptionModule = typeof import('../@pension/lib');
 
 /**
  * Counts up one byte at a time so every call yields distinct IV bytes.

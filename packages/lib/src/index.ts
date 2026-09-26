@@ -7,4 +7,4 @@
  */
 
 /** Canonical npm package name for the lib package. */
-export const LIB_PACKAGE_NAME = '@pension/lib';
+export * from './encryption';
