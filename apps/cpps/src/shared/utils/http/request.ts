@@ -26,6 +26,11 @@ import type { InternalAxiosRequestConfig } from 'axios';
  * `application/x-www-form-urlencoded` requests.
  *
  * @returns The Axios request interceptor function.
+ *
+ * @example
+ * ```ts
+ * apiClient.interceptors.request.use(encryptReqBody());
+ * ```
  */
 export const encryptReqBody = () => {
   return async (config: InternalAxiosRequestConfig) => {
@@ -35,7 +40,7 @@ export const encryptReqBody = () => {
       !(config.data instanceof FormData) &&
       !(config.data instanceof URLSearchParams)
     ) {
-      config.data = encryptFields({
+      config.data = await encryptFields({
         payload: JSON.stringify(config.data),
       });
     }

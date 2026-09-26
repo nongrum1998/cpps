@@ -7,53 +7,57 @@
  *
  * The interesting cases run against a *simulated native runtime* because the
  * Jest environment ships Node's WebCrypto, which always provides a working
- * `globalThis.crypto.getRandomValues` and therefore masks the production
- * failure entirely. See `describe('secure random source')` below.
+ * `globalThis.crypto.getRandomValues` and would mask a regression back to that
+ * source. See `describe('secure random source')` below.
  */
 
 const FERNET_KEY = '29fuUgagIGhDtyGqzrg1r39nKeWfGEobhXWwkaXMlTo=';
 
+const IV_BYTE_LENGTH = 16;
+
 type EncryptionModule = typeof import('@lib/encryption');
+
+/**
+ * Counts up one byte at a time so every call yields distinct IV bytes.
+ *
+ * Deterministic on purpose: it makes "a fresh IV per call" and "the token IV
+ * is exactly what expo-crypto returned" assertions exact, instead of relying
+ * on random bytes happening to differ.
+ */
+let byteCounter = 0;
+
+const mockGetRandomBytesAsync = jest.fn(async (byteCount: number): Promise<Uint8Array> => {
+  const bytes = new Uint8Array(byteCount);
+
+  for (let i = 0; i < byteCount; i += 1) {
+    byteCounter = (byteCounter + 1) & 0xff;
+    bytes[i] = byteCounter;
+  }
+
+  return bytes;
+});
+
+const mockGetRandomValues = jest.fn((array: Uint8Array): Uint8Array => array);
 
 /**
  * Stands in for the `expo-crypto` native module.
  *
  * The real package resolves `requireNativeModule('ExpoCrypto')` at import
- * time, which throws under Jest because no native runtime is present. This
- * mock instead publishes the same shape onto the `global.expo.modules` proxy
- * that `react-native-get-random-values` probes for, including the synchronous
- * `getRandomValues` signature the polyfill calls.
+ * time, which throws under Jest because no native runtime is present.
  */
-jest.mock('expo-crypto', () => {
-  const getRandomValues = (array: Uint8Array): Uint8Array => {
-    for (let i = 0; i < array.length; i += 1) {
-      array[i] = Math.floor(Math.random() * 256);
-    }
-
-    return array;
-  };
-
-  const expoGlobal = globalThis as unknown as {
-    expo: { modules: Record<string, unknown> };
-  };
-
-  expoGlobal.expo.modules.ExpoCrypto = { getRandomValues };
-
-  return {
-    getRandomValues,
-    getRandomBytes: jest.fn(),
-    getRandomBytesAsync: jest.fn(),
-  };
-});
+jest.mock('expo-crypto', () => ({
+  getRandomBytes: jest.fn(),
+  getRandomBytesAsync: mockGetRandomBytesAsync,
+  getRandomValues: mockGetRandomValues,
+}));
 
 /**
  * Loads a fresh copy of the encryption barrel.
  *
  * `encryption.ts` reads `process.env.EXPO_PUBLIC_FERNET_KEY` into a
- * module-scope constant, and `crypto-js` captures its reference to
- * `globalThis.crypto` at import time. Both mean the module must be required
- * *after* the relevant global state is arranged, and it must be a fresh
- * instance — hence `jest.isolateModules` rather than a static import.
+ * module-scope constant, so the module must be required *after* the key is
+ * arranged, and it must be a fresh instance per test — hence
+ * `jest.isolateModules` rather than a static import.
  */
 function loadEncryption(): EncryptionModule {
   let loaded: EncryptionModule | undefined;
@@ -70,48 +74,52 @@ function loadEncryption(): EncryptionModule {
   return loaded;
 }
 
+/**
+ * Decodes a urlsafe-base64 Fernet token into its raw bytes.
+ *
+ * `Buffer` is avoided deliberately: the project ships no Node type
+ * definitions, so it is not available in tests. The DOM `atob` is, and both
+ * React Native and Node provide it at runtime.
+ */
+function tokenToBytes(token: string): number[] {
+  let base64 = token.replace(/-/g, '+').replace(/_/g, '/');
+
+  while (base64.length % 4 !== 0) {
+    base64 += '=';
+  }
+
+  return Array.from(atob(base64), (char) => char.charCodeAt(0));
+}
+
 type MutableCryptoGlobal = { getRandomValues?: unknown };
 
 /**
  * Reproduces the React Native 0.86 runtime as the app actually runs it.
  *
  * React Native provides no `getRandomValues` of its own, so the property is
- * masked to `undefined` to match. `RN$Bridgeless` is also set because
- * `react-native-get-random-values` treats a bridgeless runtime as
- * non-debuggable; without it the polyfill silently degrades to `Math.random()`
- * and the missing native module never surfaces as an error.
+ * masked to `undefined` to match. Encryption must still succeed, because it
+ * must not read this global at all.
  */
 function simulateNativeRuntime(): () => void {
-  const runtime = globalThis as unknown as {
-    RN$Bridgeless?: boolean;
-    crypto: MutableCryptoGlobal;
-  };
+  const runtime = globalThis as unknown as { crypto: MutableCryptoGlobal };
 
   const hadOwnGetRandomValues = Object.prototype.hasOwnProperty.call(
     runtime.crypto,
     'getRandomValues'
   );
   const previousOwn = runtime.crypto.getRandomValues;
-  const previousBridgeless = runtime.RN$Bridgeless;
 
   Object.defineProperty(runtime.crypto, 'getRandomValues', {
     value: undefined,
     configurable: true,
     writable: true,
   });
-  runtime.RN$Bridgeless = true;
 
   return () => {
     if (hadOwnGetRandomValues) {
       runtime.crypto.getRandomValues = previousOwn;
     } else {
       delete runtime.crypto.getRandomValues;
-    }
-
-    if (previousBridgeless === undefined) {
-      delete runtime.RN$Bridgeless;
-    } else {
-      runtime.RN$Bridgeless = previousBridgeless;
     }
   };
 }
@@ -124,6 +132,8 @@ describe('secure random source', () => {
   beforeEach(() => {
     process.env.EXPO_PUBLIC_FERNET_KEY = FERNET_KEY;
     restoreRuntime = simulateNativeRuntime();
+    mockGetRandomBytesAsync.mockClear();
+    mockGetRandomValues.mockClear();
   });
 
   afterEach(() => {
@@ -136,30 +146,53 @@ describe('secure random source', () => {
     }
   });
 
-  it('installs a working getRandomValues on a runtime that lacks one', () => {
-    loadEncryption();
-
-    expect(typeof globalThis.crypto.getRandomValues).toBe('function');
-  });
-
-  it('encrypts without throwing when no host RNG exists', () => {
+  it('draws the IV from expo-crypto', async () => {
     const { encryptText } = loadEncryption();
 
-    // crypto-js reports a missing RNG as
-    // "Native crypto module could not be used to get secure random number."
-    expect(() => encryptText('{"username":"pensioner"}')).not.toThrow();
+    await encryptText('{"username":"pensioner"}');
+
+    expect(mockGetRandomBytesAsync).toHaveBeenCalledWith(IV_BYTE_LENGTH);
   });
 
-  it('round-trips a payload through encrypt and decrypt', () => {
+  it('never falls back to the host RNG', async () => {
+    const { encryptText } = loadEncryption();
+
+    await encryptText('payload');
+
+    expect(mockGetRandomValues).not.toHaveBeenCalled();
+  });
+
+  it('does not install a global polyfill to satisfy crypto-js', async () => {
+    const { encryptText } = loadEncryption();
+
+    await encryptText('payload');
+
+    // The runtime still has no RNG afterwards, which proves the IV never came
+    // from `globalThis.crypto` and that we are not quietly masking the problem.
+    expect(globalThis.crypto.getRandomValues).toBeUndefined();
+  });
+
+  it('encrypts without throwing when no host RNG exists', async () => {
+    const { encryptText } = loadEncryption();
+
+    await expect(encryptText('{"username":"pensioner"}')).resolves.toEqual(expect.any(String));
+  });
+
+  it('round-trips a payload through encrypt and decrypt', async () => {
     const { decryptText, encryptText } = loadEncryption();
     const plain = '{"username":"pensioner","password":"secret"}';
 
-    expect(decryptText(encryptText(plain))).toBe(plain);
+    expect(decryptText(await encryptText(plain))).toBe(plain);
   });
 });
 
 describe('encryptText', () => {
   const originalKey = process.env.EXPO_PUBLIC_FERNET_KEY;
+
+  beforeEach(() => {
+    process.env.EXPO_PUBLIC_FERNET_KEY = FERNET_KEY;
+    mockGetRandomBytesAsync.mockClear();
+  });
 
   afterEach(() => {
     if (originalKey === undefined) {
@@ -169,44 +202,61 @@ describe('encryptText', () => {
     }
   });
 
-  it('throws a clear error when the Fernet key is absent', () => {
+  it('returns a promise', () => {
+    const { encryptText } = loadEncryption();
+
+    expect(encryptText('payload')).toBeInstanceOf(Promise);
+  });
+
+  it('rejects with a clear error when the Fernet key is absent', async () => {
     delete process.env.EXPO_PUBLIC_FERNET_KEY;
 
     const { encryptText } = loadEncryption();
 
-    expect(() => encryptText('payload')).toThrow('Fernet key missing');
+    await expect(encryptText('payload')).rejects.toThrow('Fernet key missing');
   });
 
-  it('produces a fresh IV per call rather than reusing one', () => {
-    process.env.EXPO_PUBLIC_FERNET_KEY = FERNET_KEY;
-
+  it('writes the random bytes into the token IV in the same order', async () => {
     const { encryptText } = loadEncryption();
-    const tokens = new Set(Array.from({ length: 8 }, () => encryptText('same plaintext')));
+
+    const token = await encryptText('payload');
+    const [{ value }] = mockGetRandomBytesAsync.mock.results;
+    const bytes = await value;
+
+    // Fernet layout: 0x80 version byte, 8-byte timestamp, then the 16-byte IV.
+    const tokenIv = tokenToBytes(token).slice(9, 25);
+
+    expect(Array.from(tokenIv)).toEqual(Array.from(bytes));
+  });
+
+  it('produces a fresh IV per call rather than reusing one', async () => {
+    const { encryptText } = loadEncryption();
+
+    const tokens = new Set(
+      await Promise.all(Array.from({ length: 8 }, () => encryptText('same plaintext')))
+    );
 
     expect(tokens.size).toBe(8);
   });
 
-  it('emits urlsafe base64 so the token survives URL and header transport', () => {
-    process.env.EXPO_PUBLIC_FERNET_KEY = FERNET_KEY;
-
+  it('emits urlsafe base64 so the token survives URL and header transport', async () => {
     const { encryptText } = loadEncryption();
 
     // Checked across many tokens because the `+`/`/` characters this guards
     // against only appear in roughly one token in four.
-    const tokens = Array.from({ length: 32 }, () => encryptText('payload'));
+    const tokens = await Promise.all(Array.from({ length: 32 }, () => encryptText('payload')));
 
     for (const token of tokens) {
       expect(token).not.toMatch(/[+/]/);
     }
   });
 
-  it('prefixes the Fernet version byte 0x80', () => {
-    process.env.EXPO_PUBLIC_FERNET_KEY = FERNET_KEY;
-
+  it('prefixes the Fernet version byte 0x80', async () => {
     const { encryptText } = loadEncryption();
+
     // A leading 0x80 version byte always base64-encodes to "g", so every
     // spec-compliant Fernet token starts with it.
-    const tokens = Array.from({ length: 8 }, () => encryptText('payload'));
+    const tokens = await Promise.all(Array.from({ length: 8 }, () => encryptText('payload')));
 
     for (const token of tokens) {
       expect(token.startsWith('g')).toBe(true);
@@ -229,9 +279,9 @@ describe('decryptText', () => {
     }
   });
 
-  it('rejects a token whose payload was tampered with', () => {
+  it('rejects a token whose payload was tampered with', async () => {
     const { decryptText, encryptText } = loadEncryption();
-    const token = encryptText('payload');
+    const token = await encryptText('payload');
     const flipped = token.slice(0, 40) + (token[40] === 'A' ? 'B' : 'A') + token.slice(41);
 
     expect(() => decryptText(flipped)).toThrow(/HMAC verification failed/);
@@ -243,9 +293,9 @@ describe('decryptText', () => {
     expect(() => decryptText('c2hvcnQ')).toThrow(/Invalid Fernet token length/);
   });
 
-  it('rejects a token encrypted with a different key', () => {
+  it('rejects a token encrypted with a different key', async () => {
     const { encryptText } = loadEncryption();
-    const foreign = encryptText('payload');
+    const foreign = await encryptText('payload');
 
     process.env.EXPO_PUBLIC_FERNET_KEY = 'qL8dw3AQ5fnGR2vJ7NmXpK1sYt6bUe0cVh4Zr9iO0pXk=';
     jest.isolateModules(() => {

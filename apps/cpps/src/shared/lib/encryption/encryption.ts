@@ -1,10 +1,23 @@
-// `expo-crypto` must be imported before `react-native-get-random-values`.
-// It registers the `ExpoCrypto` native module, which the polyfill delegates
-// to in order to expose `global.crypto.getRandomValues`. React Native 0.86
-// ships no RNG of its own, so without it `CryptoJS.lib.WordArray.random()`
-// throws and every encrypted request — including login — fails.
-import 'expo-crypto';
-import 'react-native-get-random-values';
+// The IV is drawn from `expo-crypto` rather than `CryptoJS.lib.WordArray.random()`.
+//
+// `WordArray.random()` reads `globalThis.crypto.getRandomValues`, which on
+// React Native 0.86 only exists via the `react-native-get-random-values`
+// polyfill. That polyfill reaches its native module through a *synchronous*
+// call, which a bridgeless runtime does not support — so it throws, and
+// crypto-js swallows that and reports "Native crypto module could not be used
+// to get secure random number." instead, breaking every encrypted request
+// including login.
+//
+// `expo-crypto` exposes the same randomness through a native call that works
+// on every runtime, so the IV is built explicitly here and `encryptText` is
+// asynchronous as a result.
+//
+// Deliberately, nothing in this app installs `globalThis.crypto` any more — the
+// `react-native-get-random-values` import is gone from the root layout, and
+// `encryption.test.ts` asserts that encrypting still works with no host
+// `getRandomValues` present. Re-adding the polyfill to "fix" a crypto-js
+// complaint would reintroduce the synchronous native call that caused this.
+import * as Crypto from 'expo-crypto';
 import CryptoJS from 'crypto-js';
 
 const FERNET_KEY = process.env.EXPO_PUBLIC_FERNET_KEY || '';
@@ -33,6 +46,34 @@ function getFernetKeys(keyBase64: string) {
   };
 }
 
+/** Fernet IV length in bytes, fixed by the spec. */
+const IV_BYTE_LENGTH = 16;
+
+/**
+ * Packs raw bytes into the 32-bit word layout crypto-js expects.
+ *
+ * `CryptoJS.enc.Hex` reads element `i` as `words[i >>> 2] >>> (24 - (i % 4) *
+ * 8)`, i.e. most-significant byte first — the same convention its own
+ * `Hex.parse` writes with. Mirroring that here means
+ * `WordArray.create(bytesToWordArray(b)).toString(Hex)` yields `b` back
+ * unchanged, so the IV the backend reads out of the token is byte-identical to
+ * the bytes `getRandomBytesAsync` produced. Packing little-endian instead
+ * would reverse every 4-byte group and silently corrupt the IV.
+ *
+ * @param bytes - Raw bytes to pack. Length must be a multiple of 4.
+ * @returns A WordArray carrying exactly the same bytes.
+ */
+function bytesToWordArray(bytes: Uint8Array): CryptoJS.lib.WordArray {
+  const words: number[] = [];
+
+  for (let i = 0; i < bytes.length; i += 4) {
+    words[i / 4] =
+      ((bytes[i] << 24) | (bytes[i + 1] << 16) | (bytes[i + 2] << 8) | bytes[i + 3]) >>> 0;
+  }
+
+  return CryptoJS.lib.WordArray.create(words, bytes.length);
+}
+
 /**
  * Encrypts a plaintext string into a Fernet token.
  *
@@ -40,23 +81,19 @@ function getFernetKeys(keyBase64: string) {
  * timestamp, a random 16-byte IV, the AES-128-CBC ciphertext, then an
  * HMAC-SHA256 over everything preceding it.
  *
- * The IV is drawn from `CryptoJS.lib.WordArray.random`, which needs a
- * cryptographically secure `global.crypto.getRandomValues`. React Native
- * provides none on its own, so the module imports `expo-crypto` for this to
- * succeed — see the note at the top of this file.
+ * The IV is drawn from `expo-crypto`, which is what makes this asynchronous —
+ * see the note at the top of this file.
  *
  * @param plainText - Value to encrypt, usually a JSON-stringified body.
- * @returns The token encoded as urlsafe base64.
+ * @returns A promise resolving to the token encoded as urlsafe base64.
  * @throws {Error} `Fernet key missing` when `EXPO_PUBLIC_FERNET_KEY` is unset.
- * @throws {Error} When no secure random source is available; crypto-js raises
- *   "Native crypto module could not be used to get secure random number."
  *
  * @example
  * ```ts
- * const token = encryptText(JSON.stringify({ username, password }));
+ * const token = await encryptText(JSON.stringify({ username, password }));
  * ```
  */
-export function encryptText(plainText: string): string {
+export async function encryptText(plainText: string): Promise<string> {
   if (!FERNET_KEY) {
     throw new Error('Fernet key missing');
   }
@@ -69,7 +106,7 @@ export function encryptText(plainText: string): string {
     .toString(16)
     .padStart(16, '0');
 
-  const iv = CryptoJS.lib.WordArray.random(16);
+  const iv = bytesToWordArray(await Crypto.getRandomBytesAsync(IV_BYTE_LENGTH));
 
   const encrypted = CryptoJS.AES.encrypt(plainText, encryptionKey, {
     iv,
