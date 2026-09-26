@@ -5,10 +5,7 @@
 POST http://localhost:3000/api/cpps/PensionersApp/v1/encrypt
 
 {
-    "ppo_no": "MG/11xx",
-    "pname": "test",
-    "dob": "18/04/1999",
-    "bank_accno": "12345678901"
+    "token": "MG/11xx",
 }
 
 # -------------- Post Script -------------------------
@@ -42,6 +39,24 @@ POST http://localhost:3000/api/echo/123
 }
 
 ### echo
-GET http://localhost:3000/api/echo/get_ppo_status
+< {%
+   request.variables.set('RAW_BODY', JSON.stringify({
+     url:"/login",
+     status_code:200, 
+     data:{ 
+        "success":true,
+        "data": "gAAAAABqt2kpwI15lsEpgBTbzTu_dPsEwXstsZzhYF-z5kvmBSmgNzp3E8_tGzhtpEKC40Dz1vnECFi2hLjrsNFwmjJ3KeIvKdyFVWbanL3q3a2N8VZKSkI="
+     }
+   }));
+%}
 
+POST http://localhost:3000/api/echo
 
+{ 
+  "url":"/login",
+  "status_code":200,
+  "data": "gAAAAABqt2kpwI15lsEpgBTbzTu_dPsEwXstsZzhYF-z5kvmBSmgNzp3E8_tGzhtpEKC40Dz1vnECFi2hLjrsNFwmjJ3KeIvKdyFVWbanL3q3a2N8VZKSkI="
+}
+
+###
+GET http://localhost:3000/api/echo/login

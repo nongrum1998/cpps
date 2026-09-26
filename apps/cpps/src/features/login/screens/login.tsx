@@ -29,7 +29,7 @@ export function LoginScreen() {
           {/* Top Branding Section */}
           <View className="items-center">
             <Image
-              source={require('../../../shared/assets/images/logo-meg.png')}
+              source={require('../../../shared/assets/images/logo.jpg')}
               className="h-24 w-24"
               resizeMode="contain"
             />
