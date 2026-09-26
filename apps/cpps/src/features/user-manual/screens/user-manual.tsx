@@ -1,8 +1,7 @@
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Container } from '@components/layout';
-import { Button } from '@pension/ui';
-import { Icon } from '@components/ui';
+import { Button, Icon } from '@pension/ui';
 import { APP_LINKS, APP_VERSION, PAGE_ROUTES } from '@utils/constants';
 import { openPhoneNumber } from '@utils/helpers';
 

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Animated, TouchableOpacity, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSnackbarStore } from '@stores/snackbar.store';
-import { Icon } from '@components/ui/icon';
+import { Icon } from '@pension/ui';
 import { cn } from '@pension/utils';
 
 const ANIMATION_DURATION = 250;

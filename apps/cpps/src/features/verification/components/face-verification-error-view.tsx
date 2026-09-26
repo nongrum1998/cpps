@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native';
-import { Button } from '@pension/ui';
-import { Alert, AlertDescription, Icon, AlertTitle } from '@components/ui';
+import { Button, Icon } from '@pension/ui';
+import { Alert, AlertDescription, AlertTitle } from '@components/ui';
 import { Container } from '@components/layout';
 import { FooterImg } from '@components/common';
 import { useSafeNavigation } from '@pension/hooks';

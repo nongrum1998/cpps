@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { IconName } from '@components/ui';
+import { type IconName } from '@pension/ui';
 
 interface SnackbarState {
   /** The message text to display. Null means hidden. */

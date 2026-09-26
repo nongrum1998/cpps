@@ -1,6 +1,7 @@
 import { View, Text } from 'react-native';
 
-import { Alert, AlertTitle, AlertDescription, Icon } from '@components/ui';
+import { Icon } from '@pension/ui';
+import { Alert, AlertTitle, AlertDescription } from '@components/ui';
 
 /**
  * The props for {@link DLCInstructions}.

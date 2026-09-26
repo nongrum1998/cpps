@@ -1,10 +1,9 @@
 import { useSafeNavigation } from '@pension/hooks';
 import { Text, View } from 'react-native';
-import { Button } from '@pension/ui';
+import { Button, Icon } from '@pension/ui';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FooterImg } from '@components/common/nic-footer-img';
 import { Alert, AlertDescription, AlertTitle } from '@components/ui/alert';
-import { Icon } from '@components/ui/icon';
 import { PAGE_ROUTES } from '@utils/constants/routes';
 import * as Linking from 'expo-linking';
 import { APP_LINKS } from '@utils/constants';

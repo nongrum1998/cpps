@@ -2,9 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { RegisterSchema, RegisterInput } from '../validators';
 import { View, Text, Pressable } from 'react-native';
-import { Button } from '@pension/ui';
+import { Button, Icon } from '@pension/ui';
 import { Input } from '@components/ui/input';
-import { Icon } from '@components/ui/icon';
 import { useRegistrationStore } from '../store/registration';
 import { useState } from 'react';
 

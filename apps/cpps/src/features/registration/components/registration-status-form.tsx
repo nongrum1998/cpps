@@ -2,11 +2,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { RegistrationStatusInput, RegistrationStatusSchema } from '../validators';
 import { View, Text } from 'react-native';
-import { Button } from '@pension/ui';
+import { Button, Icon } from '@pension/ui';
 import { useCheckPPO } from '../hooks';
 import { Input } from '@components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@components/ui/alert';
-import { Icon } from '@components/ui/icon';
 import { cn } from '@pension/utils';
 
 const defaultValues = {

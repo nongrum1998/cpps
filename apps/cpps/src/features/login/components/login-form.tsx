@@ -6,8 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginInput, LoginSchema } from '../validators';
 import { useLogin } from '../hooks/use-login';
 import { Input } from '@components/ui/input';
-import { Button } from '@pension/ui';
-import { Icon } from '@components/ui/icon';
+import { Button, Icon } from '@pension/ui';
 import { Alert, AlertDescription, AlertTitle } from '@components/ui/alert';
 import { useNetworkStatus } from '@hooks/use-network-status';
 

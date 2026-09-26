@@ -2,12 +2,11 @@ import { View, Text, Image } from 'react-native';
 import { useSafeNavigation } from '@pension/hooks';
 
 import { LoginForm } from '../components';
-import { Button } from '@pension/ui';
+import { Button, Icon } from '@pension/ui';
 import { Container } from '@components/layout';
 import { FooterImg } from '@components/common/nic-footer-img';
 import { PAGE_ROUTES } from '@utils/constants/routes';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Icon } from '@components/ui';
 import { NetworkStatusBanner } from '@components/common/network-status-banner';
 
 /**

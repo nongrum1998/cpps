@@ -6,8 +6,7 @@ import {
   DrawerItem,
   DrawerContentComponentProps,
 } from 'expo-router/drawer';
-import { Button } from '@pension/ui';
-import { Icon } from '@components/ui';
+import { Button, Icon } from '@pension/ui';
 import { useAuthStore } from '@stores/auth.store';
 import { PAGE_ROUTES } from '@utils/constants';
 import { useSafeNavigation } from '@pension/hooks';

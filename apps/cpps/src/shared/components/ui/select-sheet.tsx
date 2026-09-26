@@ -20,8 +20,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { cn } from '@pension/utils';
 import { Ternary } from '@components/common';
-import { Button } from '@pension/ui';
-import { Icon } from './icon';
+import { Button, Icon } from '@pension/ui';
 
 /**
  * A single option shape for the {@link SelectSheet} component.

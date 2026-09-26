@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRoutePath } from '@hooks/use-route-path';
 import { useSafeNavigation } from '@pension/hooks';
 import { matchPageHeader } from '@utils/helpers';
-import { Icon } from '@components/ui/icon';
+import { Icon } from '@pension/ui';
 import { DrawerToggleButton } from 'expo-router/drawer';
 import { NicBanner } from '@components/common/nic-banner';
 import { NetworkStatusBanner } from '@components/common/network-status-banner';

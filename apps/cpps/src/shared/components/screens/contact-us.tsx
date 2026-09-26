@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity } from 'react-native';
-import { Icon } from '@components/ui';
+import { Icon } from '@pension/ui';
 import { Container } from '@components/layout';
 import { FooterImg } from '@components/common';
 import { SafeAreaView } from 'react-native-safe-area-context';

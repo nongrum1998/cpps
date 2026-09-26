@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useSnackbarStore } from '@stores/snackbar.store';
-import { IconName } from '@components/ui';
+import { type IconName } from '@pension/ui';
 
 /**
  * Convenience hook for showing and dismissing the snackbar banner.
