@@ -1,3 +1,9 @@
+// `expo-crypto` must be imported before `react-native-get-random-values`.
+// It registers the `ExpoCrypto` native module, which the polyfill delegates
+// to in order to expose `global.crypto.getRandomValues`. React Native 0.86
+// ships no RNG of its own, so without it `CryptoJS.lib.WordArray.random()`
+// throws and every encrypted request — including login — fails.
+import 'expo-crypto';
 import 'react-native-get-random-values';
 import CryptoJS from 'crypto-js';
 
@@ -27,6 +33,29 @@ function getFernetKeys(keyBase64: string) {
   };
 }
 
+/**
+ * Encrypts a plaintext string into a Fernet token.
+ *
+ * The token is laid out per the Fernet spec: version byte `0x80`, an 8-byte
+ * timestamp, a random 16-byte IV, the AES-128-CBC ciphertext, then an
+ * HMAC-SHA256 over everything preceding it.
+ *
+ * The IV is drawn from `CryptoJS.lib.WordArray.random`, which needs a
+ * cryptographically secure `global.crypto.getRandomValues`. React Native
+ * provides none on its own, so the module imports `expo-crypto` for this to
+ * succeed — see the note at the top of this file.
+ *
+ * @param plainText - Value to encrypt, usually a JSON-stringified body.
+ * @returns The token encoded as urlsafe base64.
+ * @throws {Error} `Fernet key missing` when `EXPO_PUBLIC_FERNET_KEY` is unset.
+ * @throws {Error} When no secure random source is available; crypto-js raises
+ *   "Native crypto module could not be used to get secure random number."
+ *
+ * @example
+ * ```ts
+ * const token = encryptText(JSON.stringify({ username, password }));
+ * ```
+ */
 export function encryptText(plainText: string): string {
   if (!FERNET_KEY) {
     throw new Error('Fernet key missing');
@@ -63,6 +92,24 @@ export function encryptText(plainText: string): string {
   return base64ToUrlSafe(token.toString(CryptoJS.enc.Base64));
 }
 
+/**
+ * Decrypts a Fernet token produced by {@link encryptText}.
+ *
+ * The HMAC is verified before any decryption is attempted, so a tampered
+ * token or an incorrect key fails loudly instead of yielding garbage.
+ *
+ * @param encryptedText - Fernet token encoded as urlsafe base64.
+ * @returns The original plaintext.
+ * @throws {Error} `Fernet key missing` when `EXPO_PUBLIC_FERNET_KEY` is unset.
+ * @throws {Error} `Invalid Fernet token length` when the token is too short to
+ *   hold a payload plus HMAC.
+ * @throws {Error} `Fernet HMAC verification failed: ...` when the token was
+ *   tampered with or the key is wrong.
+ * @throws {Error} `Invalid Fernet version: ...` when the leading version byte
+ *   is not `0x80`.
+ * @throws {Error} `Fernet decryption failed` when the ciphertext does not
+ *   decode to valid UTF-8.
+ */
 export function decryptText(encryptedText: string): string {
   if (!FERNET_KEY) {
     throw new Error('Fernet key missing');
@@ -124,6 +171,12 @@ export function decryptText(encryptedText: string): string {
   return result;
 }
 
+/**
+ * Hashes a string with SHA-256 and returns the digest as lowercase hex.
+ *
+ * @param value - Value to hash.
+ * @returns A 64-character hex digest.
+ */
 export const sha256 = (value: string): string => {
   return CryptoJS.SHA256(value).toString(CryptoJS.enc.Hex);
 };
