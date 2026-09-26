@@ -4,7 +4,7 @@ import { Container } from '@components/layout';
 import { FooterImg } from '@components/common';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { APP_LINKS } from '@utils/constants';
-import { openEmailAddress, openPhoneNumber } from '@utils/helpers';
+import { openEmailAddress, openPhoneNumber } from '@pension/utils';
 
 export function ContactScreen() {
   return (

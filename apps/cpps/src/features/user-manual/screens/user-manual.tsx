@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Container } from '@components/layout';
 import { Button, Icon } from '@pension/ui';
 import { APP_LINKS, APP_VERSION, PAGE_ROUTES } from '@utils/constants';
-import { openPhoneNumber } from '@utils/helpers';
+import { openPhoneNumber } from '@pension/utils';
 
 import { FooterImg } from '@components/common';
 import { useSafeNavigation } from '@pension/hooks';

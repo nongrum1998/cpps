@@ -1,7 +1,7 @@
 import { Text, View } from 'react-native';
 import { Button } from '@pension/ui';
 import { APP_LINKS } from '@utils/constants';
-import { openEmailAddress } from '@utils/helpers';
+import { openEmailAddress } from '@pension/utils';
 
 import {
   UserManualSectionCard as SectionCard,
