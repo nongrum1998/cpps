@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, Modal, ActivityIndicator } from 'react-native';
 import { useAppUpdateStore } from '@stores/update.store';
-import { isRealDevice } from '@utils/helpers';
+import { isRealDevice } from '@pension/utils';
 import { Button, Icon } from '@pension/ui';
 
 export const UpdateModal: React.FC = () => {

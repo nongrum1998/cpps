@@ -15,6 +15,7 @@
   "peerDependencies": {
     "clsx": "^2.1.1",
     "expo-linking": "57.0.8",
+    "expo-device": "57.0.1",
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
