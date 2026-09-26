@@ -3,15 +3,13 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
-import { LocationProvider, TQueryProvider } from '@pension/ui';
+import { LocationProvider, TQueryProvider, RootProvider, GlobalErrorBoundary } from '@pension/ui';
 
 // Internal Providers
 import { AuthInitializer } from './auth-provider';
-import { RootProvider } from '@pension/ui';
 // Shared Components & Redirects
 import { AuthRedirect } from '@components/common';
 import { UpdateModal } from './update-modal';
-import { GlobalErrorBoundary } from './global-error-boundary';
 import { usePreventScreenCapture } from 'expo-screen-capture';
 import { queryClient } from '@utils/react-query';
 

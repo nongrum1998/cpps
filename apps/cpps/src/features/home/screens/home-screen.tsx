@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AlertDescription, Alert, AlertTitle, Icon } from '@components/ui';
 import { FooterImg } from '@components/common';
 import { useDlcStatus } from '@hooks/use-dlc-status';
-import { LoadingScreen } from '@components/screens';
+import { LoadingScreen } from '@pension/ui';
 import { SubmitDLCCard } from '@components/common/submit-dlc-card';
 
 /**

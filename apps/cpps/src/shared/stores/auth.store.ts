@@ -3,7 +3,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import * as SecureStore from 'expo-secure-store';
 import { UserT } from '../types/auth';
 import { TokenStoreManager } from '@stores/token.store';
-import { logger } from '../../../../../packages/utils/src/logger';
+import { logger } from '@pension/utils';
 import { http } from '@utils/http';
 import { ENDPOINTS } from '@utils/constants';
 

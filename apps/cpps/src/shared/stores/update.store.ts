@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import * as ExpoUpdates from 'expo-updates';
-import { logger } from '../../../../../packages/utils/src/logger';
+import { logger } from '@pension/utils';
 
 type AppUpdateStore = {
   isUpdateAvailable: boolean;

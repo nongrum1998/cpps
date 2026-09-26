@@ -1,10 +1,7 @@
 import { View, Text } from 'react-native';
 import { Button } from '@pension/ui';
-import { Icon } from '@components/ui';
-import { Stack } from 'expo-router';
-import { useSafeNavigation } from '@hooks/use-safe-navigation';
-import { PAGE_ROUTES } from '@utils/constants/routes';
-import { useAuthStore } from '@stores/auth.store';
+import { Href, Stack } from 'expo-router';
+import { useSafeNavigation } from '@pension/hooks';
 
 /**
  * Props for the {@link Forbidden} screen component.
@@ -17,6 +14,8 @@ interface ForbiddenProps {
   /** Custom handler for the "Go Back Home" button. Defaults to replacing the current route with the home page. */
   /** When provided, renders a "Try Again" button that invokes this handler on press. */
   onPressTryAgain?: () => void;
+  onLogout?: () => void;
+  url?: Href;
 }
 
 /**
@@ -45,12 +44,13 @@ export const Forbidden = ({
   title = 'Access Restricted',
   message = 'You do not have permission to view this page. Contact your administrator if you believe this is a mistake.',
   onPressTryAgain,
+  onLogout,
+  url = '/',
 }: ForbiddenProps) => {
   const { navigate } = useSafeNavigation();
-  const { logout } = useAuthStore();
 
   const handlePress = () => {
-    navigate(PAGE_ROUTES.HOME, 'replace');
+    navigate(url, 'replace');
   };
 
   return (
@@ -61,10 +61,6 @@ export const Forbidden = ({
         }}
       />
       <View className="flex-1 items-center justify-center gap-y-5 p-6">
-        <View className="bg-destructive/20 h-24 w-24 items-center justify-center rounded-md">
-          <Icon name="security-block" size={48} color="#EF4444" />
-        </View>
-
         <Text className="text-center text-4xl font-bold tracking-widest text-foreground">
           {title}
         </Text>
@@ -90,14 +86,16 @@ export const Forbidden = ({
             Try Again
           </Button>
         )}
-        <Button
-          className="w-full"
-          size={'lg'}
-          variant={'destructive'}
-          onPress={logout}
-          activeOpacity={0.8}>
-          Logout
-        </Button>
+        {onLogout && (
+          <Button
+            className="w-full"
+            size={'lg'}
+            variant={'destructive'}
+            onPress={onLogout}
+            activeOpacity={0.8}>
+            Logout
+          </Button>
+        )}
       </View>
     </>
   );

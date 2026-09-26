@@ -1,5 +1,5 @@
 import { FooterImg } from '@components/common';
-import { LoadingScreen } from '@components/screens';
+import { LoadingScreen } from '@pension/ui';
 import { View } from 'react-native';
 
 /**

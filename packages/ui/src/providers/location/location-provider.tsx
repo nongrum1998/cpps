@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useCurrentLocation } from '@pension/hooks';
-import { LoadingScreen } from '../../screen/loading';
+import { LoadingScreen } from '../../screen/loading-screen';
 
 /**
  * Mounts the app subtree and eagerly requests foreground location

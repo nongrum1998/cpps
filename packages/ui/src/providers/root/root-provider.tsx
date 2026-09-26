@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { useRootDetection } from '@pension/hooks';
 import { BlockedDeviceScreen } from '../../screen/block-device-screen';
-import { LoadingScreen } from '../../screen/loading';
+import { LoadingScreen } from '../../screen/loading-screen';
 
 interface Props {
   children: React.ReactNode;

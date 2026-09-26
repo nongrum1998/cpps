@@ -1,7 +1,6 @@
 import { useSafeNavigation } from '@pension/hooks';
 import { Text, View } from 'react-native';
 import { Button } from '@pension/ui';
-import { PAGE_ROUTES } from '@utils/constants/routes';
 
 type NotFoundScreenProps = {
   title?: string;
@@ -22,19 +21,10 @@ export const NotFoundScreen = ({
       <Text className="text-graphite text-center">{message}</Text>
 
       <View className="mt-4 w-full items-center justify-center gap-3">
-        <Button
-          className="w-full"
-          variant={'outline'}
-          size={'lg'}
-          onPress={() => {
-            const wentBack = back();
-            if (!wentBack) {
-              navigate(PAGE_ROUTES.HOME);
-            }
-          }}>
+        <Button className="w-full" variant={'outline'} size={'lg'} onPress={() => back()}>
           Go Back
         </Button>
-        <Button size={'lg'} className="w-full" onPress={() => navigate(PAGE_ROUTES.HOME)}>
+        <Button size={'lg'} className="w-full" onPress={() => navigate('/', 'replace')}>
           Home
         </Button>
       </View>

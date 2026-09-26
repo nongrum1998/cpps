@@ -1,3 +1,3 @@
-import { Unmatched } from 'expo-router';
+import { NotFoundScreen } from '@pension/ui';
 
-export default Unmatched;
+export default NotFoundScreen;

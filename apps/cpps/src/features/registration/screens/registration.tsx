@@ -11,7 +11,7 @@ import { Container } from '@components/layout';
 import { useRegistrationStore } from '../store/registration';
 import { RegistrationErrorView } from '../components/registration-error-view';
 import { useRegisterPensioner } from '../hooks';
-import { LoadingScreen } from '@components/screens';
+import { LoadingScreen } from '@pension/ui';
 import { RegisterPensionerInput } from '../validators';
 
 /**

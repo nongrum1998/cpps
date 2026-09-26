@@ -4,12 +4,11 @@ import { Container, PaginatedList } from '@components/layout';
 import { usePensionerStatement } from '../hooks';
 import { PensionerStatementListItem, PensionerStatementListSkeleton } from '../components';
 import type { PensionerStatement } from '../types';
-import { Button } from '@pension/ui';
+import { Button, EmptyScreen } from '@pension/ui';
 import { PAGE_ROUTES } from '@utils/constants';
 import { FooterImg, Ternary } from '@components/common';
 import { useSafeNavigation } from '@pension/hooks';
 import { usePdfPreviewStore } from '@stores/pdf-preview';
-import { EmptyScreen } from '@components/screens';
 
 /**
  * Screen displaying pensioner statements for the current year.
