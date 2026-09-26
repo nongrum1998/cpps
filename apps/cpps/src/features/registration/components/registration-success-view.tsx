@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-import { useSafeNavigation } from '@hooks/use-safe-navigation';
+import { useSafeNavigation } from '@pension/hooks';
 import { Button } from '@pension/ui';
 import { useRegistrationStore } from '../store/registration';
 import { PAGE_ROUTES } from '@utils/constants';

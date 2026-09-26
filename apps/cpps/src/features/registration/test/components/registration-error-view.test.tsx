@@ -10,7 +10,7 @@ jest.mock('expo-secure-store', () => ({
 }));
 
 const mockNavigate = jest.fn();
-jest.mock('@hooks/use-safe-navigation', () => ({
+jest.mock('@pension/hooks', () => ({
   useSafeNavigation: () => ({ navigate: mockNavigate, back: jest.fn() }),
 }));
 

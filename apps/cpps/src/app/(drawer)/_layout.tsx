@@ -10,7 +10,7 @@ import { Button } from '@pension/ui';
 import { Icon } from '@components/ui';
 import { useAuthStore } from '@stores/auth.store';
 import { PAGE_ROUTES } from '@utils/constants';
-import { useSafeNavigation } from '@hooks/use-safe-navigation';
+import { useSafeNavigation } from '@pension/hooks';
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const { user, logout } = useAuthStore();

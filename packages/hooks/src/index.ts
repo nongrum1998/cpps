@@ -9,3 +9,4 @@
 /** Canonical npm package name for the hooks package. */
 export * from './use-current-location';
 export * from './use-root-detection';
+export * from './use-safe-navigation';

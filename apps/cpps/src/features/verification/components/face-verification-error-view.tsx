@@ -3,7 +3,7 @@ import { Button } from '@pension/ui';
 import { Alert, AlertDescription, Icon, AlertTitle } from '@components/ui';
 import { Container } from '@components/layout';
 import { FooterImg } from '@components/common';
-import { useSafeNavigation } from '@hooks/use-safe-navigation';
+import { useSafeNavigation } from '@pension/hooks';
 
 /** Props for {@link FaceVerificationErrorView}. */
 export interface FaceVerificationErrorViewProps {

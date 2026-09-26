@@ -1,6 +1,6 @@
 import { Button } from '@pension/ui';
 import { Alert, AlertTitle, AlertDescription, Icon } from '@components/ui';
-import { useSafeNavigation } from '@hooks/use-safe-navigation';
+import { useSafeNavigation } from '@pension/hooks';
 import { PAGE_ROUTES } from '@utils/constants';
 import { View, Text } from 'react-native';
 import { Ternary } from './ternary';

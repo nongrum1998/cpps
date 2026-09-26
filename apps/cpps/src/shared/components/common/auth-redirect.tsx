@@ -1,6 +1,6 @@
 import { useAuthStore } from '@stores/auth.store';
 import { usePathname, useLocalSearchParams, Href } from 'expo-router';
-import { useSafeNavigation } from '@hooks/use-safe-navigation';
+import { useSafeNavigation } from '@pension/hooks';
 import React, { useEffect } from 'react';
 import { LoadingScreen } from '@components/screens/loading-screen';
 import { isGuestOnlyRoute, isPublicRoute, isProtectedRoute } from '@utils/constants/auth';

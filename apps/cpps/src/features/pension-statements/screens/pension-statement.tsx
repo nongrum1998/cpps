@@ -7,7 +7,7 @@ import type { PensionerStatement } from '../types';
 import { Button } from '@pension/ui';
 import { PAGE_ROUTES } from '@utils/constants';
 import { FooterImg, Ternary } from '@components/common';
-import { useSafeNavigation } from '@hooks/use-safe-navigation';
+import { useSafeNavigation } from '@pension/hooks';
 import { usePdfPreviewStore } from '@stores/pdf-preview';
 import { EmptyScreen } from '@components/screens';
 

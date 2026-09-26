@@ -2,7 +2,7 @@ import Pdf from 'react-native-pdf';
 import { useEffect } from 'react';
 import { View } from 'react-native';
 
-import { useSafeNavigation } from '@hooks/use-safe-navigation';
+import { useSafeNavigation } from '@pension/hooks';
 import { Container } from '@components/layout';
 import { EmptyScreen } from '@components/screens';
 import { Button } from '@pension/ui';

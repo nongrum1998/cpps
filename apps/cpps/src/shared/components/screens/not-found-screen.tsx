@@ -1,4 +1,4 @@
-import { useSafeNavigation } from '@hooks/use-safe-navigation';
+import { useSafeNavigation } from '@pension/hooks';
 import { Text, View } from 'react-native';
 import { Button } from '@pension/ui';
 import { PAGE_ROUTES } from '@utils/constants/routes';

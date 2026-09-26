@@ -1,5 +1,5 @@
 import { View, Text, Image } from 'react-native';
-import { useSafeNavigation } from '@hooks/use-safe-navigation';
+import { useSafeNavigation } from '@pension/hooks';
 
 import { LoginForm } from '../components';
 import { Button } from '@pension/ui';

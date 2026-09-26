@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRoutePath } from '@hooks/use-route-path';
-import { useSafeNavigation } from '@hooks/use-safe-navigation';
+import { useSafeNavigation } from '@pension/hooks';
 import { matchPageHeader } from '@utils/helpers';
 import { Icon } from '@components/ui/icon';
 import { DrawerToggleButton } from 'expo-router/drawer';

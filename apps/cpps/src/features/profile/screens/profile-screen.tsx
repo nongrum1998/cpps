@@ -2,7 +2,7 @@ import { View, Text, RefreshControl } from 'react-native';
 import { Container } from '@components/layout';
 import { Button } from '@pension/ui';
 import { useAuthStore } from '@stores/auth.store';
-import { useSafeNavigation } from '@hooks/use-safe-navigation';
+import { useSafeNavigation } from '@pension/hooks';
 import { PAGE_ROUTES } from '@utils/constants';
 import { ProfileFieldRow } from '../components';
 

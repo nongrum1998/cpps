@@ -7,7 +7,7 @@ import { APP_LINKS, APP_VERSION, PAGE_ROUTES } from '@utils/constants';
 import { openPhoneNumber } from '@utils/helpers';
 
 import { FooterImg } from '@components/common';
-import { useSafeNavigation } from '@hooks/use-safe-navigation';
+import { useSafeNavigation } from '@pension/hooks';
 
 /**
  * Senior-friendly user manual screen for the Pensioner app.
