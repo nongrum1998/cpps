@@ -8,7 +8,7 @@ import { useLogin } from '../hooks/use-login';
 import { Input } from '@components/ui/input';
 import { Button, Icon } from '@pension/ui';
 import { Alert, AlertDescription, AlertTitle } from '@components/ui/alert';
-import { useNetworkStatus } from '@hooks/use-network-status';
+import { useNetworkStatus } from '@pension/hooks';
 
 const defaultValues = {
   // DEV-ONLY convenience prefill. EXPO_PUBLIC_PPO_NO is compiled into the JS

@@ -1,12 +1,11 @@
 import { Button, Icon } from '@pension/ui';
 import { Alert, AlertTitle, AlertDescription } from '@components/ui';
-import { useSafeNavigation } from '@pension/hooks';
+import { useSafeNavigation, useNetworkStatus } from '@pension/hooks';
 import { PAGE_ROUTES } from '@utils/constants';
 import { View, Text } from 'react-native';
 import { Ternary } from './ternary';
 import { useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 import * as Linking from 'expo-linking';
-import { useNetworkStatus } from '@hooks/use-network-status';
 import { useAuthStore } from '@stores/auth.store';
 import { isWithinProcessingPeriod } from '@utils/helpers/is-within-processing-period';
 
