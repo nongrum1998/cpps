@@ -4,9 +4,9 @@ import { Container, PaginatedList } from '@components/layout';
 import { usePensionerStatement } from '../hooks';
 import { PensionerStatementListItem, PensionerStatementListSkeleton } from '../components';
 import type { PensionerStatement } from '../types';
-import { Button, EmptyScreen } from '@pension/ui';
+import { Button, EmptyScreen, Ternary } from '@pension/ui';
 import { PAGE_ROUTES } from '@utils/constants';
-import { FooterImg, Ternary } from '@components/common';
+import { FooterImg } from '@components/common';
 import { useSafeNavigation } from '@pension/hooks';
 import { usePdfPreviewStore } from '@stores/pdf-preview';
 

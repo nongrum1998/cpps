@@ -1,9 +1,8 @@
-import { Button, Icon } from '@pension/ui';
+import { Button, Icon, Ternary } from '@pension/ui';
 import { Alert, AlertTitle, AlertDescription } from '@components/ui';
 import { useSafeNavigation, useNetworkStatus } from '@pension/hooks';
 import { PAGE_ROUTES } from '@utils/constants';
 import { View, Text } from 'react-native';
-import { Ternary } from './ternary';
 import { useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 import * as Linking from 'expo-linking';
 import { useAuthStore } from '@stores/auth.store';
