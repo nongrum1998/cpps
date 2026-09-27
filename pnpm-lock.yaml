@@ -26,9 +26,6 @@ importers:
       '@pension/api':
         specifier: workspace:*
         version: link:../../packages/api
-      '@pension/core':
-        specifier: workspace:*
-        version: link:../../packages/core
       '@pension/hooks':
         specifier: workspace:*
         version: link:../../packages/hooks
@@ -243,9 +240,6 @@ importers:
       '@hugeicons/react-native':
         specifier: 1.0.16
         version: 1.0.16(react-native-svg@15.15.4(react-native@0.86.3(@babel/core@7.29.7)(@react-native/jest-preset@0.86.3(@babel/core@7.29.7)(react@19.2.3))(@react-native/metro-config@0.86.3(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.7)(@react-native/jest-preset@0.86.3(@babel/core@7.29.7)(react@19.2.3))(@react-native/metro-config@0.86.3(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
-      '@pension/core':
-        specifier: workspace:*
-        version: link:../../packages/core
       '@react-native-community/netinfo':
         specifier: 12.0.1
         version: 12.0.1(react-native@0.86.3(@babel/core@7.29.7)(@react-native/jest-preset@0.86.3(@babel/core@7.29.7)(react@19.2.3))(@react-native/metro-config@0.86.3(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
@@ -456,27 +450,6 @@ importers:
         specifier: 6.0.3
         version: 6.0.3
 
-  packages/core:
-    devDependencies:
-      '@pension/eslint-config':
-        specifier: workspace:*
-        version: link:../eslint-config
-      '@pension/prettier-config':
-        specifier: workspace:*
-        version: link:../prettier-config
-      '@pension/typescript-config':
-        specifier: workspace:*
-        version: link:../typescript-config
-      eslint:
-        specifier: 9.39.5
-        version: 9.39.5(jiti@1.21.7)
-      prettier:
-        specifier: 3.2.5
-        version: 3.2.5
-      typescript:
-        specifier: 6.0.3
-        version: 6.0.3
-
   packages/eslint-config:
     devDependencies:
       '@eslint/js':
@@ -638,6 +611,9 @@ importers:
       '@pension/utils':
         specifier: workspace:*
         version: link:../utils
+      '@react-native-community/netinfo':
+        specifier: 12.0.1
+        version: 12.0.1(react-native@0.86.3(@babel/core@7.29.7)(@react-native/jest-preset@0.86.3(@babel/core@7.29.7)(react@19.2.3))(@react-native/metro-config@0.86.3(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)
       '@tanstack/react-query':
         specifier: 5.101.4
         version: 5.101.4(react@19.2.3)
