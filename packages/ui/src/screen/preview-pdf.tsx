@@ -2,8 +2,9 @@ import Pdf from 'react-native-pdf';
 import { View } from 'react-native';
 
 import { useSafeNavigation } from '@pension/hooks';
-import { EmptyScreen, Container } from '@pension/ui';
 import { logger } from '@pension/utils';
+import { Container } from '../layout';
+import { EmptyScreen } from './empty-screen';
 
 type PreviewPDFProps = {
   base64: string;

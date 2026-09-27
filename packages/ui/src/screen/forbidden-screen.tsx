@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native';
-import { Button } from '@pension/ui';
+import { Button } from '../base';
 import { Href, Stack } from 'expo-router';
 import { useSafeNavigation } from '@pension/hooks';
 

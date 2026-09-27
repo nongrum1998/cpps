@@ -1,6 +1,6 @@
 import { Text } from 'react-native';
 import { useSafeNavigation } from '@pension/hooks';
-import { Button } from '@pension/ui';
+import { Button } from '../base';
 import { Container } from '../layout';
 
 interface UnderDevelopmentProps {

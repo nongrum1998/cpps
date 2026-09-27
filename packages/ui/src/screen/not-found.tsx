@@ -1,6 +1,6 @@
 import { useSafeNavigation } from '@pension/hooks';
 import { Text, View } from 'react-native';
-import { Button } from '@pension/ui';
+import { Button } from '../base';
 
 type NotFoundScreenProps = {
   title?: string;
