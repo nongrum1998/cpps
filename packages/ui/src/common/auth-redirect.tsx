@@ -1,13 +1,14 @@
-import { useAuthStore } from '@stores/auth.store';
 import { usePathname, useLocalSearchParams, Href } from 'expo-router';
 import { useSafeNavigation } from '@pension/hooks';
 import React, { useEffect } from 'react';
 import { LoadingScreen } from '@pension/ui';
-import { isGuestOnlyRoute, isPublicRoute, isProtectedRoute } from '@utils/constants/auth';
-import { PAGE_ROUTES } from '@utils/constants/routes';
 
 type Props = {
   children: React.ReactNode;
+  isLoading?: boolean;
+  isSignedIn?: boolean;
+  guestOnly?: string[];
+  publicOnly?: string[];
 };
 
 /**
@@ -24,18 +25,42 @@ type Props = {
  * - Public: /user-manual, /privacy-policy, /contact-us, /about
  * - Protected: Everything else (requires authentication)
  */
-export const AuthRedirect = ({ children }: Props) => {
-  const { isAuthLoading: isLoading, isSignedIn } = useAuthStore();
 
+const isGuestOnlyRoute = (pathname: string, route: string[] = []): boolean => {
+  return route.some((route) => pathname === route || pathname.startsWith(route + '/'));
+};
+
+/**
+ * Check if a route is public (accessible by both auth and non-auth users).
+ */
+const isPublicRoute = (pathname: string, route: string[] = []): boolean => {
+  return route.some((route) => pathname === route || pathname.startsWith(route + '/'));
+};
+
+/**
+ * Check if a route is protected (requires authentication).
+ */
+const isProtectedRoute = (pathname: string): boolean => {
+  // Explicitly not guest-only and not public
+  return !isGuestOnlyRoute(pathname) && !isPublicRoute(pathname);
+};
+
+export const AuthRedirect = ({
+  children,
+  isLoading = false,
+  isSignedIn = false,
+  guestOnly = [],
+  publicOnly = [],
+}: Props) => {
   const pathName = usePathname();
   const params = useLocalSearchParams();
   const { navigate } = useSafeNavigation();
 
   const redirectTo = params.redirect as Href;
-  const redirectHref = (redirectTo || PAGE_ROUTES.HOME) as Href;
+  const redirectHref = redirectTo as Href;
 
-  const onGuestOnlyPage = isGuestOnlyRoute(pathName);
-  const onPublicPage = isPublicRoute(pathName);
+  const onGuestOnlyPage = isGuestOnlyRoute(pathName, guestOnly);
+  const onPublicPage = isPublicRoute(pathName, publicOnly);
   const onProtectedPage = isProtectedRoute(pathName);
 
   useEffect(() => {
@@ -49,7 +74,7 @@ export const AuthRedirect = ({ children }: Props) => {
 
     // 2. Non-authenticated user on protected page -> redirect to auth
     if (!isSignedIn && onProtectedPage) {
-      navigate(PAGE_ROUTES.AUTH.HOME, 'replace');
+      navigate('/', 'replace');
       return;
     }
 

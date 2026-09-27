@@ -3,15 +3,22 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
-import { LocationProvider, TQueryProvider, RootProvider, GlobalErrorBoundary } from '@pension/ui';
+import {
+  LocationProvider,
+  AuthRedirect,
+  TQueryProvider,
+  RootProvider,
+  GlobalErrorBoundary,
+} from '@pension/ui';
 
 // Internal Providers
 import { AuthInitializer } from './auth-provider';
 // Shared Components & Redirects
-import { AuthRedirect } from '@components/common';
 import { UpdateModal } from './update-modal';
 import { usePreventScreenCapture } from 'expo-screen-capture';
 import { queryClient } from '@utils/react-query';
+import { GUEST_ONLY_ROUTES, PUBLIC_ROUTES } from '@utils/constants';
+import { useAuthStore } from '@stores/auth.store';
 
 type Props = {
   children: React.ReactNode;
@@ -30,6 +37,7 @@ type Props = {
 export const ProviderWrapper = ({ children }: Props) => {
   // Prevent user from taking screen shot or screen recording
   usePreventScreenCapture();
+  const { isSignedIn, isAuthLoading } = useAuthStore();
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider className="flex-1">
@@ -39,7 +47,11 @@ export const ProviderWrapper = ({ children }: Props) => {
               <TQueryProvider queryClient={queryClient}>
                 <QueryErrorResetBoundary>
                   <AuthInitializer>
-                    <AuthRedirect>
+                    <AuthRedirect
+                      isSignedIn={isSignedIn}
+                      isLoading={isAuthLoading}
+                      guestOnly={GUEST_ONLY_ROUTES}
+                      publicOnly={PUBLIC_ROUTES}>
                       <StatusBar style="auto" animated />
                       {children}
                       <UpdateModal />
