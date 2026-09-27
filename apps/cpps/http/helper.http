@@ -1,8 +1,10 @@
+@baseUrl=http://192.168.1.5:3000
+
 ### --------------------------------------------
 ### Encrypt helper
 # -------------- Pre Script -------------------------
 
-POST http://localhost:3000/api/cpps/PensionersApp/v1/encrypt
+POST {{baseUrl}}/api/cpps/encrypt
 
 {
     "token": "MG/11xx",
@@ -12,7 +14,7 @@ POST http://localhost:3000/api/cpps/PensionersApp/v1/encrypt
 
 
 ### Decrypt helper
-POST http://localhost:3000/api/cpps/PensionersApp/v1/decrypt
+POST {{baseUrl}}/api/cpps/decrypt
 
 {
   "payload": "gAAAAABquAAG_2OqVN2LOOzged7AFx0YjYwD5MXojnhRL2gweNtZooHNpDAD7EEo2gTlf3VwFhCpquSZ6wqffrANaSnlVa182NTRX_wQISvK45WKyN3GaxSK8C0z_vocR_-mlH96_2CAClcfhmEG6Rf-BloC7hM3HWRZukYLEIPwVvHlRAKvx7deJ1xdKX8t6ufbA6ZzDyIr7fudalQoNkCJ2uyF8ZIRh8CpWnrymLwLh0R4mlNxWg06XSi70LfCDYfH2Mc6jOTGpPtydSWnt7LSsicCwqXjc1C1fdXmfx83JXA1lNCbxDfeM7DrRhEPjIb_49RIx5TvW7cuSkUL1P8AF6ImRA_KYMny0LZogeiLw2f26fsk2m0="
@@ -20,7 +22,7 @@ POST http://localhost:3000/api/cpps/PensionersApp/v1/decrypt
 
 
 ### format-password helper
-POST http://localhost:3000/api/cpps/PensionersApp/v1/format-password
+POST {{baseUrl}}/api/cpps/format-password
 
 {
   "password": "{{PASSWORD}}"
@@ -50,13 +52,15 @@ POST http://localhost:3000/api/echo/123
    }));
 %}
 
-POST http://localhost:3000/api/echo
+POST {{baseUrl}}/api/echo
 
 { 
-  "url":"/login",
+  "url":"/logout",
   "status_code":200,
-  "data": {"data":"gAAAAABqt2kpwI15lsEpgBTbzTu_dPsEwXstsZzhYF-z5kvmBSmgNzp3E8_tGzhtpEKC40Dz1vnECFi2hLjrsNFwmjJ3KeIvKdyFVWbanL3q3a2N8VZKSkI="}
+  "data": { 
+    "message":"success"
+  }
 }
 
 ###
-GET http://localhost:3000/api/echo/login
+GET http://192.168.1.5:3000/api/echo
