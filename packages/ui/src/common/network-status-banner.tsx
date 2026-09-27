@@ -3,6 +3,44 @@ import { View, Text } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import { cn } from '@pension/utils';
 
+/**
+ * Renders a slim, full-width connectivity banner that appears only while the
+ * device is offline, then briefly confirms recovery.
+ *
+ * Mount it once near the top of a screen (or inside a header) to give the user
+ * visible feedback that a request is failing because of connectivity rather
+ * than because of the request itself. The banner occupies layout space only
+ * while it is visible, so screens must not assume a fixed header offset.
+ *
+ * Connectivity is read from `@react-native-community/netinfo`. A device counts
+ * as online only when `isConnected` is truthy **and** `isInternetReachable` is
+ * not explicitly `false`; a `null` reachability (still probing) is treated as
+ * online to avoid flashing the banner during startup.
+ *
+ * Behaviour by transition:
+ *
+ * - **Online to offline** — shows an amber `Offline` banner and holds it there
+ *   for as long as connectivity is lost.
+ * - **Offline to online** — shows a green `Back Online` banner for two
+ *   seconds, then removes itself.
+ * - **Online to online** — stays hidden, so mounting this on every screen is
+ *   safe and does not produce a persistent chrome element.
+ *
+ * Any pending hide timer is cancelled when a new network state arrives, so
+ * rapid flapping (for example, toggling between a cellular and Wi-Fi access
+ * point) restarts the recovery window instead of hiding the banner while the
+ * user is still seeing it.
+ *
+ * @returns A full-width banner when offline or briefly after recovery;
+ * `null` otherwise. Renders no host element while hidden.
+ * @example
+ * ```tsx
+ * <SafeAreaView className="flex-1">
+ *   <NetworkStatusBanner />
+ *   <Container>...</Container>
+ * </SafeAreaView>
+ * ```
+ */
 export const NetworkStatusBanner = () => {
   const [isOffline, setIsOffline] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
