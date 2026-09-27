@@ -1,4 +1,4 @@
-import { PAGE_HEADERS, type PageHeaderConfig } from '@config/page-headers';
+import type { PageHeaderConfig, PageHeader } from '@pension/types';
 
 /**
  * Matches a route path against the `PAGE_HEADERS` configuration registry.
@@ -20,7 +20,8 @@ import { PAGE_HEADERS, type PageHeaderConfig } from '@config/page-headers';
  * matchPageHeader('/unknown');        // => null
  * ```
  */
-export function matchPageHeader(path: string): PageHeaderConfig | null {
+
+export function matchPageHeader(path: string, PAGE_HEADERS: PageHeader): PageHeaderConfig | null {
   if (PAGE_HEADERS[path as keyof typeof PAGE_HEADERS])
     return PAGE_HEADERS[path as keyof typeof PAGE_HEADERS]!;
 

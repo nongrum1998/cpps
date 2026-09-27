@@ -75,6 +75,7 @@
   "devDependencies": {
     "@babel/core": "7.29.7",
     "@babel/plugin-transform-react-jsx": "^8.0.1",
+    "@pension/types": "workspace:*",
     "@pension/jest-config": "workspace:*",
     "@testing-library/react-native": "^14.0.1",
     "@types/crypto-js": "4.2.2",

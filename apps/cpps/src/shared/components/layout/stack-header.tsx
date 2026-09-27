@@ -3,15 +3,15 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSafeNavigation, useRoutePath } from '@pension/hooks';
-import { matchPageHeader } from '@utils/helpers';
+import { matchPageHeader, cn } from '@pension/utils';
 import { Icon, NetworkStatusBanner } from '@pension/ui';
 import { DrawerToggleButton } from 'expo-router/drawer';
 import { NicBanner } from '@components/common/nic-banner';
-import { cn } from '@pension/utils';
+import { PAGE_HEADERS } from '@config/page-headers';
 
 export const StackHeader = memo(() => {
   const path = useRoutePath();
-  const config = useMemo(() => matchPageHeader(path), [path]);
+  const config = useMemo(() => matchPageHeader(path, PAGE_HEADERS), [path]);
   const { back } = useSafeNavigation();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();

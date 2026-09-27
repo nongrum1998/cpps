@@ -19,6 +19,7 @@
     "@pension/eslint-config": "workspace:*",
     "@pension/prettier-config": "workspace:*",
     "@pension/typescript-config": "workspace:*",
+    "@types/react": "19.2.18",
     "axios": "^1.19.0",
     "eslint": "9.39.5",
     "prettier": "3.2.5",

@@ -1,3 +1,4 @@
+export * from './page';
 export * from './cn';
 export * from './date';
 export * from './formatters';

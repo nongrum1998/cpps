@@ -1,15 +1,4 @@
-import type { ReactNode } from 'react';
-
-export interface PageHeaderConfig {
-  title: string;
-  subtitle?: string;
-  showBackButton?: boolean;
-  showDrawer?: boolean;
-  leftSlot?: ReactNode;
-  rightSlot?: ReactNode;
-  bottomContent?: ReactNode;
-  background?: string;
-}
+import { PageHeader } from '@pension/types';
 
 export const PAGE_HEADERS = {
   // TABS
@@ -48,6 +37,6 @@ export const PAGE_HEADERS = {
     showBackButton: true,
   },
   '/privacy-policy': { title: 'Privacy Policy', showBackButton: true, showDrawer: false },
-} as const satisfies Record<string, PageHeaderConfig>;
+} as const satisfies PageHeader;
 
 export type PageHeaderRoute = keyof typeof PAGE_HEADERS;
