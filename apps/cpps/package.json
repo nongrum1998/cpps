@@ -21,7 +21,6 @@
     "@hugeicons/core-free-icons": "4.3.0",
     "@hugeicons/react-native": "1.0.16",
     "@pension/api": "workspace:*",
-    "@pension/core": "workspace:*",
     "@pension/hooks": "workspace:*",
     "@pension/storage": "workspace:*",
     "@pension/ui": "workspace:*",
