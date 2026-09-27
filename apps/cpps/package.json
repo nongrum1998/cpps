@@ -22,9 +22,9 @@
     "@hugeicons/react-native": "1.0.16",
     "@pension/api": "workspace:*",
     "@pension/hooks": "workspace:*",
+    "@pension/lib": "workspace:*",
     "@pension/storage": "workspace:*",
     "@pension/ui": "workspace:*",
-    "@pension/lib": "workspace:*",
     "@pension/utils": "workspace:*",
     "@react-native-community/netinfo": "12.0.1",
     "@tanstack/react-query": "5.101.4",
@@ -75,8 +75,8 @@
   "devDependencies": {
     "@babel/core": "7.29.7",
     "@babel/plugin-transform-react-jsx": "^8.0.1",
-    "@pension/types": "workspace:*",
     "@pension/jest-config": "workspace:*",
+    "@pension/types": "workspace:*",
     "@testing-library/react-native": "^14.0.1",
     "@types/crypto-js": "4.2.2",
     "@types/jest": "^30.0.0",
@@ -89,8 +89,7 @@
     "jest-expo": "~57.0.0",
     "prettier": "3.2.5",
     "prettier-plugin-tailwindcss": "0.5.11",
-    "tailwindcss": "3.4.0",
-    "typescript": "6.0.3"
+    "tailwindcss": "3.4.0"
   },
   "private": true
 }
