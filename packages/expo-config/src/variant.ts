@@ -36,6 +36,16 @@ export interface VariantEnv {
   APP_VARIANT?: string;
   /** Value of `EAS_BUILD_PROFILE`, set by EAS on the build server. */
   EAS_BUILD_PROFILE?: string;
+
+  /**
+   * Open index signature so `process.env` (whose `ProcessEnv` type has only an
+   * index signature, no declared properties) is assignable.
+   *
+   * Without this, TypeScript's weak-type check rejects `env: VariantEnv =
+   * process.env`: every property of `VariantEnv` is optional, and `ProcessEnv`
+   * shares no *declared* property with it.
+   */
+  [key: string]: string | undefined;
 }
 
 /**
