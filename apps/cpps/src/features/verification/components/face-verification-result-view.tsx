@@ -1,7 +1,6 @@
 import { Text, View } from 'react-native';
 import { Button, Ternary } from '@pension/ui';
 import { Container } from '@components/layout';
-import { PAGE_ROUTES } from '@utils/constants';
 import { useSafeNavigation } from '@pension/hooks';
 
 /** Props for {@link FaceVerificationResultView}. */
