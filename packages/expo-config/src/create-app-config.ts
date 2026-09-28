@@ -34,15 +34,15 @@ const PLATFORMS: readonly ('ios' | 'android')[] = ['ios', 'android'];
  * @param icon - App icon path from the spec, relative to the app root.
  * @returns A plugin entry ready to drop into `plugins`.
  */
-function splashScreenPlugin(icon: string): ConfigPluginEntry {
+function splashScreenPlugin(icon: string, color?: string, darkColor?: string): ConfigPluginEntry {
   return [
     'expo-splash-screen',
     {
       image: icon,
-      backgroundColor: '#ffffff',
+      backgroundColor: color ?? '#ffffff',
       dark: {
         image: icon,
-        backgroundColor: '#000000',
+        backgroundColor: darkColor ?? '#000000',
       },
     },
   ];
@@ -85,7 +85,6 @@ export function createAppConfig(spec: AppSpec, env: VariantEnv = process.env): E
 
   const plugins: ConfigPluginEntry[] = [
     'expo-router',
-    'expo-sharing',
     ...(spec.plugins ?? []),
     splashScreenPlugin(spec.icon),
     buildPropertiesPlugin(variant),
@@ -124,7 +123,7 @@ export function createAppConfig(spec: AppSpec, env: VariantEnv = process.env): E
 
     android: {
       package: identity.androidPackage,
-      permissions: ['android.permission.CAMERA'],
+      permissions: ['android.permission.CAMERA', 'android.permission.LOCATION'],
       adaptiveIcon: {
         foregroundImage: spec.icon,
         backgroundColor: '#ffffff',

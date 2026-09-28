@@ -5,6 +5,9 @@ packages:
 # pnpm blocks native module postinstall scripts by default (v10+).
 # Whitelist the ones the workspace actually needs.
 allowBuilds:
+  # tsx (required by apps/*/app.config.ts to import workspace TypeScript)
+  # transpiles via esbuild, whose postinstall pnpm 10+ blocks by default.
+  esbuild: true
   unrs-resolver: true
 
 # Pinned overrides previously living in apps/pension/pnpm-workspace.yaml.
