@@ -1,4 +1,4 @@
-@baseUrl=http://192.168.1.5:3000
+@baseUrl=http://localhost:3000
 
 ### --------------------------------------------
 ### Encrypt helper
@@ -7,7 +7,11 @@
 POST {{baseUrl}}/api/cpps/encrypt
 
 {
-    "token": "MG/11xx",
+  "message":"Success",
+  "data":{ 
+    "ppo_id": "MG/11xx",
+    "ppo_no": "MG/11xx"
+  }
 }
 
 # -------------- Post Script -------------------------
@@ -29,38 +33,13 @@ POST {{baseUrl}}/api/cpps/format-password
 }
 
 ### echo
-POST http://localhost:3000/api/echo/123
-
-{
-  "url":"/get_ppo_status",
-  "status_code":200,
-  "data":{ 
-     "success":true,
-     "data":"gAAAAABqtNTrfAsSHkMZB0WPWLKUjxytsrLwOPo2kjPJ6mGp52Iw4XB7kRVwh85mWJlFLTJGDsvDBcwP4CjrzjpXZVjoTShiVZbtKioWjXK2vMqW_uuvkUyk6fKhUR528Cr5rbIoXAWNftxcrku5VgGxMNVl1hGnA4sxQGXGwzqJsXFTntSmEivH_Ky6xD6_L6CC5hRctQcG"
-  }
-}
-
-### echo
-< {%
-   request.variables.set('RAW_BODY', JSON.stringify({
-     url:"/login",
-     status_code:200, 
-     data:{ 
-        "success":true,
-        "data": "gAAAAABqt2kpwI15lsEpgBTbzTu_dPsEwXstsZzhYF-z5kvmBSmgNzp3E8_tGzhtpEKC40Dz1vnECFi2hLjrsNFwmjJ3KeIvKdyFVWbanL3q3a2N8VZKSkI="
-     }
-   }));
-%}
-
 POST {{baseUrl}}/api/echo
 
 { 
-  "url":"/logout",
+  "url":"/dlc",
   "status_code":200,
-  "data": { 
-    "message":"success"
-  }
+  "data":"gAAAAABqugsaQW_X9E-7WMuuV7OSEunPjXS51nk5AZ-yarGYRkcXbwqMTUW8GWxpm3XFTBQ4nE0ZMEwuVVEIiL-RChHYGvaOon6U7fgUAPCTh14mJ7Wr4XxXozKl8qhBGogkvv1Ph_udoQ44gobQLbKoH_ng8W2mNNiMe-LKjUruCCA6hAvFgXw="
 }
 
 ###
-GET http://192.168.1.5:3000/api/echo
+GET {{baseUrl}}/api/echo

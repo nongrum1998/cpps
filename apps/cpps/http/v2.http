@@ -171,7 +171,7 @@ Content-Type: application/json
    require("./scripts/enc-req.http.js");
 %}
 
-POST {{BASE_URL}}/user
+POST http://localhost:3000/api/echo/user
 Content-Type: application/json
 
 {

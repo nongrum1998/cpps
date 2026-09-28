@@ -12,6 +12,7 @@ export interface FaceVerificationResultViewProps {
   message: string;
   /** Called when the user chooses to retake after a failed result. */
   onRetakePress?: () => void;
+  onGoBack?: () => void;
 }
 
 /**
@@ -21,8 +22,14 @@ export interface FaceVerificationResultViewProps {
  * fallback only for an empty message. It is exported for reuse by the result
  * container and does not submit or capture data.
  */
-export const SuccessStatusCard = ({ message }: { message: string }) => {
-  const { navigate } = useSafeNavigation();
+export const SuccessStatusCard = ({
+  message,
+  onGoBack,
+}: {
+  message: string;
+  onGoBack?: () => void;
+}) => {
+  const { back } = useSafeNavigation();
   return (
     <View className="gap-y-5 rounded-md border border-emerald-500/30 bg-emerald-500/10 p-5">
       <View className="flex-row items-center gap-3">
@@ -53,7 +60,13 @@ export const SuccessStatusCard = ({ message }: { message: string }) => {
       <Text className="text-center text-lg font-medium leading-relaxed text-emerald-950/80">
         {message || 'Your face verification was processed and matched successfully.'}
       </Text>
-      <Button size="lg" variant="primary" onPress={() => navigate(PAGE_ROUTES.HOME)}>
+      <Button
+        size="lg"
+        variant="primary"
+        onPress={() => {
+          onGoBack && onGoBack();
+          back();
+        }}>
         Go Back
       </Button>
     </View>
@@ -107,6 +120,7 @@ export function FaceVerificationResultView({
   isSuccess,
   message,
   onRetakePress,
+  onGoBack,
 }: FaceVerificationResultViewProps) {
   return (
     <Container className="gap-y-5">
@@ -129,7 +143,7 @@ export function FaceVerificationResultView({
 
       <Ternary
         condition={isSuccess}
-        ifTrue={<SuccessStatusCard message={message} />}
+        ifTrue={<SuccessStatusCard onGoBack={onGoBack} message={message} />}
         ifFalse={<RejectStatusCard message={message} onRetakePress={onRetakePress} />}
       />
     </Container>

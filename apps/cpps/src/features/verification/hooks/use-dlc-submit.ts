@@ -7,6 +7,7 @@ import { ENDPOINTS } from '@utils/constants';
 import { http } from '@utils/http';
 import type { DlcDeclarationDetails, DlcResponseEnvelope, DlcSubmitPayload } from '../types';
 import { useCurrentLocation } from '@pension/hooks';
+import { PermissionStatus } from 'expo-location';
 
 /** Values supplied by the face-verification screen for one DLC submission. */
 type DlcSubmitInput = DlcDeclarationDetails & {
@@ -19,26 +20,6 @@ interface DeviceMetadata {
   deviceName: string;
   /** OS-level device identifier (iOS `idForVendor` / Android ID, fallback `'unknown'`). */
   deviceId: string;
-}
-
-/**
- * Validates the decrypted application envelope returned by the DLC endpoint.
- *
- * The shared HTTP wrapper reports whether the HTTP exchange succeeded, while
- * the DLC backend separately reports whether the declaration was accepted.
- * Requiring both fields here prevents an HTTP 200 response with a false or
- * malformed application status from being rendered as an approval.
- *
- * @param value - The runtime value exposed as `ApiResponse.data`.
- * @returns `true` when the value has the required `/dlc` response shape.
- */
-function isDlcResponseEnvelope(value: unknown): value is DlcResponseEnvelope {
-  if (!value || typeof value !== 'object') {
-    return false;
-  }
-
-  const envelope = value as Record<string, unknown>;
-  return typeof envelope.status === 'boolean' && typeof envelope.message === 'string';
 }
 
 /**
@@ -78,7 +59,7 @@ async function resolveDeviceMetadata(): Promise<DeviceMetadata> {
  */
 export function useSubmitDLC() {
   const { user } = useAuthStore();
-  const { getLocationName, getCurrentLocation } = useCurrentLocation();
+  const { getLocationName, permission, getCurrentLocation } = useCurrentLocation();
 
   return useMutation<ApiResponse<unknown>, Error, DlcSubmitInput>({
     mutationFn: async ({ nec, nmc, image }) => {
@@ -87,7 +68,11 @@ export function useSubmitDLC() {
       let place = 'unknown';
 
       const currentPosition = await getCurrentLocation();
-      if (currentPosition?.coords.latitude && currentPosition.coords.longitude) {
+      if (
+        currentPosition?.coords.latitude &&
+        currentPosition.coords.longitude &&
+        permission === PermissionStatus.GRANTED
+      ) {
         const locationName = await getLocationName({
           latitude: currentPosition?.coords.latitude || 0,
           longitude: currentPosition?.coords.longitude || 0,
@@ -96,8 +81,6 @@ export function useSubmitDLC() {
           ? `${locationName?.city}-${locationName?.district}-${locationName?.region}`
           : 'unknown';
       }
-
-      if (place === 'unknown') throw new Error('Error Place name');
 
       if (!ppoId || !ppoNo) {
         throw new Error('Authenticated PPO details are required');
@@ -117,19 +100,9 @@ export function useSubmitDLC() {
       };
 
       const response = await http.post<DlcResponseEnvelope>(ENDPOINTS.DLC.CREATE, requestBody);
-
-      if (!response.success) {
-        throw new Error('DLC submission request failed');
-      }
-
-      if (!isDlcResponseEnvelope(response.data)) {
-        throw new Error('Invalid DLC response envelope');
-      }
-
       return {
-        ...response,
-        success: response.data.status,
-        message: response.data.message,
+        success: response.success,
+        message: response.message,
       };
     },
   });

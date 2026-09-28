@@ -1,9 +1,5 @@
 /**
- * @file Axios response interceptor — login token capture and auth-path handling.
- *
- * On successful responses it captures the access token returned by the login
- * endpoint. On errors it lets auth-path failures pass through to the caller
- * (login/logout never trigger token machinery) and purges stored tokens when
+ * @file Axios response interceptor — login token capture and auth-path handling. On successful responses it captures the access token returned by the login endpoint. On errors it lets auth-path failures pass through to the caller (login/logout never trigger token machinery) and purges stored tokens when
  * the `/user` endpoint fails. There is intentionally no 401 token refresh:
  * the old refresh/retry machinery was never wired in and has been removed.
  */

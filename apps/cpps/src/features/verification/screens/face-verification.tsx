@@ -183,7 +183,6 @@ export function FaceVerificationScreen() {
     setDlcDialogOpen(false);
     setResult(null);
     setErrorMsg('');
-
     if (!capturedImageBase64) {
       showTechnicalError(CAPTURE_ERROR);
       return;
@@ -191,6 +190,7 @@ export function FaceVerificationScreen() {
 
     const ppoId = user?.ppo_id;
     const ppoNo = user?.ppo_no;
+
     if (!ppoId || !ppoNo) {
       setCapturedImageBase64('');
       resetSubmission();
@@ -315,6 +315,7 @@ export function FaceVerificationScreen() {
             isSuccess={result.isSuccess}
             message={result.message}
             onRetakePress={result.isSuccess ? undefined : handleRetake}
+            onGoBack={() => setPhase('declaration')}
           />
         )}
 
