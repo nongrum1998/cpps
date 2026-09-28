@@ -65,8 +65,8 @@ export function ChangePasswordScreen() {
     resolver: zodResolver(ChangePasswrodSchema),
     defaultValues: {
       oldPassword: __DEV__ ? process.env.EXPO_PUBLIC_PASSWORD : '',
-      newPassword: '',
-      confirmPassword: '',
+      newPassword: __DEV__ ? process.env.EXPO_PUBLIC_PASSWORD : '',
+      confirmPassword: __DEV__ ? process.env.EXPO_PUBLIC_PASSWORD : '',
     },
     mode: 'all',
   });

@@ -27,9 +27,9 @@ export const ENDPOINTS = {
     /** Creates a new pensioner record. */
     CREATE_PENSIONER: '/facial_registration',
     /** Changes the user's password. */
-    CHANGE_PASSWORD: '/api/change_password/',
+    CHANGE_PASSWORD: '/change_password',
     /** Updates the user's profile. */
-    UPDATE_PROFILE: '/api/update_profile/',
+    UPDATE_PROFILE: '/update_profile/',
   },
 
   /** DLC (life certificate) endpoints. */
