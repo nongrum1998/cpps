@@ -36,7 +36,7 @@ export function useRegisterPensioner() {
         dob: data.dob,
         bank_accno: data.bank_accno,
         password: sha256(data.password),
-        image: '',
+        image: data.image,
       };
       return http.post<RegisterPensionerData>(ENDPOINTS.USER.CREATE_PENSIONER, payload, {
         timeout: 60_000,
