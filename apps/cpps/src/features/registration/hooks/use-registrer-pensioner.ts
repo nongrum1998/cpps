@@ -1,9 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { ENDPOINTS } from '@utils/constants';
 import { http } from '@utils/http';
-import { formatPassword, sha256 } from '@pension/lib';
+import { sha256 } from '@pension/lib';
 import { RegisterPensionerInput } from '../validators';
-import { logger } from '@pension/utils';
 
 /**
  * Response payload of `POST {USER.CREATE_PENSIONER}` — callers currently
@@ -42,6 +41,5 @@ export function useRegisterPensioner() {
         timeout: 60_000,
       });
     },
-    onSuccess: (data) => logger.log('UseRegiserPensioner', data),
   });
 }
