@@ -64,7 +64,7 @@ export interface DlcSubmitPayload {
   /** Re-marriage declaration answer. */
   nmc: DeclarationAnswer;
   /** Reserved place value required by the current API contract. */
-  place: '';
+  place: string;
   /** Raw captured JPEG base64, kept in memory only. */
   image: string;
 }
