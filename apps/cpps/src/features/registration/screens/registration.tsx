@@ -38,9 +38,7 @@ export default function RegistrationScreen() {
   const { mutate, data, isPending, isSuccess } = useRegisterPensioner();
 
   const onSubmit = (value: RegisterPensionerInput) => {
-    mutate(value, {
-      onSuccess: () => {},
-    });
+    mutate(value);
   };
   useEffect(() => {
     reset();
