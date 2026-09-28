@@ -5,7 +5,10 @@ type PageRouteMap<T> = {
 };
 
 const routes = {
+  // TAB
   HOME: '/' as Href,
+  DLC: '/dlc' as Href,
+  PENSION_SLIP: '/statement' as Href,
   AUTH: {
     HOME: '/auth' as Href,
     REGISTER: '/auth/register' as Href,
@@ -21,7 +24,6 @@ const routes = {
   ABOUT_US: '/about' as Href,
   FACE_RECOGNITION: '/face-recognition' as Href,
   PRIVACY: '/privacy-policy' as Href,
-  DLC: '/dlc' as Href,
   USER_MANUAL: {
     HOME: '/user-manual',
     DLC: '/user-manual/dlc',
