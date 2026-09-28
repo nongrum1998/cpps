@@ -19,7 +19,7 @@ export const SubmitDLCCard = () => {
   const isDisableCapture = frontCamera === null || !hasPermission;
 
   const handleCapturePress = () => {
-    navigate(PAGE_ROUTES.FACE_RECOGNITION);
+    navigate(PAGE_ROUTES.DLC);
   };
 
   const openSettings = async () => await Linking.openSettings();

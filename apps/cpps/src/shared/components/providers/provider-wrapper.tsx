@@ -41,6 +41,7 @@ export const ProviderWrapper = ({ children }: Props) => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider className="flex-1">
+        <StatusBar style="auto" animated />
         <RootProvider>
           <LocationProvider>
             <GlobalErrorBoundary>
@@ -52,7 +53,6 @@ export const ProviderWrapper = ({ children }: Props) => {
                       isLoading={isAuthLoading}
                       guestOnly={GUEST_ONLY_ROUTES}
                       publicOnly={PUBLIC_ROUTES}>
-                      <StatusBar style="auto" animated />
                       {children}
                       <UpdateModal />
                     </AuthRedirect>

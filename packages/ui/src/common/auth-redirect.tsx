@@ -74,7 +74,7 @@ export const AuthRedirect = ({
 
     // 2. Non-authenticated user on protected page -> redirect to auth
     if (!isSignedIn && onProtectedPage) {
-      navigate('/', 'replace');
+      navigate('/auth', 'replace');
       return;
     }
 

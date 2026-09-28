@@ -6,6 +6,7 @@ import { useAuthStore } from '@stores/auth.store';
 import { ENDPOINTS } from '@utils/constants';
 import { http } from '@utils/http';
 import type { DlcDeclarationDetails, DlcResponseEnvelope, DlcSubmitPayload } from '../types';
+import { useCurrentLocation } from '@pension/hooks';
 
 /** Values supplied by the face-verification screen for one DLC submission. */
 type DlcSubmitInput = DlcDeclarationDetails & {
@@ -77,17 +78,33 @@ async function resolveDeviceMetadata(): Promise<DeviceMetadata> {
  */
 export function useSubmitDLC() {
   const { user } = useAuthStore();
+  const { getLocationName, getCurrentLocation } = useCurrentLocation();
 
   return useMutation<ApiResponse<unknown>, Error, DlcSubmitInput>({
     mutationFn: async ({ nec, nmc, image }) => {
       const ppoId = user?.ppo_id;
       const ppoNo = user?.ppo_no;
+      let place = 'unknown';
+
+      const currentPosition = await getCurrentLocation();
+      if (currentPosition?.coords.latitude && currentPosition.coords.longitude) {
+        const locationName = await getLocationName({
+          latitude: currentPosition?.coords.latitude || 0,
+          longitude: currentPosition?.coords.longitude || 0,
+        });
+        place = locationName
+          ? `${locationName?.city}-${locationName?.district}-${locationName?.region}`
+          : 'unknown';
+      }
+
+      if (place === 'unknown') throw new Error('Error Place name');
 
       if (!ppoId || !ppoNo) {
         throw new Error('Authenticated PPO details are required');
       }
 
       const { deviceName, deviceId } = await resolveDeviceMetadata();
+
       const requestBody: DlcSubmitPayload = {
         deviceName,
         deviceId,
@@ -95,7 +112,7 @@ export function useSubmitDLC() {
         ppo_no: ppoNo,
         nec,
         nmc,
-        place: '',
+        place: place,
         image,
       };
 

@@ -28,7 +28,7 @@ type AuthStore = {
 export const useAuthStore = createPersistedStore<AuthStore>(
   (set, get) => ({
     user: null,
-    isSignedIn: true,
+    isSignedIn: false,
     isAuthLoading: true,
 
     fetchUser: async (keepStaleOnError?: boolean) => {
