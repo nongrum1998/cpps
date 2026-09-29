@@ -10,13 +10,13 @@ import { ExpoConfig } from 'expo/config';
 // Expo Project ID
 const PROJECT_ID = '966c5b58-3295-42e5-a4df-bfe597541f66';
 
-const bundleIdentifier = 'com.jyrwajr.plcvm';
+const BUNDLE_IDENTIFIER = 'com.jyrwajr.plcvm';
 
 const config = createAppConfig({
   appName: 'PLCVM',
   slug: 'plcvm',
   scheme: 'plcvm',
-  baseBundleIdentifier: bundleIdentifier,
+  baseBundleIdentifier: BUNDLE_IDENTIFIER,
   projectId: PROJECT_ID,
   owner: 'pixel-thread',
   icon: './src/shared/assets/images/logo.jpg',
