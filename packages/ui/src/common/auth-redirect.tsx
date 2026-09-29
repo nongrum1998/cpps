@@ -26,15 +26,14 @@ type Props = {
  * - Protected: Everything else (requires authentication)
  */
 
-const isGuestOnlyRoute = (pathname: string, route: string[] = []): boolean => {
-  console.log(route);
+const isGuestOnlyRoute = (pathname: string, route: string[]): boolean => {
   return route.some((route) => pathname === route || pathname.startsWith(route + '/'));
 };
 
 /**
  * Check if a route is public (accessible by both auth and non-auth users).
  */
-const isPublicRoute = (pathname: string, route: string[] = []): boolean => {
+const isPublicRoute = (pathname: string, route: string[]): boolean => {
   return route.some((route) => pathname === route || pathname.startsWith(route + '/'));
 };
 

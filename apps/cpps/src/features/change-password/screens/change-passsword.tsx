@@ -11,7 +11,6 @@ import { FooterImg } from '@components/common';
 import { ChangePasswrodSchema } from '../validators';
 import { useChangePassword } from '../hooks';
 import { ChangePasswordConfirmDialog, PasswordRequiredments } from '../components';
-import { formatPassword, sha256 } from '@pension/lib';
 
 /**
  * The type of the change password form fields.
@@ -19,7 +18,6 @@ import { formatPassword, sha256 } from '@pension/lib';
  * `oldPassword` is the user's current password, `newPassword` is the desired
  * replacement, and `confirmPassword` must match `newPassword` for validation
  * to pass. All values are captured in plain text and encoded by
- * {@link formatPassword} before being sent to the API.
  */
 type ChangePasswordForm = {
   oldPassword: string;
@@ -78,8 +76,8 @@ export function ChangePasswordScreen() {
     if (isValid.success)
       mutate(
         {
-          oldPassword: sha256(formatPassword(data.oldPassword)),
-          newPassword: sha256(formatPassword(data.newPassword)),
+          oldPassword: data.oldPassword,
+          newPassword: data.newPassword,
         },
         {
           onSuccess: (data) => {
@@ -120,20 +118,31 @@ export function ChangePasswordScreen() {
         <Ternary
           condition={isSuccess}
           ifTrue={
-            /* Success */
-            <View className="my-4 items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
-              <View className="h-12 w-12 items-center justify-center rounded-full bg-emerald-500">
-                <Icon name="check" size={24} color="white" />
+            <>
+              <View className="my-4 items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
+                <View className="h-12 w-12 items-center justify-center rounded-full bg-emerald-500">
+                  <Icon name="check" size={24} color="white" />
+                </View>
+
+                <Text className="text-center text-base font-bold text-emerald-950">
+                  Password Changed Successfully
+                </Text>
+
+                <Text className="text-center text-xs leading-5 text-emerald-800">
+                  Your password has been updated. Please use your new password for future log ins.
+                </Text>
               </View>
 
-              <Text className="text-center text-base font-bold text-emerald-950">
-                Password Changed Successfully
-              </Text>
-
-              <Text className="text-center text-xs leading-5 text-emerald-800">
-                Your password has been updated. Please use your new password for future log ins.
-              </Text>
-            </View>
+              <Button
+                size="lg"
+                variant={'secondary'}
+                onPress={() => setIsSuccess(false)}
+                disabled={isPending || !isValid}
+                isLoading={isPending}
+                activeOpacity={0.8}>
+                Back
+              </Button>
+            </>
           }
           ifFalse={
             <>
@@ -295,19 +304,19 @@ export function ChangePasswordScreen() {
                   )}
                 />
               </View>
+
+              {/* Submit */}
+              <Button
+                size="lg"
+                onPress={() => setIsConfirmOpen(true)}
+                disabled={isPending || !isValid}
+                isLoading={isPending}
+                activeOpacity={0.8}>
+                Change Password
+              </Button>
             </>
           }
         />
-
-        {/* Submit */}
-        <Button
-          size="lg"
-          onPress={() => setIsConfirmOpen(true)}
-          disabled={isPending || !isValid}
-          isLoading={isPending}
-          activeOpacity={0.8}>
-          Change Password
-        </Button>
       </View>
 
       <FooterImg />
