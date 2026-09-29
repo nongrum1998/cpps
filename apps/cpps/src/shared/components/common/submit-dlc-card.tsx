@@ -48,7 +48,7 @@ export const SubmitDLCCard = () => {
             size="lg"
             onPress={handleCapturePress}
             activeOpacity={0.8}>
-            Capture Photo
+            Submit DLC
           </Button>
         }
         ifFalse={
