@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@pension/expo-config": "workspace:*",
+    "@pension/ui": "workspace:*",
     "@hookform/resolvers": "5.9.1",
     "@hugeicons/core-free-icons": "4.3.0",
     "@hugeicons/react-native": "1.0.16",
