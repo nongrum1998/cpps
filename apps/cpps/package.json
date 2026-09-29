@@ -21,6 +21,7 @@
     "@hugeicons/core-free-icons": "4.3.0",
     "@hugeicons/react-native": "1.0.16",
     "@pension/api": "workspace:*",
+    "@pension/expo-config": "workspace:*",
     "@pension/hooks": "workspace:*",
     "@pension/lib": "workspace:*",
     "@pension/storage": "workspace:*",
@@ -89,7 +90,8 @@
     "jest-expo": "~57.0.0",
     "prettier": "3.2.5",
     "prettier-plugin-tailwindcss": "0.5.11",
-    "tailwindcss": "3.4.0"
+    "tailwindcss": "3.4.0",
+    "tsx": "^4.23.15"
   },
   "private": true
 }
