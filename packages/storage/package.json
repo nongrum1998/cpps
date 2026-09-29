@@ -13,17 +13,17 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "expo-secure-store": "57.0.2",
-    "zustand": "4.5.7"
+    "expo-secure-store": "57.0.4",
+    "zustand": "^4.5.7"
   },
   "devDependencies": {
     "@pension/eslint-config": "workspace:*",
     "@pension/prettier-config": "workspace:*",
     "@pension/typescript-config": "workspace:*",
     "eslint": "9.39.5",
-    "expo-secure-store": "57.0.2",
+    "expo-secure-store": "57.0.4",
     "prettier": "3.2.5",
     "typescript": "6.0.3",
-    "zustand": "4.5.7"
+    "zustand": "^4.5.7"
   }
 }

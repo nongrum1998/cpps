@@ -1,0 +1,387 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# EIS — REST API Reference
+#
+# Covers every API the app calls:
+#   - Auth:  OAuth2 token, login, sign-up, OTP, reset password, refresh
+#   - RPC:   all `make_request` function names from src/shared/utils/constants/method.ts
+#   - Base:  sign-up / OTP / reset / refresh POST directly to {{host}} (no path)
+#
+# Usage (VS Code "REST Client" extension):
+#   1. Run "OAuth2 client-credentials token" → response handler captures the
+#      access token into the @token variable automatically.
+#   2. Run any RPC request below; they all use Bearer {{token}}.
+# ═══════════════════════════════════════════════════════════════════════════
+@oauthHost = {{EXPO_PUBLIC_API_OAUTH_URL}}
+@host = {{EXPO_PUBLIC_API_URL}}
+@basicAuth = {{EXPO_PUBLIC_BASIC_AUTH}}
+@token = eyJ4NXQiOiJNell4TW1Ga09HWXdNV0kwWldObU5EY3hOR1l3WW1NNFpUQTNNV0kyTkRBelpHUXpOR00wWkdSbE5qSmtPREZrWkRSaU9URmtNV0ZoTXpVMlpHVmxOZyIsImtpZCI6Ik16WXhNbUZrT0dZd01XSTBaV05tTkRjeE5HWXdZbU00WlRBM01XSTJOREF6WkdRek5HTTBaR1JsTmpKa09ERmtaRFJpT1RGa01XRmhNelUyWkdWbE5nX1JTMjU2IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJhZG1pbiIsImF1dCI6IkFQUExJQ0FUSU9OIiwiYXVkIjoiWEo4U3NiNXFiNWJlZl9KemdhNU1nV1NzUnJBYSIsIm5iZiI6MTc4ODI1Nzc5NiwiYXpwIjoiWEo4U3NiNXFiNWJlZl9KemdhNU1nV1NzUnJBYSIsInNjb3BlIjoiZGVmYXVsdCIsImlzcyI6Imh0dHBzOlwvXC8xMC4xNzkuMzUuNDg6OTQ0M1wvb2F1dGgyXC90b2tlbiIsImV4cCI6MTc4ODI1ODk5NiwiaWF0IjoxNzg4MjU3Nzk2LCJqdGkiOiJkNTA0YzEyYS0yZWEyLTRmMzktYTdjOC0xNTJjNzIzZDNjODYifQ.VENBqbVqiLG6VrfGpaxE6JLNd4xdphn4FdEwGeZbdoH4itJiPkSBRVlQlSicYn0oMuY3jzK6j0bQ0CdGm9WGKOhgR21LNhARu1SU5jPHb41HXtKIkYLdGfABDbtlPHz1xreR4uA9wCScpUZ1Eri0_eejDBPsH-RF40OhVyqlhNk6Sd6dtbwUW771vQS1EpePSvKe_og9ODclbe2JlknVxjav_ZoSKFNyyUc07NKeHwUMahDpCpvjkWjq4T20jO2W20fV7NYOjxOpfrsTzL_bLscZAFwp_16UQf734yfaUxI86Xn3FHQKsgBIGzdtvrywhiPBSVIGudaod-_8iUAewg
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# AUTH
+# ═══════════════════════════════════════════════════════════════════════════
+
+### 1. OAuth2 client-credentials token (use-get-oauth-token)
+# @kulala-curl-k
+# @name oauthToken
+POST {{oauthHost}}/oauth2/token
+Authorization: Basic {{basicAuth}}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials
+
+### 2. Employee login (use-login-mutation → employee_login)
+# @name login
+# @kulala-curl-k
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "employee_login",
+  "emp_cd": "2009200083T",
+  "password": "MeghE1TSE"
+} 
+
+# ═══════════════════════════════════════════════════════════════════════════
+# EMPLOYEE / PROFILE
+# ═══════════════════════════════════════════════════════════════════════════
+
+### 7. Get employee details (use-profile / auth.store → get_employee_details)
+# @kulala-curl-k
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "get_employee_details",
+  "emp_cd": "2009200083T"
+}
+
+### 8. Get home overview (use-home-overview → get_employee_overview)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "get_employee_overview",
+  "emp_cd": "2009200083T"
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LEAVE
+# ═══════════════════════════════════════════════════════════════════════════
+
+### 9. Get leave types (use-leave-type → get_leave_type)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "get_leave_type"
+}
+
+### 10. Get leave reasons (use-leave-reason → get_leave_reason)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "get_leave_reason"
+}
+
+### 11. Get employee leaves (use-leaves → get_employee_leaves)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "get_employee_leaves",
+  "emp_cd": "2009200083T"
+}
+
+### 12. Get leave details (use-leave-detail → get_employee_leave_details)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "get_employee_leave_details",
+  "emp_cd": "2009200083T",
+  "from_dt": "10/08/2026",
+  "leave_cd": "SL",
+  "order_dt": "05/08/2026"
+}
+
+### 13. Create leave (use-create-leave → insert_update_leave, flag: "N")
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "insert_update_leave",
+  "emp_cd": "2009200083T",
+  "leave_cd": "CL",
+  "from_dt": "2026-08-10",
+  "to_dt": "2026-08-12",
+  "no_days": "2",
+  "order_dt": "2026-08-05",
+  "order_no": "123",
+  "remarks": null,
+  "reason_text": "Family event",
+  "reason_cd": "1",
+  "flag": "N"
+}
+
+### 14. Update leave (use-update-leave → insert_update_leave, flag: "E")
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "insert_update_leave",
+  "emp_cd": "2009200083T",
+  "leave_cd": "CL",
+  "from_dt": "2026-08-10",
+  "to_dt": "2026-08-12",
+  "no_days": "2",
+  "order_dt": "2026-08-05",
+  "order_no": "123",
+  "remarks": null,
+  "reason_text": "Family event",
+  "reason_cd": "1",
+  "flag": "E"
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SALARY
+# ═══════════════════════════════════════════════════════════════════════════
+
+### 15. Get salary years (use-salary-years → get_sal_years)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "get_sal_years",
+  "emp_cd": "2009200083T"
+}
+
+### 16. Get salary statement (use-salary-statements → get_salary_statement)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "get_salary_statement",
+  "emp_cd": "2009200083T",
+  "sal_mon": 8,
+  "sal_year": 2026
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LOAN
+# ═══════════════════════════════════════════════════════════════════════════
+
+### 17. Get employee loans (use-loans → get_employee_loan)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "get_employee_loan",
+  "emp_cd": "2009200083T"
+}
+
+### 18. Get loan details (use-loan → get_employee_loan_details)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "get_employee_loan_details",
+  "emp_cd": "2009200083T",
+  "loan_id": "1"
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# GPF STATEMENTS
+# ═══════════════════════════════════════════════════════════════════════════
+
+### 19. Get GPF financial years (use-gpf-financial-years → get_financial_year)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "get_financial_year",
+  "gpf_series": "MEG/POL",
+  "gpf_acc_no": "12279"
+}
+
+### 20. Get GPF statement (use-gpf-statements → view_statement)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "view_statement",
+  "financial_year": "2024-2025",
+  "gpf_series": "MEG/POL",
+  "gpf_acc_no": "12279"
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# NPS STATEMENTS
+# ═══════════════════════════════════════════════════════════════════════════
+
+### 21. Get NPS financial years (use-nps-fin-year → get_nps_fin_year)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "get_nps_fin_year",
+  "pran": "<pran>",
+  "ppan": "<ppan>"
+}
+
+### 22. Get NPS Annex-5 statement (use-nps-statement → get_annex5)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "get_annex5",
+  "pran": "<pran>",
+  "ppan": "<ppan>",
+  "fin_year": "2024-2025"
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# E-PAY SLIP
+# ═══════════════════════════════════════════════════════════════════════════
+
+### 23. Get e-pay slip (use-e-payslip → get_epay_slip_data)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "get_epay_slip_data",
+  "ge_number": "1069587"
+}
+
+### 24. Save GE number (use-update-ge-number → insert_ge_no)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "insert_ge_no",
+  "emp_cd": "2009200083T",
+  "ge_no": "1069587"
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# INCOME TAX
+# ═══════════════════════════════════════════════════════════════════════════
+
+### 25. Get tax list (use-employee-taxes → get_employee_tax_list)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "get_employee_tax_list",
+  "emp_cd": "2009200083T"
+}
+
+### 26. Get tax detail (use-employee-tax → get_employee_tax_detail)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "get_employee_tax_detail",
+  "emp_cd": "2009200083T"
+}
+
+### 27. Update tax detail (use-update-tax-detail → update_employee_tax_detail)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "update_employee_tax_detail",
+  "emp_cd": "2009200083T",
+  "regime": "NEW",
+  "deductions80C": 150000,
+  "deductions80D": 50000,
+  "hraExemption": 0,
+  "ltaExemption": 0,
+  "homeLoanInterest": 200000,
+  "npsContribution": 50000
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ANNOUNCEMENTS / NOTIFICATIONS
+# ═══════════════════════════════════════════════════════════════════════════
+
+### 28. Get notifications / announcements (use-announcements → get_notifications)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "get_notifications"
+}
+
+### 29. Register notification token (notification.service → insert_notification_token)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "insert_notification_token",
+  "emp_cd": "2009200083T",
+  "device_token": "<expo push token>"
+}
+
+### 30. Unregister notification token (notification.service → insert_notification_token)
+POST {{host}}/make_request
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "functionName": "insert_notification_token",
+  "emp_cd": "2009200083T",
+  "token": "<expo push token>"
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LEGACY DIRECT ENDPOINTS (not called by the app — superseded by the RPC
+# /make_request refactor; kept for historical reference)
+# ═══════════════════════════════════════════════════════════════════════════
+
+### Legacy GPF financial years (superseded by get_financial_year RPC)
+POST http://10.179.35.51:82/api/fetch/gpf/financialyear
+
+{ "gpfSeries": "POL", "gpfAccNo": "12279" }
+
+### Legacy GPF statement (superseded by view_statement RPC)
+POST http://10.179.35.51:82/api/fetch/gpf/statement
+
+{
+  "financial_year": "2024-2025",
+  "rtype": "S",
+  "gpfSeries": "MEG/POL",
+  "gpfAccNo": "12279"
+}
+
+### Legacy e-payslip (superseded by get_epay_slip_data RPC)
+POST http://10.179.35.51:82/api/get/epayslip
+
+{
+  "ge_number": "1069587"
+}

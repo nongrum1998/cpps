@@ -1,0 +1,41 @@
+name: Production Build
+
+on:
+#   push:
+#     branches:
+#       - master
+      manual: {}
+
+jobs:
+  fingerprint:
+    name: Calculate Fingerprint
+    type: fingerprint
+    params:
+      platform: android
+      profile: production
+
+  update:
+    name: Send OTA Update
+    # Only run if a build with the current native fingerprint already exists
+    # This provides immediate JS-only updates to existing users
+    if: ${{ !needs_build(outputs.fingerprint.android_fingerprint_hash, 'android', 'production') }}
+    type: update
+    params:
+      branch: main # Standard production branch for EAS Update
+      message: "Production OTA Update (JS Only - Native Match Found)"
+
+  build:
+    name: Build Android Binary
+    # Always run a fresh build as requested, ensuring the version history is maintained
+    type: build
+    params:
+      platform: android
+      profile: production
+
+  submit:
+    name: Submit to Play Store
+    needs: [build]
+    type: submit
+    params:
+      platform: android
+      profile: production # Uses the production submit profile defined in eas.json

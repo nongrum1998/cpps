@@ -15,9 +15,9 @@
   "peerDependencies": {
     "expo-location": "~57.0.20",
     "jail-monkey": "^3.0.0",
-    "expo-router": "57.0.17",
+    "expo-router": "57.0.24",
     "@react-native-community/netinfo": "12.0.1",
-    "react": "~19.2.3"
+    "react": "19.2.3"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",

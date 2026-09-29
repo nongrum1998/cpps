@@ -1,0 +1,24 @@
+export type NPSAnnux5 = {
+  basic: string[];
+  c_type: string[];
+  closing_bal: string;
+  da: string[];
+  date_of_joining: string;
+  date_of_regularisation: string;
+  ddo_code: string;
+  deposit: string;
+  dept: string;
+  desig: string;
+  empamt: number[];
+  fin_mmyyy: string[];
+  fname: string;
+  govt_amt: number[];
+  office_name: string;
+  opening_bal: string;
+  ppan: string;
+  pran: string;
+  tot_ampamt: number;
+  tot_gvtamt: number;
+  tot_tier1amt: number;
+  total: number[];
+};

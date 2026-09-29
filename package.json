@@ -1,6 +1,7 @@
 {
   "name": "pension-workspace",
   "private": true,
+  "packageManager": "pnpm@10.26.0",
   "scripts": {
     "dev": "pnpm --filter pension dev",
     "dev:cpps": "pnpm --filter cpps dev",
@@ -9,9 +10,14 @@
     "lint": "pnpm -r lint",
     "format": "pnpm -r format",
     "test": "pnpm -r test",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "deps:check": "tsx scripts/check-deps.ts"
   },
   "devDependencies": {
+    "@types/node": "^26.6.2",
+    "@types/semver": "^7.8.0",
+    "semver": "^7.8.5",
+    "tsx": "^4.23.15",
     "typescript": "6.0.3"
   }
 }

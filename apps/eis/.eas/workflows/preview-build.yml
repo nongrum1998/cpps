@@ -1,0 +1,39 @@
+name: Preview Build
+
+on:
+  push:
+    branches:
+      - uat
+  manual: {}
+
+jobs:
+  fingerprint:
+    name: Calculate Fingerprint (Preview)
+    # Only run if commit message contains the flag OR triggered manually
+    if: ${{ contains(github.event.head_commit.message, 'eas:build') || github.event_name == 'manual' }}
+    type: fingerprint
+    params:
+      platform: android
+      profile: preview
+
+  update:
+    name: Send Preview Update
+    needs: [fingerprint]
+    # This also inherits the fingerprint's 'if' status implicitly, but we'll add the condition for clarity
+    if: ${{ contains(github.event.head_commit.message, 'eas:build') || github.event_name == 'manual' }}
+    # Only send OTA if native matches (same version present)
+    # Note: needs_build check remains as part of the Dual-Path strategy
+    condition: ${{ !needs_build(outputs.fingerprint.android_fingerprint_hash, 'android', 'preview') }}
+    type: update
+    params:
+      branch: preview
+      message: "Preview OTA Update (JS Only - Native Match Found)"
+
+  build:
+    name: Build Preview Binary
+    needs: [fingerprint]
+    if: ${{ contains(github.event.head_commit.message, 'eas:build') || github.event_name == 'manual' }}
+    type: build
+    params:
+      platform: android
+      profile: preview

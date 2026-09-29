@@ -1,0 +1,16 @@
+node_modules/
+.expo/
+android/
+ios/
+dist/
+build/
+.eas/
+*.min.js
+*.min.css
+pnpm-lock.yaml
+*.png
+*.jpg
+*.jpeg
+*.svg
+ios/
+android/
