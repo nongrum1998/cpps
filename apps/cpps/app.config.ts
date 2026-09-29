@@ -7,12 +7,15 @@ import 'tsx/cjs';
 import { createAppConfig } from '@pension/expo-config';
 import { ExpoConfig } from 'expo/config';
 
+// Expo Project ID
+const PROJECT_ID = '966c5b58-3295-42e5-a4df-bfe597541f66';
+
 const config = createAppConfig({
-  appName: 'cssp',
-  slug: 'cssp',
-  scheme: 'cssp',
+  appName: 'PLCVM',
+  slug: 'plcvm',
+  scheme: 'plcvm',
   baseBundleIdentifier: 'com.jyrwajr.csspmobile',
-  projectId: '9ac6a35c-06b5-445c-8227-37951817b496',
+  projectId: PROJECT_ID,
   owner: 'pixel-thread',
   icon: './src/shared/assets/images/logo.jpg',
   version: '1.0.0',
