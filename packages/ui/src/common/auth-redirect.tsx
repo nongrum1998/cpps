@@ -27,6 +27,7 @@ type Props = {
  */
 
 const isGuestOnlyRoute = (pathname: string, route: string[] = []): boolean => {
+  console.log(route);
   return route.some((route) => pathname === route || pathname.startsWith(route + '/'));
 };
 
@@ -40,9 +41,13 @@ const isPublicRoute = (pathname: string, route: string[] = []): boolean => {
 /**
  * Check if a route is protected (requires authentication).
  */
-const isProtectedRoute = (pathname: string): boolean => {
+const isProtectedRoute = (
+  pathname: string,
+  routeGuest: string[],
+  routePublic: string[]
+): boolean => {
   // Explicitly not guest-only and not public
-  return !isGuestOnlyRoute(pathname) && !isPublicRoute(pathname);
+  return !isGuestOnlyRoute(pathname, routeGuest) && !isPublicRoute(pathname, routePublic);
 };
 
 export const AuthRedirect = ({
@@ -61,7 +66,7 @@ export const AuthRedirect = ({
 
   const onGuestOnlyPage = isGuestOnlyRoute(pathName, guestOnly);
   const onPublicPage = isPublicRoute(pathName, publicOnly);
-  const onProtectedPage = isProtectedRoute(pathName);
+  const onProtectedPage = isProtectedRoute(pathName, guestOnly, publicOnly);
 
   useEffect(() => {
     if (isLoading) return;
